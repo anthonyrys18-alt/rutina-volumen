@@ -68,6 +68,9 @@ a{color:var(--accent)}
 
 .banner{margin:16px 0 0;padding:10px 12px;border-radius:10px;background:var(--warn-soft);color:var(--warn);font-size:14px}
 .banner.info{margin:0 0 18px;background:var(--accent-soft);color:var(--ink);display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.banner.nag{margin:0 0 18px;display:grid;gap:10px}
+.nag-actions{display:flex;flex-wrap:wrap;gap:8px}
+.pr-note{margin:0;padding:8px 10px;border-radius:10px;background:var(--ok-soft);color:var(--ok);font-size:13px;font-weight:600}
 
 .days{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
 .day{position:relative;appearance:none;display:grid;justify-items:center;gap:4px;padding:13px 2px 9px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;min-width:0;-webkit-tap-highlight-color:transparent}
@@ -230,6 +233,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
   <div class="banner info" id="update" role="status" hidden><span>Hay una versión nueva de la app.</span><button class="btn primary small" type="button" id="update-btn">Actualizar</button></div>
   <section id="tab-entreno" role="tabpanel" aria-labelledby="tab-btn-entreno">
     <div class="banner info" id="install" hidden></div>
+    <div class="banner nag" id="backup-nag" role="status" hidden></div>
     <div class="days" id="days" role="tablist" aria-label="Día de la rutina"></div>
     <p class="banner" id="banner" hidden></p>
     <div class="dayhead" id="dayhead"></div>
@@ -285,7 +289,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     <div class="guide">
       <div>
         <h3>Cómo anotar</h3>
-        <p>Escribe el peso y las repeticiones de cada serie y toca ✓. La serie queda marcada, arranca el descanso y se guarda en el móvil. Los números en gris dentro de cada casilla son los de la última vez que hiciste ese ejercicio.</p>
+        <p>Escribe el peso y las repeticiones de cada serie y toca ✓. La serie queda marcada, arranca el descanso y se guarda en el móvil. Los números en gris dentro de cada casilla son los de la última vez que hiciste ese ejercicio. Si una serie supera tu mejor marca de ese ejercicio, la app te lo avisa como récord.</p>
       </div>
       <div>
         <h3>RIR</h3>
@@ -322,7 +326,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       </div>
       <div>
         <h3>Tus datos</h3>
-        <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
+        <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </div>
     </div>
   </section>
@@ -444,7 +448,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
 
   // ---- almacenamiento en el móvil ----
   const KEY = 'rutina-volumen.v1';
-  const emptyStore = () => ({ v: 1, sessions: {}, bw: {}, waist: {}, lastBackup: null });
+  const emptyStore = () => ({ v: 1, sessions: {}, bw: {}, waist: {}, lastBackup: null, backupSnooze: null });
   let storageOk = true, changed = false;
   function readStore() {
     try {
@@ -454,7 +458,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       const raw = localStorage.getItem(KEY);
       if (!raw) return emptyStore();
       const d = JSON.parse(raw);
-      return { v: 1, sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null };
+      return { v: 1, sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
     } catch (e) {
       storageOk = false;
       return emptyStore();
@@ -593,8 +597,9 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       h('div', { class: 'set-row set-head', 'aria-hidden': 'true' },
         h('span', { text: '' }), h('span', { text: ex.load === 'lastre' ? 'Lastre kg' : 'kg' }), h('span', { text: 'Reps' }), h('span', { text: '' })));
     for (let k = 0; k < ex.sets; k++) grid.append(renderSetRow(ex, k, sets[k]));
-    li.append(grid, h('div', { class: 'ex-foot', 'data-role': 'foot' }));
+    li.append(grid, h('p', { class: 'pr-note', 'data-role': 'pr', role: 'status', hidden: true }), h('div', { class: 'ex-foot', 'data-role': 'foot' }));
     fillLast(li, ex, lastFor(ex.id));
+    updatePrNote(li, ex);
     return li;
   }
 
@@ -653,6 +658,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     arr[k] = Object.assign({}, arr[k], { [inp.dataset.field]: v });
     row.classList.remove('need');
     scheduleSave();
+    if (row.classList.contains('done')) updatePrNote(li, EX[li.dataset.ex]);
   });
   list.addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
@@ -680,6 +686,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
         row.classList.remove('done');
         btn.setAttribute('aria-pressed', 'false');
         scheduleSave();
+        updatePrNote(li, ex);
         return;
       }
       const repsIn = row.querySelector('input.reps');
@@ -689,6 +696,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       row.classList.add('done');
       btn.setAttribute('aria-pressed', 'true');
       scheduleSave();
+      updatePrNote(li, ex);
       startTimer(ex.rest);
     } else if (btn.dataset.act === 'copy') {
       const last = lastFor(ex.id);
@@ -726,6 +734,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     askPersist();
     state.sessions = sessionsSorted();
     renderDays();
+    renderBackupNag();
     if (state.tab === 'progreso') renderProgress();
   }
   window.addEventListener('pagehide', flush);
@@ -793,6 +802,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     renderWaist();
     renderStrength();
     renderBackup();
+    renderBackupNag();
     renderHistory();
   }
 
@@ -1194,7 +1204,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       el.classList.toggle('warn', hasData);
     }
   }
-  $('export-btn').addEventListener('click', async () => {
+  async function exportBackup() {
     flush();
     const payload = { app: 'rutina-volumen', version: 1, exportedAt: new Date().toISOString(), sessions: store.sessions, bw: store.bw, waist: store.waist };
     const json = JSON.stringify(payload, null, 2);
@@ -1207,7 +1217,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
         done = true;
       }
     } catch (err) {
-      if (err && err.name === 'AbortError') { backupMsg('Exportación cancelada.'); return; }
+      if (err && err.name === 'AbortError') return { ok: false, cancelled: true };
     }
     if (!done) {
       try {
@@ -1217,18 +1227,103 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
         a.click();
         a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 10000);
-        done = true;
       } catch (err) {
-        backupMsg('No se pudo exportar la copia.', true);
-        return;
+        return { ok: false };
       }
     }
     store.lastBackup = new Date().toISOString();
+    store.backupSnooze = null;
     changed = true;
     persistNow();
     renderBackup();
-    backupMsg('Copia exportada (' + name + '). Guárdala en Archivos o en tu nube.');
+    renderBackupNag();
+    return { ok: true, name };
+  }
+  $('export-btn').addEventListener('click', async () => {
+    const r = await exportBackup();
+    if (r.ok) backupMsg('Copia exportada (' + r.name + '). Guárdala en Archivos o en tu nube.');
+    else backupMsg(r.cancelled ? 'Exportación cancelada.' : 'No se pudo exportar la copia.', !r.cancelled);
   });
+
+  // Aviso en Entreno cuando pasan 7 días sin copia (o 7 días desde el primer dato).
+  function earliestRecord() {
+    const dates = Object.values(store.sessions).map(s => s && s.date)
+      .concat(Object.keys(store.bw), Object.keys(store.waist))
+      .filter(isYmd)
+      .sort();
+    return dates[0] || null;
+  }
+  function renderBackupNag() {
+    const box = $('backup-nag');
+    const first = earliestRecord();
+    const t = today();
+    if (!storageOk || !first || (store.backupSnooze && store.backupSnooze > t)) { box.hidden = true; return; }
+    const since = store.lastBackup ? ymd(new Date(store.lastBackup)) : first;
+    const days = diffDays(since, t);
+    if (days < 7) { box.hidden = true; return; }
+    box.textContent = '';
+    box.append(
+      h('span', { text: (store.lastBackup ? 'Llevas ' + days + ' días sin exportar una copia de seguridad.' : 'Todavía no has exportado ninguna copia de seguridad.') + ' Tus datos solo están en este móvil, así que si lo pierdes o borras la app, se pierden.' }),
+      h('span', { class: 'nag-actions' },
+        h('button', { class: 'btn primary small', type: 'button', 'data-act': 'export' }, 'Exportar ahora'),
+        h('button', { class: 'btn small', type: 'button', 'data-act': 'snooze' }, 'Recordar mañana')));
+    box.hidden = false;
+  }
+  $('backup-nag').addEventListener('click', async e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.dataset.act === 'snooze') {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      store.backupSnooze = ymd(d);
+      changed = true;
+      persistNow();
+      renderBackupNag();
+    } else if (b.dataset.act === 'export') {
+      const r = await exportBackup();
+      if (!r.ok && !r.cancelled) showBanner('No se pudo exportar la copia. Inténtalo desde Progreso → Copia de seguridad.');
+    }
+  });
+
+  // Récords: la mejor serie de hoy frente a la mejor de todas las sesiones anteriores.
+  function setScore(metric, date, x) {
+    if (!x || !(x.reps > 0)) return 0;
+    if (metric === 'reps') return x.reps;
+    const load = (metric === 'bw' ? (bwOn(date) || 0) : 0) + (x.kg || 0);
+    return load > 0 ? e1rm(load, x.reps) : 0;
+  }
+  function previousBest(ex, metric) {
+    const cur = sessionId();
+    let best = null;
+    for (const s of state.sessions) {
+      if (s.id === cur) continue;
+      const arr = s.sets && s.sets[ex.id];
+      if (!Array.isArray(arr)) continue;
+      for (const x of arr) {
+        const v = setScore(metric, s.date, x);
+        if (v > 0 && (best == null || v > best)) best = v;
+      }
+    }
+    return best;
+  }
+  function updatePrNote(li, ex) {
+    const note = li.querySelector('[data-role="pr"]');
+    if (!note) return;
+    const metric = metricFor(ex);
+    const prev = previousBest(ex, metric);
+    let top = null, topV = 0;
+    for (const x of setsFor()[ex.id] || []) {
+      if (!x || !x.done) continue;
+      const v = setScore(metric, today(), x);
+      if (v > topV) { topV = v; top = x; }
+    }
+    const margin = metric === 'reps' ? 0.5 : 0.05;
+    if (prev == null || !top || topV < prev + margin) { note.hidden = true; note.textContent = ''; return; }
+    note.textContent = metric === 'reps'
+      ? 'Nuevo récord. ' + top.reps + ' repeticiones en una serie, ' + Math.round(topV - prev) + ' más que tu mejor marca.'
+      : 'Nuevo récord con ' + fmtSet(ex, top) + '. Tu 1RM estimado sube a ' + nf1.format(topV) + ' kg, ' + nf1.format(topV - prev) + ' kg por encima de tu mejor marca.';
+    note.hidden = false;
+  }
   const validKg = v => (typeof v === 'number' && Number.isFinite(v) && v >= 0 && v < 1000 ? v : null);
   const validReps = v => (typeof v === 'number' && Number.isFinite(v) && v >= 0 && v < 1000 ? Math.round(v) : null);
   function cleanSession(s) {
@@ -1443,6 +1538,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
   renderDays();
   renderDay();
   renderProgress();
+  renderBackupNag();
   setTab('entreno');
   if (!storageOk) {
     showBanner('Este navegador no deja guardar datos (quizá estás en una ventana privada). La rutina, los videos y el temporizador funcionan, pero lo que anotes no se guardará.');
