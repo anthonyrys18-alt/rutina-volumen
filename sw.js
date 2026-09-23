@@ -1,7 +1,7 @@
 // Rutina de Volumen: guarda la app en el móvil para que abra sin conexión.
 // Estrategia: responde con lo guardado y actualiza en segundo plano, así que
 // los cambios publicados llegan en la siguiente apertura.
-const CACHE = 'rutina-volumen-v1';
+const CACHE = 'rutina-volumen-v2';
 const INDEX = new URL('./index.html', self.location).href;
 const ASSETS = [
   './',

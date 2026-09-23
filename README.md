@@ -1,6 +1,6 @@
 # Rutina de Volumen
 
-App web instalable para seguir una rutina de volumen de 6 días. Cada ejercicio muestra series, repeticiones, RIR, descanso y su video de técnica. Registra pesos y repeticiones, avisa cuándo toca subir carga, lleva un temporizador de descanso y controla el ritmo de subida de peso corporal. Funciona sin conexión y guarda los datos solo en el móvil.
+App web instalable para seguir una rutina de volumen de 6 días. Cada ejercicio muestra series, repeticiones, RIR, descanso y su video de técnica. Registra pesos y repeticiones, avisa cuándo toca subir carga, lleva un temporizador de descanso, dibuja la fuerza estimada de cada ejercicio a lo largo de las semanas y controla el peso corporal y la cintura. Funciona sin conexión y guarda los datos solo en el móvil.
 
 **Abrir:** https://anthonyrys18-alt.github.io/rutina-volumen/
 
