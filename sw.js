@@ -1,7 +1,9 @@
 // Rutina de Volumen: guarda la app en el móvil para que abra sin conexión.
 // Estrategia: responde con lo guardado y actualiza en segundo plano, así que
 // los cambios publicados llegan en la siguiente apertura.
-const CACHE = 'rutina-volumen-v2';
+// GitHub Pages deja que el navegador reutilice cada archivo durante 10 minutos;
+// por eso las descargas de aquí piden siempre la copia del servidor.
+const CACHE = 'rutina-volumen-v3';
 const INDEX = new URL('./index.html', self.location).href;
 const ASSETS = [
   './',
@@ -19,7 +21,7 @@ const ASSETS = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE)
-      .then(cache => cache.addAll(ASSETS))
+      .then(cache => cache.addAll(ASSETS.map(url => new Request(url, { cache: 'reload' }))))
       .then(() => self.skipWaiting())
   );
 });
@@ -42,7 +44,7 @@ async function withoutRedirect(res) {
 
 async function fetchAndStore(request, key, isPage) {
   try {
-    const res = await fetch(request);
+    const res = await fetch(isPage ? new Request(INDEX, { cache: 'no-cache' }) : new Request(request, { cache: 'no-cache' }));
     if (!res || !res.ok || res.type !== 'basic') return res;
     const clean = isPage ? await withoutRedirect(res) : res;
     const cache = await caches.open(CACHE);

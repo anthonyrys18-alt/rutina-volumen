@@ -227,6 +227,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
 </header>
 
 <main class="wrap">
+  <div class="banner info" id="update" role="status" hidden><span>Hay una versión nueva de la app.</span><button class="btn primary small" type="button" id="update-btn">Actualizar</button></div>
   <section id="tab-entreno" role="tabpanel" aria-labelledby="tab-btn-entreno">
     <div class="banner info" id="install" hidden></div>
     <div class="days" id="days" role="tablist" aria-label="Día de la rutina"></div>
@@ -321,7 +322,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       </div>
       <div>
         <h3>Tus datos</h3>
-        <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso.</p>
+        <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </div>
     </div>
   </section>
@@ -1449,8 +1450,21 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
   } else {
     idleSync();
   }
+  // Actualizaciones: al abrir la app y al volver a ella se busca una versión
+  // nueva; cuando se instala, un aviso ofrece recargar sin perder nada.
+  $('update-btn').addEventListener('click', () => { flush(); persistNow(); location.reload(); });
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}); });
+    const hadController = !!navigator.serviceWorker.controller;
+    let swReg = null;
+    navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) $('update').hidden = false; });
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => { swReg = reg; return reg.update(); })
+        .catch(() => {});
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && swReg) swReg.update().catch(() => {});
+    });
   }
 })();
 </script>
