@@ -196,6 +196,10 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
 .stores{display:flex;flex-wrap:wrap;gap:6px;grid-column:1 / -1;padding-top:6px}
 .store{font-size:12px;font-weight:700;text-decoration:none;color:var(--accent);border:1px solid var(--line);border-radius:999px;padding:4px 9px;white-space:nowrap}
 .store:hover{border-color:var(--accent)}
+.adjust{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 2px}
+.adjust b{font-size:14px;font-variant-numeric:tabular-nums}
+.adj-btn{appearance:none;width:44px;height:44px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:700 22px/1 var(--body);cursor:pointer}
+.adj-btn:disabled{opacity:.4;cursor:default}
 .swap-body{padding:0 14px 6px}
 .swap-body .food-row:first-child{border-top:0}
 .shop-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin:0 0 4px}
@@ -372,14 +376,15 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       </div>
       <div>
         <h3>Comida</h3>
-        <p>La pestaña Comida calcula tus calorías y tu proteína a partir del último peso que apuntaste, y reparte la comida del día en cantidades concretas. Es un punto de partida, no una verdad exacta: quien decide si comes bien es la báscula. Si en dos semanas tu media de peso no se mueve, suma 150-200 kcal al día. La app no cuenta lo que comes; para eso tendrías que llevar tú la cuenta aparte.</p>
+        <p>La pestaña Comida calcula tus calorías y tu proteína con la media de peso de los últimos 7 días, y reparte el día en cantidades concretas. Es un punto de partida, y quien decide si comes bien es la báscula.</p>
+        <p>Por eso lleva un ajuste. Cuando tengas 3 pesajes en cada una de las dos últimas semanas, la app mira tu ritmo real y te propone subir o bajar 150 kcal con un botón; también puedes moverlo tú a mano. Al cambiarlo suben o bajan la avena, el arroz, la papa, las tortillas y las grasas, mientras la proteína se mantiene, que es como se ajusta una dieta de verdad. La app no cuenta lo que comes; para eso tendrías que llevar tú la cuenta aparte.</p>
         <p>No soy dietista. Si tienes alguna condición médica, alergias o tomas medicación, consúltalo antes con un profesional.</p>
       </div>
       <div>
         <h3>Tus datos</h3>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </div>
-      <p class="app-version">Versión 6 · 24 de septiembre de 2026</p>
+      <p class="app-version">Versión 7 · 24 de septiembre de 2026</p>
     </div>
   </section>
 </main>
@@ -500,7 +505,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
 
   // ---- almacenamiento en el móvil ----
   const KEY = 'rutina-volumen.v1';
-  const emptyStore = () => ({ v: 1, sessions: {}, bw: {}, waist: {}, shop: {}, lastBackup: null, backupSnooze: null });
+  const emptyStore = () => ({ v: 1, sessions: {}, bw: {}, waist: {}, shop: {}, kcalAdj: 0, adjDate: null, lastBackup: null, backupSnooze: null });
   let storageOk = true, changed = false;
   function readStore() {
     try {
@@ -510,7 +515,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       const raw = localStorage.getItem(KEY);
       if (!raw) return emptyStore();
       const d = JSON.parse(raw);
-      return { v: 1, sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
+      return { v: 1, sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
     } catch (e) {
       storageOk = false;
       return emptyStore();
@@ -807,7 +812,9 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
 
   // ---- progreso ----
   function stat(label, value) { return h('div', { class: 'stat' }, h('span', { text: label }), h('strong', { text: value })); }
-  function renderProgress() {
+  // Media de los últimos 7 días frente a la semana anterior. La usan Progreso
+  // (para el ritmo) y Comida (para las cantidades y el ajuste de calorías).
+  function weightTrend() {
     const t = today();
     const entries = Object.entries(store.bw)
       .filter(([d, v]) => isYmd(d) && typeof v === 'number')
@@ -817,7 +824,10 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       return vals.length ? { avg: vals.reduce((x, y) => x + y, 0) / vals.length, n: vals.length } : { avg: null, n: 0 };
     };
     const cur = win(0, 6), prev = win(7, 13);
-    const rate = cur.n >= 3 && prev.n >= 3 ? (cur.avg - prev.avg) / prev.avg * 100 : null;
+    return { entries, cur, prev, rate: cur.n >= 3 && prev.n >= 3 ? (cur.avg - prev.avg) / prev.avg * 100 : null };
+  }
+  function renderProgress() {
+    const { entries, cur, prev, rate } = weightTrend();
 
     const stats = $('bw-stats');
     stats.textContent = '';
@@ -1428,21 +1438,24 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
   // ---- comida ----
   // El plan está escrito para 80 kg y se escala con el peso apuntado en Progreso.
   // Macros aproximados por unidad; valores redondeados de tablas de composición.
-  const REF_KG = 80, KCAL_KG = 37, PROT_LO = 1.6, PROT_HI = 2.2, PROT_PLAN = 2.1;
+  // x: true = alimento flexible. Los anclajes de proteína sólo escalan con el
+  // peso; los flexibles absorben además el ajuste de calorías, que es como se
+  // sube o se baja una dieta sin tocar la proteína.
+  const REF_KG = 80, KCAL_KG = 37, PROT_LO = 1.6, PROT_HI = 2.2, ADJ_STEP = 150, ADJ_MIN = -600, ADJ_MAX = 900;
   const F = {
     huevos:    { n: 'Huevos enteros',            q: 'eggs',                             u: 'ud', step: 1,  p: 6,    k: 70,  cat: 'Refrigerados', pack: 'Se venden por docena' },
-    avena:     { n: 'Avena en hojuelas',         q: 'old fashioned oats',               u: 'g',  step: 10, p: 0.13, k: 3.8, cat: 'Despensa',     pack: 'Un envase grande dura varias semanas' },
+    avena:     { n: 'Avena en hojuelas',         q: 'old fashioned oats',               u: 'g',  step: 10, p: 0.13, k: 3.8, cat: 'Despensa',     pack: 'Un envase grande dura varias semanas', x: true },
     leche:     { n: 'Leche entera',              q: 'whole milk',                       u: 'ml', step: 50, p: 0.032, k: 0.6, cat: 'Refrigerados' },
-    platano:   { n: 'Plátano',                   q: 'bananas',                          u: 'ud', step: 1,  p: 1.3,  k: 105, cat: 'Fruta y verdura' },
+    platano:   { n: 'Plátano',                   q: 'bananas',                          u: 'ud', step: 1,  p: 1.3,  k: 105, cat: 'Fruta y verdura', x: true },
     yogur:     { n: 'Yogur griego natural',      q: 'plain greek yogurt',               u: 'g',  step: 10, p: 0.1,  k: 0.6, cat: 'Refrigerados' },
-    crema:     { n: 'Mantequilla de cacahuate',  q: 'peanut butter',                    u: 'g',  step: 5,  p: 0.23, k: 6,   cat: 'Despensa',     pack: 'Un frasco dura 2-3 semanas' },
+    crema:     { n: 'Mantequilla de cacahuate',  q: 'peanut butter',                    u: 'g',  step: 5,  p: 0.23, k: 6,   cat: 'Despensa',     pack: 'Un frasco dura 2-3 semanas', x: true },
     pollo:     { n: 'Pechuga de pollo',          q: 'boneless skinless chicken breast', u: 'g',  step: 25, p: 0.23, k: 1.2, cat: 'Carne y pescado' },
-    arroz:     { n: 'Arroz blanco (en crudo)',   q: 'white rice',                       u: 'g',  step: 10, p: 0.07, k: 3.6, cat: 'Despensa',     pack: 'Una bolsa de 5 lb dura semanas' },
+    arroz:     { n: 'Arroz blanco (en crudo)',   q: 'white rice',                       u: 'g',  step: 10, p: 0.07, k: 3.6, cat: 'Despensa',     pack: 'Una bolsa de 5 lb dura semanas', x: true },
     brocoli:   { n: 'Brócoli congelado',         q: 'frozen broccoli',                  u: 'g',  step: 50, p: 0.026, k: 0.35, cat: 'Congelados' },
-    aceite:    { n: 'Aceite de oliva',           q: 'olive oil',                        u: 'cda', step: 1, p: 0,    k: 120, cat: 'Despensa',     pack: 'Una botella dura más de un mes' },
-    tortillas: { n: 'Tortillas de harina',       q: 'flour tortillas',                  u: 'ud', step: 1,  p: 3,    k: 140, cat: 'Despensa' },
+    aceite:    { n: 'Aceite de oliva',           q: 'olive oil',                        u: 'cda', step: 1, p: 0,    k: 120, cat: 'Despensa',     pack: 'Una botella dura más de un mes', x: true },
+    tortillas: { n: 'Tortillas de harina',       q: 'flour tortillas',                  u: 'ud', step: 1,  p: 3,    k: 140, cat: 'Despensa', x: true },
     carne:     { n: 'Carne molida magra 93/7',   q: 'lean ground beef 93 7',            u: 'g',  step: 25, p: 0.21, k: 1.5, cat: 'Carne y pescado' },
-    papa:      { n: 'Papa',                      q: 'russet potatoes',                  u: 'g',  step: 50, p: 0.02, k: 0.77, cat: 'Fruta y verdura' },
+    papa:      { n: 'Papa',                      q: 'russet potatoes',                  u: 'g',  step: 50, p: 0.02, k: 0.77, cat: 'Fruta y verdura', x: true },
     ensalada:  { n: 'Ensalada verde',            q: 'salad mix',                        u: 'g',  step: 50, p: 0.01, k: 0.2, cat: 'Fruta y verdura' },
     requeson:  { n: 'Requesón (cottage cheese)', q: 'cottage cheese',                   u: 'g',  step: 25, p: 0.11, k: 0.9, cat: 'Refrigerados' }
   };
@@ -1474,27 +1487,63 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     }
     return box;
   }
-  const planKg = () => {
-    const v = bwOn(today());
+  // Peso de referencia: la media de 7 días si la hay, porque el peso de un solo
+  // día se mueve casi un kilo y las cantidades no deben bailar con eso.
+  function planKg() {
+    const { cur } = weightTrend();
+    const v = cur.avg != null ? cur.avg : bwOn(today());
     return v != null ? Math.min(160, Math.max(45, v)) : null;
-  };
+  }
   const amountFor = (f, base, kg) => {
     const raw = base * (kg / REF_KG);
     return Math.max(f.step, Math.round(raw / f.step) * f.step);
   };
   const unitText = (f, a) => (f.u === 'ud' ? a + (a === 1 ? ' unidad' : ' unidades') : f.u === 'cda' ? a + (a === 1 ? ' cucharada' : ' cucharadas') : a + ' ' + f.u);
+  const kcalTarget = kg => Math.round(kg * KCAL_KG) + (store.kcalAdj || 0);
   function planFor(kg) {
+    const target = kcalTarget(kg), wf = kg / REF_KG;
+    let fixK = 0, flexK = 0;
+    for (const m of MEALS) for (const [id, base] of m.items) {
+      const f = F[id];
+      if (f.x) flexK += f.k * base * wf; else fixK += f.k * base * wf;
+    }
+    const s = flexK > 0 ? Math.min(1.8, Math.max(0.55, (target - fixK) / flexK)) : 1;
     let p = 0, k = 0;
-    const meals = MEALS.map(m => {
-      const items = m.items.map(([id, base]) => {
-        const f = F[id], a = amountFor(f, base, kg);
+    const flex = [];
+    const meals = MEALS.map(m => ({
+      n: m.n, w: m.w,
+      items: m.items.map(([id, base]) => {
+        const f = F[id], a = amountFor(f, f.x ? base * s : base, kg);
         p += f.p * a;
         k += f.k * a;
-        return { id, f, a };
-      });
-      return { n: m.n, w: m.w, items };
-    });
-    return { meals, p, k };
+        const it = { id, f, a };
+        if (f.x) {
+          const step = f.step, ref = base * wf;
+          flex.push({ it, lo: Math.max(step, Math.round(ref * 0.4 / step) * step), hi: Math.max(step, Math.round(ref * 2.2 / step) * step) });
+        }
+        return it;
+      })
+    }));
+    // Los redondeos se comen buena parte del ajuste, así que después se reparte
+    // lo que falta subiendo o bajando un paso del alimento que más se acerque.
+    for (let n = 0; n < 60; n++) {
+      const diff = target - k;
+      if (Math.abs(diff) <= 30) break;
+      const dir = diff > 0 ? 1 : -1;
+      let best = null, bestErr = Math.abs(diff);
+      for (const fx of flex) {
+        const na = fx.it.a + dir * fx.it.f.step;
+        if (na < fx.lo || na > fx.hi) continue;
+        const err = Math.abs(diff - dir * fx.it.f.step * fx.it.f.k);
+        if (err < bestErr - 0.001) { bestErr = err; best = { fx, na }; }
+      }
+      if (!best) break;
+      const d = best.na - best.fx.it.a;
+      k += d * best.fx.it.f.k;
+      p += d * best.fx.it.f.p;
+      best.fx.it.a = best.na;
+    }
+    return { meals, p, k, target };
   }
   function renderFood() {
     const kg = planKg();
@@ -1510,12 +1559,47 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       return;
     }
     const plan = planFor(kg);
-    const stats = h('div', { class: 'stats' },
-      stat('Calorías al día', Math.round(kg * KCAL_KG / 10) * 10 + ' kcal'),
+    const adj = store.kcalAdj || 0;
+    targets.append(h('div', { class: 'stats' },
+      stat('Calorías al día', Math.round(plan.target / 10) * 10 + ' kcal'),
       stat('Proteína', Math.round(kg * PROT_LO) + '-' + Math.round(kg * PROT_HI) + ' g'),
-      stat('Grasa mínima', Math.round(kg * 0.8) + ' g'));
-    targets.append(stats);
-    basis.textContent = 'Calculado con tu último peso apuntado, ' + fmtKg(kg) + ' kg. Son estimaciones de partida: la que manda es la báscula. Si tu media semanal no sube en 2 semanas, añade 150-200 kcal al día.';
+      stat('Grasa mínima', Math.round(kg * 0.8) + ' g')));
+    const minus = h('button', { class: 'adj-btn', type: 'button', 'data-adj': -ADJ_STEP, 'aria-label': 'Quitar ' + ADJ_STEP + ' calorías' }, '−');
+    const plus = h('button', { class: 'adj-btn', type: 'button', 'data-adj': ADJ_STEP, 'aria-label': 'Añadir ' + ADJ_STEP + ' calorías' }, '+');
+    minus.disabled = adj <= ADJ_MIN;
+    plus.disabled = adj >= ADJ_MAX;
+    targets.append(h('div', { class: 'adjust' },
+      h('span', { class: 'tile-label', text: 'Ajuste manual' }),
+      minus, plus,
+      h('b', { text: adj === 0 ? 'sin ajuste' : (adj > 0 ? '+' : '−') + Math.abs(adj) + ' kcal' }),
+      adj !== 0 ? h('button', { class: 'linkbtn', type: 'button', 'data-adj': 'reset' }, 'Quitar ajuste') : null));
+
+    const { rate, cur } = weightTrend();
+    // Un cambio de comida tarda unas 2 semanas en verse en la báscula, así que
+    // hasta entonces no se vuelve a proponer otro; a mano sigue pudiendo.
+    const sinceAdj = store.adjDate ? diffDays(store.adjDate, today()) : null;
+    const waiting = sinceAdj != null && sinceAdj < 14;
+    const sug = h('p', { class: 'tile-note' });
+    if (rate == null) {
+      sug.append(h('span', { text: 'Con 3 pesajes en cada una de las dos últimas semanas te propongo el ajuste yo, con tu ritmo real.' }));
+    } else if (waiting) {
+      sug.append(h('span', { class: 'chip hold', text: 'Dale tiempo' }),
+        h('span', { text: 'Cambiaste la comida ' + (sinceAdj === 0 ? 'hoy mismo' : 'hace ' + sinceAdj + (sinceAdj === 1 ? ' día' : ' días')) + '. Un cambio tarda unas 2 semanas en notarse en la báscula, así que vuelve a mirar el ' + fmtDate(ymd(new Date(toDate(store.adjDate).getTime() + 14 * 86400000))) + '. Ahora mismo subes al ' + nf2.format(rate) + ' % por semana.' }));
+    } else if (rate < 0.25 && adj < ADJ_MAX) {
+      sug.append(h('span', { class: 'chip low', text: 'Te has estancado' }),
+        h('span', { text: 'Tu peso subió ' + nf2.format(rate) + ' % esta semana, por debajo del 0,25 % que buscamos.' }),
+        h('button', { class: 'btn primary small', type: 'button', 'data-adj': ADJ_STEP }, 'Subir ' + ADJ_STEP + ' kcal'));
+    } else if (rate > 0.5 && adj > ADJ_MIN) {
+      sug.append(h('span', { class: 'chip bad', text: 'Subes muy rápido' }),
+        h('span', { text: 'Tu peso subió ' + nf2.format(rate) + ' % esta semana, por encima del 0,5 %. Si se repite 2-3 semanas, baja la comida.' }),
+        h('button', { class: 'btn small', type: 'button', 'data-adj': -ADJ_STEP }, 'Bajar ' + ADJ_STEP + ' kcal'));
+    } else {
+      sug.append(h('span', { class: 'chip up', text: '✓ Buen ritmo' }), h('span', { text: 'Subes al ' + nf2.format(rate) + ' % por semana. No toques nada.' }));
+    }
+    targets.append(h('div', { class: 'tile' }, sug));
+    basis.textContent = 'Calculado con tu media de los últimos 7 días, ' + fmtKg(kg) + ' kg'
+      + (cur.n ? ' (' + cur.n + (cur.n === 1 ? ' pesaje' : ' pesajes') + ')' : '')
+      + '. Cuando cambies el ajuste, suben o bajan la avena, el arroz, la papa, las tortillas y las grasas; la proteína se queda donde está.';
 
     const box = $('food-plan');
     box.textContent = '';
@@ -1604,6 +1688,19 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     cb.closest('.shop-item').classList.toggle('on', cb.checked);
     const n = Object.keys(store.shop).length, tot = $('food-shop').querySelectorAll('input[type="checkbox"]').length;
     $('shop-count').textContent = Math.min(n, tot) + ' de ' + tot + ' marcados';
+  });
+  $('food-targets').addEventListener('click', e => {
+    const b = e.target.closest('button[data-adj]');
+    if (!b) return;
+    const v = b.dataset.adj;
+    const next = v === 'reset' ? 0 : Math.max(ADJ_MIN, Math.min(ADJ_MAX, (store.kcalAdj || 0) + Number(v)));
+    if (next === (store.kcalAdj || 0)) return;
+    store.kcalAdj = next;
+    store.adjDate = next === 0 ? null : today();
+    changed = true;
+    persistNow();
+    renderFood();
+    $('food-targets').scrollIntoView({ block: 'start' });
   });
   $('shop-reset').addEventListener('click', () => {
     store.shop = {};

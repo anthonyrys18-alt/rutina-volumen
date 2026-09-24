@@ -3,7 +3,7 @@
 // los cambios publicados llegan en la siguiente apertura.
 // GitHub Pages deja que el navegador reutilice cada archivo durante 10 minutos;
 // por eso las descargas de aquí piden siempre la copia del servidor.
-const CACHE = 'rutina-volumen-v6';
+const CACHE = 'rutina-volumen-v7';
 const INDEX = new URL('./index.html', self.location).href;
 const ASSETS = [
   './',
