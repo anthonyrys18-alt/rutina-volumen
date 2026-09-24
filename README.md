@@ -1,6 +1,6 @@
 # Rutina de Volumen
 
-App web instalable para seguir una rutina de volumen de 6 días. Cada ejercicio muestra series, repeticiones, RIR, descanso y su video de técnica. Registra pesos y repeticiones, avisa cuándo toca subir carga, lleva un temporizador de descanso, dibuja la fuerza estimada de cada ejercicio a lo largo de las semanas y controla el peso corporal y la cintura. Funciona sin conexión y guarda los datos solo en el móvil.
+App web instalable para seguir una rutina de volumen de 6 días. Cada ejercicio muestra series, repeticiones, RIR, descanso y su video de técnica. Registra pesos y repeticiones, avisa cuándo toca subir carga, lleva un temporizador de descanso, dibuja la fuerza estimada de cada ejercicio a lo largo de las semanas y controla el peso corporal y la cintura. Incluye una sección de comida que calcula calorías y proteína a partir del peso apuntado, reparte el día en cantidades concretas y genera la lista de la compra semanal con búsquedas en Walmart, Sam's Club y Aldi. Funciona sin conexión y guarda los datos solo en el móvil.
 
 **Abrir:** https://anthonyrys18-alt.github.io/rutina-volumen/
 
@@ -19,7 +19,7 @@ App web instalable para seguir una rutina de volumen de 6 días. Cada ejercicio 
 
 - `index.html`: la app completa (HTML, CSS y JavaScript, sin dependencias).
 - `sw.js`: service worker que guarda la app para abrirla sin conexión.
-- `manifest.webmanifest` e `icons/`: instalación en la pantalla de inicio.
+- `manifest.webmanifest` e `icons/`: instalación en la pantalla de inicio, con el icono MG.
 - `fonts/`: Figtree y Big Shoulders Display, con licencia SIL Open Font License 1.1 (textos en `fonts/OFL-*.txt`).
 
 Los videos enlazados pertenecen a sus autores en YouTube.
