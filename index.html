@@ -219,6 +219,15 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
 .meal-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 12px;padding-bottom:8px}
 .meal-head h3{margin:0;font:800 20px/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
 .meal-head span{font-size:12px;color:var(--muted)}
+.fdays{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin:0 0 12px}
+.fday{appearance:none;display:grid;justify-items:center;gap:2px;padding:8px 2px 7px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);cursor:pointer;min-width:0;-webkit-tap-highlight-color:transparent}
+.fday small{font-size:10px;line-height:1;color:var(--muted);text-transform:capitalize}
+.fday b{font:800 17px/1 var(--display);font-variant-numeric:tabular-nums}
+.fdot{width:6px;height:6px;border-radius:50%;background:var(--line);margin-top:1px}
+.fdot.some{background:var(--warn)}
+.fdot.full{background:var(--ok)}
+.fday.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.fday.on small{color:var(--accent)}
 .meter{height:8px;border-radius:99px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden;margin:2px 0 2px}
 .meter span{display:block;height:100%;border-radius:99px;background:var(--accent);min-width:0}
 .ate{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:10px 0 12px;margin-top:2px;border-top:1px solid var(--line)}
@@ -325,6 +334,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, var(--surface-2) 0%, var(--b
 .effort-btn{transition:background-color .18s ease, border-color .18s ease, color .18s ease, transform .14s ease}
 .effort-btn:active{transform:translateY(1px)}
 .effort-btn.on{background-image:linear-gradient(100deg, var(--gold-1), var(--gold-2));border-color:transparent;box-shadow:0 5px 14px -9px var(--accent)}
+.fday{transition:transform .16s ease, box-shadow .2s ease, border-color .2s ease}
+.fday:active{transform:scale(.95)}
+.fday.on{box-shadow:inset 0 0 0 1px var(--accent), 0 6px 18px -12px var(--accent)}
 .ate-btn{transition:background-color .18s ease, border-color .18s ease, color .18s ease, transform .14s ease}
 .ate-btn:active{transform:translateY(1px)}
 .meter span{background-image:linear-gradient(90deg, var(--gold-2), var(--gold-1));transition:width .35s cubic-bezier(.2,.8,.2,1)}
@@ -453,6 +465,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
 
     <h2 class="sec next">Plan del día</h2>
     <p class="backup-text">Cantidades en crudo y ya ajustadas a tu peso. Come lo mismo cada día: es más barato, se compra mejor y no tienes que pensar. Si te aburre, cambia un alimento por otro de la lista de abajo.</p>
+    <div class="fdays" id="food-days" role="tablist" aria-label="Día que estás marcando"></div>
     <div id="food-today"></div>
     <div id="food-plan"></div>
     <div id="food-total"></div>
@@ -550,6 +563,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <summary>Marcar las comidas</summary>
         <p>Debajo de cada comida hay tres botones: según el plan, comí otra cosa, y no la hice. Tres estados y no un contador de calorías, porque el plan ya sabe cuántas lleva cada comida; lo único que falta saber es si te la comiste.</p>
         <p>Una comida cambiada no suma calorías en el total del día, porque no sé qué comiste, y meter ahí el número del plan sería inventármelo. Y una comida sin marcar no cuenta como fallada: cuenta como que no sé qué pasó.</p>
+        <p>Arriba hay una tira con los últimos 7 días. Sirve para la cena que se te olvidó marcar anoche: tocas el día y marcas sus comidas. El punto bajo cada día se pone ámbar en cuanto marcas algo, y verde solo cuando las seis comidas fueron según el plan.</p>
         <p>Esto arregla algo que estaba mal. Antes, si la báscula no se movía, la app te proponía subir 150 kcal sin saber si te estabas comiendo el plan. Ahora, si en dos semanas te saltaste una de cada cinco comidas marcadas, en vez del botón te dice que el objetivo no es el problema.</p>
       </details>
       <details class="g" open>
@@ -573,7 +587,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <summary>Tus datos</summary>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </details>
-      <p class="app-version">Versión 15 · 25 de septiembre de 2026</p>
+      <p class="app-version">Versión 16 · 25 de septiembre de 2026</p>
     </div>
   </section>
 </main>
@@ -761,7 +775,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     } catch (e) { /* opcional */ }
   }
 
-  const state = { tab: 'entreno', day: null, dayPicked: false, sessions: [], local: {}, effort: {}, progEx: null };
+  const state = { tab: 'entreno', day: null, dayPicked: false, sessions: [], local: {}, effort: {}, progEx: null, foodDay: null };
   // Esfuerzo real con el que terminaste cada ejercicio. Sin esto, «estancado»
   // no distingue entre chocar con un muro y no haber apretado.
   const EFFORTS = [
@@ -2099,10 +2113,11 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       + (ph.reentry ? 'Estás en reentrada, así que va a mantenimiento; desde la semana ' + (REENTRY_WEEKS + 1) + ' sube solo al objetivo de volumen. ' : '')
       + 'Cuando cambies el ajuste, suben o bajan la avena, el arroz, la papa, las tortillas y las grasas; la proteína se queda donde está.';
 
+    renderFoodDays();
     renderToday(plan);
     const box = $('food-plan');
     box.textContent = '';
-    const ate = ateOn(today());
+    const ate = ateOn(foodDay());
     for (const m of plan.meals) {
       const card = h('div', { class: 'meal', 'data-meal': m.id }, h('div', { class: 'meal-head' }, h('h3', { text: m.n }), h('span', { text: m.w })));
       for (const it of m.items) {
@@ -2149,39 +2164,78 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     renderSwaps();
     renderShop(plan);
   }
+  // Siete días hacia atrás terminando hoy. Sirve para la cena que se te olvidó
+  // marcar anoche, que es cuando un registro de comida se muere de verdad.
+  const FDAYS = 7;
+  const foodDay = () => (state.foodDay && diffDays(state.foodDay, today()) >= 0 && diffDays(state.foodDay, today()) < FDAYS ? state.foodDay : today());
+  const wdfmt = new Intl.DateTimeFormat('es-ES', { weekday: 'short' });
+  function renderFoodDays() {
+    const box = $('food-days');
+    if (!box) return;
+    const sel = foodDay();
+    box.textContent = '';
+    for (let i = FDAYS - 1; i >= 0; i--) {
+      const d = ymd(new Date(toDate(today()).getTime() - i * 86400000));
+      const day = store.meals[d] || {};
+      // Verde solo si el día entero fue según el plan. Contar marcas a secas
+      // pondría en verde un día de seis comidas saltadas.
+      const n = MEAL_IDS.filter(id => day[id]).length;
+      const plan = MEAL_IDS.filter(id => day[id] === 'si').length;
+      const on = d === sel;
+      box.append(h('button', {
+        class: 'fday' + (on ? ' on' : ''), type: 'button', role: 'tab', 'data-fday': d,
+        'aria-selected': String(on),
+        'aria-label': (i === 0 ? 'Hoy, ' : '') + fmtDate(d) + ', ' + (n ? plan + ' de 6 comidas según el plan, ' + n + ' marcadas' : 'sin marcar')
+      },
+        h('small', { 'aria-hidden': 'true', text: i === 0 ? 'Hoy' : wdfmt.format(toDate(d)).replace('.', '') }),
+        h('b', { 'aria-hidden': 'true', text: String(toDate(d).getDate()) }),
+        h('i', { class: 'fdot' + (plan === MEAL_IDS.length ? ' full' : n ? ' some' : ''), 'aria-hidden': 'true' })));
+    }
+  }
+  $('food-days').addEventListener('click', e => {
+    const b = e.target.closest('button[data-fday]');
+    if (!b) return;
+    state.foodDay = b.dataset.fday;
+    renderFood();
+  });
+
   // Lo de hoy: qué llevas comido del plan y qué falta. Las comidas cambiadas
   // no suman calorías porque no sé cuáles fueron, y decirlo es más útil que
   // rellenar el hueco con el número del plan y fingir que lo sé.
+  const mealProt = m => m.items.reduce((a, it) => a + it.f.p * it.a, 0);
   function renderToday(plan) {
     const box = $('food-today');
     box.textContent = '';
-    const ate = ateOn(today());
-    let done = 0, kcal = 0, otra = 0, no = 0, pend = 0;
+    const d = foodDay(), hoy = d === today();
+    const ate = ateOn(d);
+    let done = 0, kcal = 0, prot = 0, otra = 0, no = 0, pend = 0, pendK = 0;
     for (const m of plan.meals) {
       const v = ate[m.id];
-      if (v === 'si') { done++; kcal += mealKcal(m); }
+      if (v === 'si') { done++; kcal += mealKcal(m); prot += mealProt(m); }
       else if (v === 'otra') otra++;
       else if (v === 'no') no++;
-      else pend++;
+      else { pend++; pendK += mealKcal(m); }
     }
-    const target = plan.target;
-    const pct = Math.max(0, Math.min(100, Math.round(kcal / target * 100)));
-    const left = Math.round((target - kcal) / 10) * 10;
+    // Lo que falta son las comidas que quedan por hacer, no la diferencia con
+    // el objetivo: el plan redondea hasta 30 kcal y comértelo entero no puede
+    // salir como «te faltan 10».
+    const pct = plan.k > 0 ? Math.max(0, Math.min(100, Math.round(kcal / plan.k * 100))) : 0;
+    const left = Math.round(pendK / 10) * 10;
     const parts = [];
     if (done) parts.push(done + (done === 1 ? ' comida según el plan' : ' comidas según el plan'));
     if (otra) parts.push(otra + (otra === 1 ? ' cambiada' : ' cambiadas'));
     if (no) parts.push(no + (no === 1 ? ' saltada' : ' saltadas'));
     if (pend) parts.push(pend + (pend === 1 ? ' sin marcar' : ' sin marcar'));
-    const bar = h('div', { class: 'meter', role: 'img', 'aria-label': 'Llevas ' + Math.round(kcal) + ' de ' + Math.round(target) + ' kcal del plan' },
+    const bar = h('div', { class: 'meter', role: 'img', 'aria-label': Math.round(kcal) + ' de ' + Math.round(plan.k) + ' kcal del plan' },
       h('span', { style: 'width:' + pct + '%' }));
     box.append(h('div', { class: 'tile' },
       h('div', { class: 'tile-top' },
         h('div', null,
-          h('div', { class: 'tile-label', text: 'Hoy, del plan' }),
+          h('div', { class: 'tile-label', text: (hoy ? 'Hoy' : fmtDate(d)) + ', del plan' }),
           h('div', { class: 'tile-value', text: Math.round(kcal / 10) * 10 + ' kcal' })),
-        h('div', { class: 'tile-delta', text: left > 0 ? 'Faltan ' + left + ' kcal' : 'Plan completo' })),
+        h('div', { class: 'tile-delta', text: (left > 0 ? 'Faltan ' + left + ' kcal' : pend === 0 && no === 0 && otra === 0 ? 'Plan completo' : 'Nada pendiente') + ' · ' + Math.round(prot) + ' g de proteína' })),
       bar,
-      h('p', { class: 'tile-note' }, h('span', { text: parts.join(' · ') || 'Marca cada comida abajo según la hagas.' })),
+      h('p', { class: 'tile-note' }, h('span', { text: parts.join(' · ') || (hoy ? 'Marca cada comida abajo según la hagas.' : 'Ese día no marcaste nada.') })),
       otra ? h('p', { class: 'tile-note' }, h('span', { class: 'chip hold', text: 'Sin contar' }),
         h('span', { text: (otra === 1 ? 'La comida cambiada no suma' : 'Las ' + otra + ' comidas cambiadas no suman') + ' calorías aquí, porque no sé qué comiste. La báscula sí lo sabrá.' })) : null));
   }
@@ -2289,7 +2343,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (!b) return;
     const card = b.closest('.meal');
     if (!card || !card.dataset.meal) return;
-    const date = today(), id = card.dataset.meal;
+    const date = foodDay(), id = card.dataset.meal;
     const day = store.meals[date] || (store.meals[date] = {});
     if (day[id] === b.dataset.ate) delete day[id]; else day[id] = b.dataset.ate;
     if (!Object.keys(day).length) delete store.meals[date];
