@@ -219,6 +219,14 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
 .meal-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 12px;padding-bottom:8px}
 .meal-head h3{margin:0;font:800 20px/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
 .meal-head span{font-size:12px;color:var(--muted)}
+.meter{height:8px;border-radius:99px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line);overflow:hidden;margin:2px 0 2px}
+.meter span{display:block;height:100%;border-radius:99px;background:var(--accent);min-width:0}
+.ate{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:10px 0 12px;margin-top:2px;border-top:1px solid var(--line)}
+.ate-q{grid-column:1 / -1;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ate-btn{appearance:none;display:grid;place-items:center;text-align:center;min-height:44px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);border-radius:12px;padding:6px 8px;font-size:13px;line-height:1.15;font-weight:700;cursor:pointer}
+.ate-btn.si.on{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.ate-btn.otra.on{background:var(--warn);border-color:var(--warn);color:var(--surface)}
+.ate-btn.no.on{background:var(--bad);border-color:var(--bad);color:var(--surface)}
 .food-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:9px 0;border-top:1px solid var(--line)}
 .food-name{font-weight:600;min-width:0}
 .food-amt{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -311,6 +319,9 @@ body{background:radial-gradient(120% 60% at 50% 0%, var(--surface-2) 0%, var(--b
 .effort-btn{transition:background-color .18s ease, border-color .18s ease, color .18s ease, transform .14s ease}
 .effort-btn:active{transform:translateY(1px)}
 .effort-btn.on{background-image:linear-gradient(100deg, var(--gold-1), var(--gold-2));border-color:transparent;box-shadow:0 5px 14px -9px var(--accent)}
+.ate-btn{transition:background-color .18s ease, border-color .18s ease, color .18s ease, transform .14s ease}
+.ate-btn:active{transform:translateY(1px)}
+.meter span{background-image:linear-gradient(90deg, var(--gold-2), var(--gold-1));transition:width .35s cubic-bezier(.2,.8,.2,1)}
 .exlist>.ex{animation:rise .36s cubic-bezier(.2,.8,.2,1) both}
 .exlist>.ex:nth-child(2){animation-delay:.04s}
 .exlist>.ex:nth-child(3){animation-delay:.08s}
@@ -436,6 +447,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
 
     <h2 class="sec next">Plan del día</h2>
     <p class="backup-text">Cantidades en crudo y ya ajustadas a tu peso. Come lo mismo cada día: es más barato, se compra mejor y no tienes que pensar. Si te aburre, cambia un alimento por otro de la lista de abajo.</p>
+    <div id="food-today"></div>
     <div id="food-plan"></div>
     <div id="food-total"></div>
 
@@ -525,6 +537,12 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <p>Está pensada para enseñar los huecos, no los aciertos. Una lista de sesiones hechas siempre se ve bien porque solo contiene lo que sí hiciste; la rejilla enseña también lo que falta, y ahí se ve si lo que se te escapa siempre es el mismo día.</p>
       </div>
       <div>
+        <h3>Marcar las comidas</h3>
+        <p>Debajo de cada comida hay tres botones: según el plan, comí otra cosa, y no la hice. Tres estados y no un contador de calorías, porque el plan ya sabe cuántas lleva cada comida; lo único que falta saber es si te la comiste.</p>
+        <p>Una comida cambiada no suma calorías en el total del día, porque no sé qué comiste, y meter ahí el número del plan sería inventármelo. Y una comida sin marcar no cuenta como fallada: cuenta como que no sé qué pasó.</p>
+        <p>Esto arregla algo que estaba mal. Antes, si la báscula no se movía, la app te proponía subir 150 kcal sin saber si te estabas comiendo el plan. Ahora, si en dos semanas te saltaste una de cada cinco comidas marcadas, en vez del botón te dice que el objetivo no es el problema.</p>
+      </div>
+      <div>
         <h3>Control del volumen</h3>
         <ul>
           <li>Pésate por la mañana entre 3 y 7 días por semana. La pestaña Progreso calcula la media semanal y el ritmo.</li>
@@ -543,7 +561,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <h3>Tus datos</h3>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </div>
-      <p class="app-version">Versión 13 · 25 de septiembre de 2026</p>
+      <p class="app-version">Versión 14 · 25 de septiembre de 2026</p>
     </div>
   </section>
 </main>
@@ -662,10 +680,35 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   const isYmd = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
   const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
 
+  // ---- comidas del día ----
+  // Los ids viven aquí y no en la tabla de comidas porque el almacenamiento,
+  // que se lee al arrancar, los necesita antes de que esa tabla exista.
+  const MEAL_IDS = ['desayuno', 'media', 'comida', 'entreno', 'cena', 'noche'];
+  // Tres estados y nada más. «Otra» no es un fallo: comiste, pero no lo que
+  // pone el plan, así que sus calorías son desconocidas en vez de cero.
+  const ATE = [
+    ['si', 'Según el plan', 'Comiste lo que pone el plan, con su margen normal'],
+    ['otra', 'Comí otra cosa', 'Comiste, pero otra cosa: no sé cuántas calorías fueron'],
+    ['no', 'No la hice', 'Te la saltaste']
+  ];
+  const ATE_NAME = Object.fromEntries(ATE.map(([k, n]) => [k, n]));
+
   // ---- almacenamiento en el móvil ----
   const KEY = 'rutina-volumen.v1';
-  const emptyStore = () => ({ v: 1, sessions: {}, bw: {}, waist: {}, shop: {}, kcalAdj: 0, adjDate: null, deloadUntil: null, voice: true, lastBackup: null, backupSnooze: null });
+  const emptyStore = () => ({ v: 1, sessions: {}, bw: {}, waist: {}, shop: {}, meals: {}, kcalAdj: 0, adjDate: null, deloadUntil: null, voice: true, lastBackup: null, backupSnooze: null });
   let storageOk = true, changed = false;
+  // Solo sobreviven fechas reales, comidas que existen y los tres estados.
+  function cleanMeals(raw) {
+    const out = {};
+    if (!isObj(raw)) return out;
+    for (const [date, day] of Object.entries(raw)) {
+      if (!isYmd(date) || !isObj(day)) continue;
+      const clean = {};
+      for (const [id, v] of Object.entries(day)) if (MEAL_IDS.includes(id) && ATE_NAME[v]) clean[id] = v;
+      if (Object.keys(clean).length) out[date] = clean;
+    }
+    return out;
+  }
   function readStore() {
     try {
       const probe = KEY + '.probe';
@@ -674,7 +717,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       const raw = localStorage.getItem(KEY);
       if (!raw) return emptyStore();
       const d = JSON.parse(raw);
-      return { v: 1, sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, deloadUntil: isYmd(d.deloadUntil) ? d.deloadUntil : null, voice: d.voice !== false, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
+      return { v: 1, sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, meals: cleanMeals(d.meals), kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, deloadUntil: isYmd(d.deloadUntil) ? d.deloadUntil : null, voice: d.voice !== false, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
     } catch (e) {
       storageOk = false;
       return emptyStore();
@@ -1376,7 +1419,9 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   // ---- cintura ----
   const fmtCm = n => nf1.format(n);
   const signedUnit = (n, unit) => (n === 0 ? 'sin cambios' : (n > 0 ? '+' : '−') + nf1.format(Math.abs(n)) + ' ' + unit);
-  const rateText = r => (r < 0 ? 'bajó un ' + nf2.format(Math.abs(r)) + ' %' : 'subió un ' + nf2.format(r) + ' %');
+  // Con el redondeo a dos decimales, «subió un 0,00 %» es una forma rara de
+  // decir que no se movió.
+  const rateText = r => (Math.abs(r) < 0.005 ? 'no se movió' : r < 0 ? 'bajó un ' + nf2.format(Math.abs(r)) + ' %' : 'subió un ' + nf2.format(r) + ' %');
   function waistEntries() {
     return Object.entries(store.waist)
       .filter(([d, v]) => isYmd(d) && typeof v === 'number')
@@ -1649,7 +1694,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   }
   async function exportBackup() {
     flush();
-    const payload = { app: 'rutina-volumen', version: 1, exportedAt: new Date().toISOString(), sessions: store.sessions, bw: store.bw, waist: store.waist };
+    const payload = { app: 'rutina-volumen', version: 1, exportedAt: new Date().toISOString(), sessions: store.sessions, bw: store.bw, waist: store.waist, meals: store.meals };
     const json = JSON.stringify(payload, null, 2);
     const name = 'rutina-volumen-' + today() + '.json';
     let done = false;
@@ -1798,6 +1843,11 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       for (const [date, kg] of Object.entries(d.bw)) {
         if (isYmd(date) && typeof kg === 'number' && kg >= 25 && kg <= 350) { store.bw[date] = Math.round(kg * 10) / 10; nb++; }
       }
+      let nm = 0;
+      for (const [date, day] of Object.entries(cleanMeals(d.meals))) {
+        store.meals[date] = Object.assign({}, store.meals[date], day);
+        nm += Object.keys(day).length;
+      }
       let nw = 0;
       if (isObj(d.waist)) {
         for (const [date, cm] of Object.entries(d.waist)) {
@@ -1812,7 +1862,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       renderDays();
       renderDay();
       renderProgress();
-      backupMsg('Copia importada: ' + ns + (ns === 1 ? ' sesión, ' : ' sesiones, ') + nb + (nb === 1 ? ' pesaje y ' : ' pesajes y ') + nw + (nw === 1 ? ' medida de cintura.' : ' medidas de cintura.'));
+      backupMsg('Copia importada: ' + ns + (ns === 1 ? ' sesión, ' : ' sesiones, ') + nb + (nb === 1 ? ' pesaje, ' : ' pesajes, ') + nw + (nw === 1 ? ' medida de cintura y ' : ' medidas de cintura y ') + nm + (nm === 1 ? ' comida marcada.' : ' comidas marcadas.'));
     } catch (err) {
       backupMsg('Ese archivo no es una copia válida de esta app.', true);
     }
@@ -1842,6 +1892,8 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     ensalada:  { n: 'Ensalada verde',            q: 'salad mix',                        u: 'g',  step: 50, p: 0.01, k: 0.2, fb: 0.015, cat: 'Fruta y verdura' },
     requeson:  { n: 'Requesón (cottage cheese)', q: 'cottage cheese',                   u: 'g',  step: 25, p: 0.11, k: 0.9, fb: 0, cat: 'Refrigerados' }
   };
+  // El id de cada comida sale de MEAL_IDS por posición, así que hay una sola
+  // lista de verdad y las marcas guardadas no se despegan de su comida.
   const MEALS = [
     { n: 'Desayuno',       w: 'Al levantarte',              items: [['huevos', 3], ['avena', 80], ['leche', 250], ['platano', 1]] },
     { n: 'Media mañana',   w: 'A media mañana',             items: [['yogur', 170], ['crema', 30]] },
@@ -1849,7 +1901,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     { n: 'Antes o después de entrenar', w: 'Alrededor del gimnasio', items: [['tortillas', 2], ['platano', 1]] },
     { n: 'Cena',           w: 'Noche',                      items: [['carne', 150], ['papa', 350], ['ensalada', 100], ['aceite', 1]] },
     { n: 'Antes de dormir', w: 'Última comida del día',     items: [['requeson', 150]] }
-  ];
+  ].map((m, i) => Object.assign({ id: MEAL_IDS[i] }, m));
   const SWAPS = [
     { t: 'En vez de pechuga de pollo', o: [['Muslo de pollo deshuesado', 'boneless chicken thighs'], ['Pavo molido 93/7', 'lean ground turkey'], ['Tilapia o bacalao', 'tilapia fillets'], ['Lomo de cerdo', 'pork loin']] },
     { t: 'En vez de carne molida', o: [['Salmón', 'salmon fillet'], ['Atún en lata', 'canned tuna'], ['Camarón congelado', 'frozen shrimp'], ['Pechuga de pollo', 'boneless skinless chicken breast']] },
@@ -1893,6 +1945,25 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   const DELOAD_KCAL = 300;
   const deloadOn = () => !!(store.deloadUntil && isYmd(store.deloadUntil) && diffDays(today(), store.deloadUntil) >= 0);
   const kcalTarget = kg => Math.round(kg * (phase().reentry ? KCAL_KG_RE : KCAL_KG)) + (store.kcalAdj || 0) - (deloadOn() ? DELOAD_KCAL : 0);
+  const ateOn = date => store.meals[date] || {};
+  const mealKcal = m => m.items.reduce((a, it) => a + it.f.k * it.a, 0);
+  // Lo que se comió no se mide en un número, sino en tres: lo del plan, lo que
+  // fue otra cosa y lo que no se comió. Mezclarlos inventaría calorías.
+  function ateStats(days) {
+    const t = today();
+    let si = 0, otra = 0, no = 0, marked = 0;
+    for (const [date, day] of Object.entries(store.meals)) {
+      const back = diffDays(date, t);
+      if (back < 0 || back >= days) continue;
+      for (const id of MEAL_IDS) {
+        const v = day[id];
+        if (!v) continue;
+        marked++;
+        if (v === 'si') si++; else if (v === 'otra') otra++; else no++;
+      }
+    }
+    return { si, otra, no, marked, possible: days * MEAL_IDS.length };
+  }
   function planFor(kg) {
     const target = kcalTarget(kg), wf = kg / REF_KG;
     let fixK = 0, flexK = 0;
@@ -1904,7 +1975,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     let p = 0, k = 0, fib = 0;
     const flex = [];
     const meals = MEALS.map(m => ({
-      n: m.n, w: m.w,
+      id: m.id, n: m.n, w: m.w,
       items: m.items.map(([id, base]) => {
         const f = F[id], a = amountFor(f, f.x ? base * s : base, kg);
         p += f.p * a;
@@ -1976,6 +2047,10 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       adj !== 0 ? h('button', { class: 'linkbtn', type: 'button', 'data-adj': 'reset' }, 'Quitar ajuste') : null));
 
     const { rate, cur } = weightTrend();
+    // Con menos de 14 comidas marcadas en dos semanas no hay muestra para
+    // decir nada, así que no se bloquea nada.
+    const ad = ateStats(14);
+    const skipping = ad.marked >= 14 && ad.no / ad.marked >= 0.2;
     // Un cambio de comida tarda unas 2 semanas en verse en la báscula, así que
     // hasta entonces no se vuelve a proponer otro; a mano sigue pudiendo.
     const sinceAdj = store.adjDate ? diffDays(store.adjDate, today()) : null;
@@ -1990,6 +2065,11 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     } else if (waiting) {
       sug.append(h('span', { class: 'chip hold', text: 'Dale tiempo' }),
         h('span', { text: 'Cambiaste la comida ' + (sinceAdj === 0 ? 'hoy mismo' : 'hace ' + sinceAdj + (sinceAdj === 1 ? ' día' : ' días')) + '. Un cambio tarda unas 2 semanas en notarse en la báscula, así que vuelve a mirar el ' + fmtDate(ymd(new Date(toDate(store.adjDate).getTime() + 14 * 86400000))) + '. Ahora mismo tu peso ' + rateText(rate) + ' por semana.' }));
+    } else if (rate < 0.25 && adj < ADJ_MAX && skipping) {
+      // Subir el objetivo de un plan que no te estás comiendo no arregla nada:
+      // solo deja el número más alto para cuando sí lo sigas.
+      sug.append(h('span', { class: 'chip low', text: 'Primero come el plan' }),
+        h('span', { text: 'Tu peso ' + rateText(rate) + ' esta semana, pero en las últimas 2 semanas te saltaste ' + ad.no + ' de las ' + ad.marked + ' comidas que marcaste. El problema no es que el objetivo sea bajo, es que no te lo estás comiendo. Súbelo cuando lleves dos semanas cumpliendo.' }));
     } else if (rate < 0.25 && adj < ADJ_MAX) {
       sug.append(h('span', { class: 'chip low', text: 'Te has estancado' }),
         h('span', { text: 'Tu peso ' + rateText(rate) + ' esta semana, por debajo del 0,25 % que buscamos.' }),
@@ -2007,10 +2087,12 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       + (ph.reentry ? 'Estás en reentrada, así que va a mantenimiento; desde la semana ' + (REENTRY_WEEKS + 1) + ' sube solo al objetivo de volumen. ' : '')
       + 'Cuando cambies el ajuste, suben o bajan la avena, el arroz, la papa, las tortillas y las grasas; la proteína se queda donde está.';
 
+    renderToday(plan);
     const box = $('food-plan');
     box.textContent = '';
+    const ate = ateOn(today());
     for (const m of plan.meals) {
-      const card = h('div', { class: 'meal' }, h('div', { class: 'meal-head' }, h('h3', { text: m.n }), h('span', { text: m.w })));
+      const card = h('div', { class: 'meal', 'data-meal': m.id }, h('div', { class: 'meal-head' }, h('h3', { text: m.n }), h('span', { text: m.w })));
       for (const it of m.items) {
         const sub = Math.round(it.f.p * it.a) >= 1 ? Math.round(it.f.p * it.a) + ' g proteína · ' + Math.round(it.f.k * it.a) + ' kcal' : Math.round(it.f.k * it.a) + ' kcal';
         card.append(h('div', { class: 'food-row' },
@@ -2018,6 +2100,12 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
           h('span', { class: 'food-amt', text: unitText(it.f, it.a) }),
           h('span', { class: 'food-sub', text: sub })));
       }
+      const cur = ate[m.id] || null;
+      const row = h('div', { class: 'ate' }, h('span', { class: 'ate-q', text: '¿La hiciste?' }));
+      for (const [k, name, why] of ATE) {
+        row.append(h('button', { class: 'ate-btn ' + k + (cur === k ? ' on' : ''), type: 'button', 'data-ate': k, title: why, 'aria-pressed': String(cur === k) }, name));
+      }
+      card.append(row);
       box.append(card);
     }
     const tot = $('food-total');
@@ -2032,10 +2120,60 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         h('div', { class: 'tile-delta', text: Math.round(plan.p) + ' g de proteína · ' + Math.round(plan.fib) + ' g de fibra · ' + nf1.format(plan.p / kg) + ' g por kilo' })),
       h('p', { class: 'tile-note' }, chip, h('span', { text: advice + ' Margen de más o menos un 10 %, y no hace falta que peses la verdura ni la ensalada.' })),
       plan.fib < 25 ? h('p', { class: 'tile-note' }, h('span', { class: 'chip low', text: 'Poca fibra' }), h('span', { text: 'Por debajo de los 25 g al día. Súmale verdura o fruta, que con este volumen de comida lo vas a notar.' })) : null));
+    const wk = ateStats(7);
+    tot.append(h('div', { class: 'tile' },
+      h('div', { class: 'tile-top' },
+        h('div', null,
+          h('div', { class: 'tile-label', text: 'Últimos 7 días' }),
+          h('div', { class: 'tile-value', text: wk.marked ? wk.si + ' de ' + wk.marked : '—' })),
+        h('div', { class: 'tile-delta', text: wk.marked ? 'comidas marcadas que fueron según el plan' : 'sin comidas marcadas' })),
+      h('p', { class: 'tile-note' }, h('span', { text: wk.marked
+        ? 'Marcaste ' + wk.marked + ' de las ' + wk.possible + ' comidas de la semana'
+          + (wk.otra ? ', ' + wk.otra + (wk.otra === 1 ? ' fue otra cosa' : ' fueron otra cosa') : '')
+          + (wk.no ? ' y ' + wk.no + (wk.no === 1 ? ' te la saltaste' : ' te las saltaste') : '')
+          + '. Las que no marcaste no cuentan como falladas: cuentan como que no sé qué pasó.'
+        : 'Marca cada comida y en una semana te digo cuánto del plan estás comiendo de verdad. Sin ese dato, cuando la báscula no se mueva no sabré si es que comes poco o que el objetivo es bajo.' }))));
     renderSupps();
     renderSwaps();
     renderShop(plan);
   }
+  // Lo de hoy: qué llevas comido del plan y qué falta. Las comidas cambiadas
+  // no suman calorías porque no sé cuáles fueron, y decirlo es más útil que
+  // rellenar el hueco con el número del plan y fingir que lo sé.
+  function renderToday(plan) {
+    const box = $('food-today');
+    box.textContent = '';
+    const ate = ateOn(today());
+    let done = 0, kcal = 0, otra = 0, no = 0, pend = 0;
+    for (const m of plan.meals) {
+      const v = ate[m.id];
+      if (v === 'si') { done++; kcal += mealKcal(m); }
+      else if (v === 'otra') otra++;
+      else if (v === 'no') no++;
+      else pend++;
+    }
+    const target = plan.target;
+    const pct = Math.max(0, Math.min(100, Math.round(kcal / target * 100)));
+    const left = Math.round((target - kcal) / 10) * 10;
+    const parts = [];
+    if (done) parts.push(done + (done === 1 ? ' comida según el plan' : ' comidas según el plan'));
+    if (otra) parts.push(otra + (otra === 1 ? ' cambiada' : ' cambiadas'));
+    if (no) parts.push(no + (no === 1 ? ' saltada' : ' saltadas'));
+    if (pend) parts.push(pend + (pend === 1 ? ' sin marcar' : ' sin marcar'));
+    const bar = h('div', { class: 'meter', role: 'img', 'aria-label': 'Llevas ' + Math.round(kcal) + ' de ' + Math.round(target) + ' kcal del plan' },
+      h('span', { style: 'width:' + pct + '%' }));
+    box.append(h('div', { class: 'tile' },
+      h('div', { class: 'tile-top' },
+        h('div', null,
+          h('div', { class: 'tile-label', text: 'Hoy, del plan' }),
+          h('div', { class: 'tile-value', text: Math.round(kcal / 10) * 10 + ' kcal' })),
+        h('div', { class: 'tile-delta', text: left > 0 ? 'Faltan ' + left + ' kcal' : 'Plan completo' })),
+      bar,
+      h('p', { class: 'tile-note' }, h('span', { text: parts.join(' · ') || 'Marca cada comida abajo según la hagas.' })),
+      otra ? h('p', { class: 'tile-note' }, h('span', { class: 'chip hold', text: 'Sin contar' }),
+        h('span', { text: (otra === 1 ? 'La comida cambiada no suma' : 'Las ' + otra + ' comidas cambiadas no suman') + ' calorías aquí, porque no sé qué comiste. La báscula sí lo sabrá.' })) : null));
+  }
+
   function renderSupps() {
     const box = $('food-supps');
     box.textContent = '';
@@ -2134,6 +2272,19 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     renderFood();
     $('food-targets').scrollIntoView({ block: 'start' });
   });
+  $('food-plan').addEventListener('click', e => {
+    const b = e.target.closest('button[data-ate]');
+    if (!b) return;
+    const card = b.closest('.meal');
+    if (!card || !card.dataset.meal) return;
+    const date = today(), id = card.dataset.meal;
+    const day = store.meals[date] || (store.meals[date] = {});
+    if (day[id] === b.dataset.ate) delete day[id]; else day[id] = b.dataset.ate;
+    if (!Object.keys(day).length) delete store.meals[date];
+    changed = true;
+    persistNow();
+    renderFood();
+  });
   $('shop-reset').addEventListener('click', () => {
     store.shop = {};
     changed = true;
@@ -2184,6 +2335,11 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         + (store.kcalAdj ? ' · ajuste ' + (store.kcalAdj > 0 ? '+' : '−') + Math.abs(store.kcalAdj) + ' kcal desde el ' + fmtDate(store.adjDate) : ' · sin ajuste'));
       if (deloadOn()) L.push('Semana de descarga activa hasta el ' + fmtDate(store.deloadUntil));
     } else L.push('Sin peso apuntado, no hay objetivo calculado');
+    const a7 = ateStats(7), a14 = ateStats(14);
+    L.push(a7.marked
+      ? 'Comidas marcadas 7 días: ' + a7.marked + ' de ' + a7.possible + ' (' + a7.si + ' según el plan, ' + a7.otra + ' otra cosa, ' + a7.no + ' saltadas)'
+      : 'Comidas marcadas 7 días: ninguna');
+    if (a14.marked) L.push('Comidas marcadas 14 días: ' + a14.marked + ' de ' + a14.possible + ' (' + a14.si + ' plan, ' + a14.otra + ' otra, ' + a14.no + ' saltadas)');
     L.push('', 'FUERZA (mejor serie convertida a 1RM estimado)');
     let any = false;
     for (const d of DAYS) for (const ex of d.ex) {
