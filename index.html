@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rutina de Volumen</title>
 <meta name="description" content="Rutina de volumen de 6 días con registro de series, temporizador de descanso y control del peso corporal. Funciona sin conexión.">
-<meta name="theme-color" content="#F1F3F6" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0E1217" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F6F4EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A0A0C" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -21,13 +21,18 @@
 <style>
 @font-face{font-family:"Figtree";font-style:normal;font-weight:300 900;font-display:swap;src:url("fonts/figtree-latin.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:"Big Shoulders Display";font-style:normal;font-weight:100 900;font-display:swap;src:url("fonts/big-shoulders-display-latin.woff2") format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+/* Identidad: oro sobre negro, tomada del logo MG. Todos los pares de color
+   están comprobados contra WCAG: ninguno baja de 4,5:1 en ninguno de los dos
+   temas. */
 :root{
   color-scheme:light;
-  --bg:#F1F3F6; --surface:#FFFFFF; --surface-2:#E9EDF2; --ink:#131820; --muted:#596375; --line:#D6DCE4;
-  --accent:#1F5FBF; --accent-ink:#FFFFFF; --accent-soft:#E2EBFA;
-  --ok:#17773F; --ok-soft:#DFF2E6; --warn:#8F5A00; --warn-soft:#FAEFD6; --bad:#B3261E; --bad-soft:#FBE3E1;
-  --timer-bg:#131820; --timer-ink:#F1F3F6;
-  --series:#1F5FBF; --grid:#E8ECF1;
+  --bg:#F6F4EE; --surface:#FFFFFF; --surface-2:#F0EDE4; --ink:#15140E; --muted:#6A6459; --line:#E2DDD1;
+  --accent:#8A6410; --accent-ink:#FFFFFF; --accent-soft:#F6EBCF;
+  --gold-1:#B98F2A; --gold-2:#8A6410; --sheen:rgba(255,255,255,.55);
+  --ok:#17773F; --ok-soft:#E1F3E8; --warn:#7A4E00; --warn-soft:#FBF0D7; --bad:#B3261E; --bad-soft:#FBE3E1;
+  --timer-bg:#15140E; --timer-ink:#F6F4EE; --timer-fill:#E8B94A;
+  --series:#8A6410; --grid:#EAE6DA;
+  --edge:rgba(21,20,14,.06); --lift:0 1px 2px rgba(21,20,14,.05), 0 10px 26px -16px rgba(21,20,14,.35);
   --p-lun:#D62839; --p-mar:#1F5FBF; --p-mie:#E8B100; --p-jue:#2E8B57; --p-vie:#F7F7F4; --p-sab:#2A2E35; --p-edge:rgba(19,24,32,.24);
   --display:"Big Shoulders Display","Arial Narrow","Roboto Condensed",sans-serif;
   --body:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -35,12 +40,14 @@
 @media (prefers-color-scheme: dark){
   :root{
     color-scheme:dark;
-    --bg:#0E1217; --surface:#161B22; --surface-2:#1E252F; --ink:#E6EAF0; --muted:#9AA3B2; --line:#2A323D;
-    --accent:#71A5FF; --accent-ink:#0B1220; --accent-soft:#1A2943;
-    --ok:#5CC98E; --ok-soft:#14301F; --warn:#E5B052; --warn-soft:#33270F; --bad:#F2877C; --bad-soft:#3A1815;
-    --timer-bg:#E6EAF0; --timer-ink:#0E1217;
-    --series:#5A93F2; --grid:#242B35;
-    --p-vie:#ECECE7; --p-sab:#07090C; --p-edge:rgba(230,234,240,.3);
+    --bg:#0A0A0C; --surface:#15151A; --surface-2:#1E1E25; --ink:#F2EFE9; --muted:#A39C8C; --line:#2A2A33;
+    --accent:#E8B94A; --accent-ink:#17140B; --accent-soft:#2A2314;
+    --gold-1:#F5D67E; --gold-2:#C89A2E; --sheen:rgba(255,255,255,.22);
+    --ok:#6FD39A; --ok-soft:#12301F; --warn:#E5B052; --warn-soft:#30250F; --bad:#F2877C; --bad-soft:#36160F;
+    --timer-bg:#111116; --timer-ink:#F2EFE9; --timer-fill:#E8B94A;
+    --series:#E8B94A; --grid:#22222A;
+    --edge:rgba(255,255,255,.06); --lift:0 1px 2px rgba(0,0,0,.5), 0 14px 32px -18px rgba(0,0,0,.9);
+    --p-vie:#ECECE7; --p-sab:#31313B; --p-edge:rgba(242,239,233,.34);
   }
 }
 *,*::before,*::after{box-sizing:border-box}
@@ -235,6 +242,66 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
 .timer.done .t-time{animation:pulse 1s ease-in-out 3}
 @keyframes pulse{50%{opacity:.35}}
 
+/* ---- acabado ----
+   Animaciones cortas y con un motivo: confirmar que una serie quedó marcada,
+   celebrar un récord y ordenar la entrada de la pantalla. Nada que retrase
+   tocar un botón, y todas se apagan con «reducir movimiento». */
+body{background:radial-gradient(120% 60% at 50% 0%, var(--surface-2) 0%, var(--bg) 60%) fixed, var(--bg)}
+
+.bar{background:color-mix(in srgb, var(--bg) 94%, transparent);backdrop-filter:saturate(1.4) blur(18px);-webkit-backdrop-filter:saturate(1.4) blur(18px);border-bottom:0;box-shadow:0 1px 0 var(--line), 0 12px 22px -20px rgba(0,0,0,.9)}
+.brand{align-items:center}
+.brand h1{display:flex;align-items:center;gap:9px}
+.brand img{width:28px;height:28px;border-radius:7px;box-shadow:0 0 0 1px var(--edge), 0 2px 8px -2px rgba(0,0,0,.45)}
+.brand .word{background:linear-gradient(100deg, var(--gold-1), var(--gold-2) 70%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tab{position:relative;border-bottom-color:transparent;transition:color .18s ease}
+.tab::after{content:'';position:absolute;left:12px;right:12px;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:linear-gradient(90deg, var(--gold-1), var(--gold-2));transform:scaleX(0);transform-origin:center;transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+.tab[aria-selected="true"]::after{transform:scaleX(1)}
+
+.ex,.meal,.tile,.stat,details.sess,.chart,.banner.nag{box-shadow:var(--lift)}
+.ex,.meal,.tile,.chart{background-image:linear-gradient(var(--edge),transparent 42px)}
+.sec{position:relative;padding-left:14px}
+.sec::before{content:'';position:absolute;left:0;top:.12em;bottom:.12em;width:4px;border-radius:4px;background:linear-gradient(var(--gold-1), var(--gold-2))}
+
+.day{transition:transform .16s ease, box-shadow .2s ease, border-color .2s ease}
+.day:active{transform:scale(.96)}
+.day[aria-selected="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent), 0 6px 18px -10px var(--accent)}
+.toca{background:linear-gradient(100deg, var(--gold-1), var(--gold-2));color:var(--accent-ink)}
+
+.set-row input,.chk{transition:background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease}
+.chk:active{transform:scale(.92)}
+.set-row.done .chk{animation:pop .32s cubic-bezier(.2,1.5,.35,1)}
+.set-row.done input{box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ok) 35%, transparent)}
+@keyframes pop{0%{transform:scale(.72)}62%{transform:scale(1.14)}100%{transform:scale(1)}}
+
+.btn,.store,.adj-btn{transition:transform .14s ease, border-color .18s ease, background-color .18s ease, box-shadow .18s ease}
+.btn:active,.store:active,.adj-btn:active{transform:translateY(1px)}
+.btn.primary{background-image:linear-gradient(100deg, var(--gold-1), var(--gold-2));border-color:transparent;color:var(--accent-ink);box-shadow:0 6px 18px -10px var(--accent)}
+:focus-visible{outline-color:var(--accent)}
+
+.pr-note{position:relative;overflow:hidden;border:1px solid color-mix(in srgb, var(--ok) 28%, transparent)}
+.pr-note::after{content:'';position:absolute;inset:0;background:linear-gradient(104deg, transparent 32%, var(--sheen) 50%, transparent 68%);transform:translateX(-110%);animation:sheen 1.05s .12s cubic-bezier(.3,.6,.3,1)}
+@keyframes sheen{to{transform:translateX(110%)}}
+
+.chip{transition:background-color .2s ease}
+.exlist>.ex{animation:rise .36s cubic-bezier(.2,.8,.2,1) both}
+.exlist>.ex:nth-child(2){animation-delay:.04s}
+.exlist>.ex:nth-child(3){animation-delay:.08s}
+.exlist>.ex:nth-child(4){animation-delay:.12s}
+.exlist>.ex:nth-child(5){animation-delay:.16s}
+.exlist>.ex:nth-child(6){animation-delay:.2s}
+.exlist>.ex:nth-child(n+7){animation-delay:.24s}
+main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+.timer{background:color-mix(in srgb, var(--timer-bg) 96%, transparent);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);box-shadow:0 -10px 30px -18px rgba(0,0,0,.8), 0 -1px 0 var(--line)}
+.t-time{background:linear-gradient(100deg, var(--gold-1), var(--gold-2) 75%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.t-bar span{background:linear-gradient(90deg, var(--gold-2), var(--gold-1));box-shadow:0 0 12px -2px var(--timer-fill)}
+.timer.done{background:color-mix(in srgb, var(--ok) 90%, black)}
+.timer.done .t-time{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#fff}
+.timer.done .t-bar span{background:#fff;box-shadow:none}
+.timer.done .t-btn{border-color:rgba(255,255,255,.45);color:#fff}
+.timer.done .t-btn.stop{background:#fff;color:var(--ok);border-color:#fff}
+
 @media (max-width:430px){
   .bw-form{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .bw-form .btn{grid-column:1 / -1}
@@ -242,14 +309,17 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
   .stat strong{font-size:19px}
   .day small{font-size:10px}
 }
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .pr-note::after{display:none}
+}
 </style>
 </head>
 <body>
 <header class="bar">
   <div class="bar-inner">
     <div class="brand">
-      <h1>Rutina de Volumen</h1>
+      <h1><img src="icons/icon-192.png" alt="" width="28" height="28" decoding="async"><span class="word">Rutina de Volumen</span></h1>
       <span class="sync" id="sync" role="status" aria-live="polite">Datos en este móvil</span>
     </div>
     <nav class="tabs" role="tablist" aria-label="Secciones">
@@ -419,7 +489,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
         <h3>Tus datos</h3>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </div>
-      <p class="app-version">Versión 9 · 25 de septiembre de 2026</p>
+      <p class="app-version">Versión 10 · 25 de septiembre de 2026</p>
     </div>
   </section>
 </main>
