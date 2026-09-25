@@ -155,6 +155,15 @@ a{color:var(--accent)}
 .stat span{font-size:12px;color:var(--muted)}
 .stat strong{font:700 22px/1.1 var(--body);white-space:nowrap}
 .stat-note{margin:0 0 14px;font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
+.cgrid{border-collapse:separate;border-spacing:5px;margin:0 -5px 4px;table-layout:fixed;width:calc(100% + 10px)}
+.cgrid th{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:0}
+.cgrid thead th{text-align:center}
+.cgrid tbody th{text-align:left;white-space:nowrap;width:4.6em;font-variant-numeric:tabular-nums;letter-spacing:.02em;text-transform:none;font-size:12px}
+.cgrid td{padding:0;text-align:center}
+.cbox{display:block;width:100%;height:30px;border-radius:7px;background:var(--surface-2);box-shadow:inset 0 0 0 1px var(--line)}
+.cbox.on{background:var(--disc);box-shadow:inset 0 0 0 1px var(--p-edge)}
+.cbox.on::before{content:'✓';display:grid;place-items:center;height:100%;font-size:15px;font-weight:800;line-height:1;color:var(--disc-ink)}
+.cnum{width:3.1em;font-size:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
 .bw-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
 .bw-list li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 .bw-list .kg{font-weight:700}
@@ -295,6 +304,8 @@ body{background:radial-gradient(120% 60% at 50% 0%, var(--surface-2) 0%, var(--b
 @keyframes sheen{to{transform:translateX(110%)}}
 
 .chip{transition:background-color .2s ease}
+.cbox{transition:background-color .25s ease, box-shadow .25s ease}
+.cbox.on{box-shadow:inset 0 0 0 1px var(--p-edge), 0 3px 10px -6px var(--disc)}
 .voice-btn{transition:color .18s ease, transform .14s ease}
 .voice-btn:active{transform:scale(.9)}
 .effort-btn{transition:background-color .18s ease, border-color .18s ease, color .18s ease, transform .14s ease}
@@ -362,7 +373,11 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   </section>
 
   <section id="tab-progreso" role="tabpanel" aria-labelledby="tab-btn-progreso" hidden>
-    <h2 class="sec">Peso corporal</h2>
+    <h2 class="sec">Constancia</h2>
+    <p class="backup-text">Una fila por semana y una columna por sesión de la rotación. Los huecos son las sesiones que no hiciste, y son la parte que importa.</p>
+    <div id="streak"></div>
+
+    <h2 class="sec next">Peso corporal</h2>
     <form id="bw-form" class="bw-form" autocomplete="off" novalidate>
       <label class="field" for="bw-date"><span>Fecha</span><input id="bw-date" type="date"></label>
       <label class="field" for="bw-kg"><span>Peso en ayunas (kg)</span><input id="bw-kg" type="text" inputmode="decimal" placeholder="80,4"></label>
@@ -456,6 +471,11 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <p>Son las repeticiones que te quedan en reserva al terminar la serie. Con RIR 1-2 paras cuando todavía podrías hacer 1 o 2 más con buena técnica. Con RIR 0, la última repetición es la última que sale limpia.</p>
       </div>
       <div>
+        <h3>Series de más</h3>
+        <p>Debajo de cada ejercicio tienes «+ Añadir serie». El plan marca las series que te tocan, no un techo: si un día te sobra tiempo y haces una cuarta, se apunta como las demás y entra en la cuenta del día y en tus registros. Mientras esté vacía puedes quitarla, y si la dejas sin rellenar no se guarda.</p>
+        <p>Eso sí, añadir series todas las semanas deja de ser un extra y pasa a ser otro plan distinto sin haberlo pensado. Si te pasa, dímelo y revisamos el volumen en serio.</p>
+      </div>
+      <div>
         <h3>Progresión</h3>
         <p>Trabaja dentro del rango de repeticiones. Cuando completes todas las series en el tope del rango, sube el peso lo mínimo que permita el material y vuelve a la parte baja. La etiqueta «Sube carga» aparece cuando la última sesión cumplió esa condición, o cuando la marcaste como fácil.</p>
       </div>
@@ -500,6 +520,11 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <p>Entre 35 y 45 ml de agua por kilo de peso al día, más si hace calor o la sesión es larga. Comida tiene tu rango ya calculado. De fibra, entre 25 y 35 g diarios, que con la avena, la verdura, la papa y la fruta del plan ya salen; si te quedas corto, la app te avisa en el total del día.</p>
       </div>
       <div>
+        <h3>Constancia</h3>
+        <p>Arriba de Progreso hay una rejilla: una fila por semana y una columna por cada sesión de la rotación. El cuadro se enciende con el color del día cuando esa sesión queda registrada.</p>
+        <p>Está pensada para enseñar los huecos, no los aciertos. Una lista de sesiones hechas siempre se ve bien porque solo contiene lo que sí hiciste; la rejilla enseña también lo que falta, y ahí se ve si lo que se te escapa siempre es el mismo día.</p>
+      </div>
+      <div>
         <h3>Control del volumen</h3>
         <ul>
           <li>Pésate por la mañana entre 3 y 7 días por semana. La pestaña Progreso calcula la media semanal y el ritmo.</li>
@@ -518,7 +543,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <h3>Tus datos</h3>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </div>
-      <p class="app-version">Versión 12 · 25 de septiembre de 2026</p>
+      <p class="app-version">Versión 13 · 25 de septiembre de 2026</p>
     </div>
   </section>
 </main>
@@ -541,7 +566,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
 
   const YT = id => 'https://www.youtube.com/watch?v=' + id;
   const DAYS = [
-    { key: 'lun', short: 'Lun', long: 'Lunes', name: 'Push A', focus: 'Hombro', disc: 'var(--p-lun)', ex: [
+    { key: 'lun', short: 'Lun', long: 'Lunes', name: 'Push A', focus: 'Hombro', disc: 'var(--p-lun)', ink: '#FFFFFF', ex: [
       { id: 'press-hombro', name: 'Press de hombro con mancuernas', sets: 3, reps: [6, 10], rir: '1-2', rest: 150, video: 'qEwKCR5JCog' },
       { id: 'press-inclinado-neutro', name: 'Press inclinado con mancuernas agarre neutro', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'SMO17ItT5Wc' },
       { id: 'pec-deck', name: 'Pec deck', sets: 3, reps: [10, 15], rir: '0-1', rest: 90, video: 'YG5RHe7xdmw' },
@@ -549,7 +574,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       { id: 'posterior-maquina', name: 'Vuelo posterior en máquina', sets: 3, reps: [12, 15], rir: '0-1', rest: 90, video: 'E4Q12zRDwwU' },
       { id: 'overhead-cable', name: 'Extensión de tríceps overhead en cable', sets: 3, reps: [10, 15], rir: '0-1', rest: 90, video: 'jioCqlKKrJc' }
     ] },
-    { key: 'mar', short: 'Mar', long: 'Martes', name: 'Pierna A', focus: 'Glúteo e isquios', disc: 'var(--p-mar)', ex: [
+    { key: 'mar', short: 'Mar', long: 'Martes', name: 'Pierna A', focus: 'Glúteo e isquios', disc: 'var(--p-mar)', ink: '#FFFFFF', ex: [
       { id: 'peso-muerto-rumano', name: 'Peso muerto rumano con barra', sets: 3, reps: [6, 10], rir: '2', rest: 150, video: '5bJEigM5iVg' },
       { id: 'hip-thrust', name: 'Hip thrust con barra', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'LM8XHLYJoYs' },
       { id: 'prensa', name: 'Prensa de piernas', sets: 3, reps: [10, 15], rir: '1-2', rest: 120, video: 'IZxyjW7MPJQ' },
@@ -557,7 +582,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       { id: 'curl-femoral-sentado', name: 'Curl femoral sentado', sets: 3, reps: [10, 15], rir: '0-1', rest: 90, video: 'ELOCsoDSmrg' },
       { id: 'gemelo-pie', name: 'Pantorrilla de pie en máquina', sets: 3, reps: [8, 12], rir: '0-1', rest: 90, video: 'YMmgqO8Jo-k', note: 'Pausa de 1-2 segundos abajo, con el gemelo estirado.' }
     ] },
-    { key: 'mie', short: 'Mié', long: 'Miércoles', name: 'Pull A', focus: 'Espalda alta', disc: 'var(--p-mie)', ex: [
+    { key: 'mie', short: 'Mié', long: 'Miércoles', name: 'Pull A', focus: 'Espalda alta', disc: 'var(--p-mie)', ink: '#1A1403', ex: [
       { id: 'remo-apoyo-pecho', name: 'Remo con apoyo en pecho', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'gdoaioGPXfE' },
       { id: 'remo-barra-t', name: 'Remo en barra T', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'j3Igk5nyZE4' },
       { id: 'jalon-neutro', name: 'Jalón al pecho agarre neutro', sets: 3, reps: [8, 12], rir: '1-2', rest: 120, video: '4P3-TXbH4tw' },
@@ -566,7 +591,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       { id: 'curl-martillo', name: 'Curl martillo con mancuernas', sets: 3, reps: [10, 12], rir: '0-1', rest: 90, video: 'zC3nLlEvin4' },
       { id: 'crunch-polea', name: 'Crunch en polea', sets: 3, reps: [10, 15], rir: '0-1', rest: 90, video: 'kc0PRn372lo' }
     ] },
-    { key: 'jue', short: 'Jue', long: 'Jueves', name: 'Push B', focus: 'Pecho', disc: 'var(--p-jue)', ex: [
+    { key: 'jue', short: 'Jue', long: 'Jueves', name: 'Push B', focus: 'Pecho', disc: 'var(--p-jue)', ink: '#FFFFFF', ex: [
       { id: 'press-inclinado-maquina', name: 'Press inclinado en máquina', sets: 3, reps: [6, 10], rir: '1-2', rest: 150, video: '7_scLkTCwTU' },
       { id: 'press-plano-mancuernas', name: 'Press plano con mancuernas', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'VmB1G1K7v94' },
       { id: 'fondos', name: 'Fondos en paralelas', sets: 3, reps: [6, 12], rir: '1-2', rest: 150, video: 'vi1-BOcj3cQ', load: 'lastre', note: 'Con lastre cuando pases de 12 repeticiones. Sin lastre, deja la casilla de kg vacía.' },
@@ -574,7 +599,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       { id: 'skull-crusher-cable', name: 'Skull crusher en cable', sets: 3, reps: [10, 12], rir: '0-1', rest: 90, video: 'GMQlN-cvnss' },
       { id: 'pressdown-cuerda', name: 'Pressdown con cuerda', sets: 3, reps: [10, 15], rir: '0-1', rest: 90, video: 'vB5OHsJ3EME' }
     ] },
-    { key: 'vie', short: 'Vie', long: 'Viernes', name: 'Pierna B', focus: 'Cuádriceps', disc: 'var(--p-vie)', ex: [
+    { key: 'vie', short: 'Vie', long: 'Viernes', name: 'Pierna B', focus: 'Cuádriceps', disc: 'var(--p-vie)', ink: '#15140E', ex: [
       { id: 'hack-squat', name: 'Hack squat', sets: 4, reps: [6, 10], rir: '1-2', rest: 150, video: 'm2DiSYKPzqk', note: 'Si prefieres la sentadilla con barra, úsala en su lugar con las mismas series, nunca las dos el mismo día.', alt: { label: 'Técnica de la sentadilla', video: 'vaMYBmJH-tw' } },
       { id: 'zancada', name: 'Zancada con mancuernas', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'D7KaRcUTQeE', side: 'por pierna' },
       { id: 'curl-femoral-tumbado', name: 'Curl femoral tumbado', sets: 3, reps: [10, 15], rir: '0-1', rest: 90, video: '1Tq3QdYUuHs' },
@@ -582,7 +607,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       { id: 'gemelo-sentado', name: 'Pantorrilla sentado en máquina', sets: 3, reps: [12, 20], rir: '0-1', rest: 90, video: '3ZRe_QpvRPg' },
       { id: 'elevacion-piernas', name: 'Elevación de piernas colgado', sets: 3, reps: [8, 15], rir: '1-2', rest: 90, video: 'EYe6dc_i4L0', load: 'lastre', note: 'Si no llegas a 8 con las piernas rectas, hazlas con las rodillas flexionadas.' }
     ] },
-    { key: 'sab', short: 'Sáb', long: 'Sábado', name: 'Pull B', focus: 'Dorsal', disc: 'var(--p-sab)', ex: [
+    { key: 'sab', short: 'Sáb', long: 'Sábado', name: 'Pull B', focus: 'Dorsal', disc: 'var(--p-sab)', ink: '#FFFFFF', ex: [
       { id: 'dominadas', name: 'Dominadas', sets: 3, reps: [6, 10], rir: '1-2', rest: 150, video: '3YvfRx31xDE', load: 'lastre', note: 'Con lastre si pasas de 10. Si no llegas a 6, usa asistencia o negativas lentas.' },
       { id: 'jalon-prono', name: 'Jalón al pecho agarre prono', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'lueEJGjTuPQ' },
       { id: 'remo-unilateral-cable', name: 'Remo unilateral en cable', sets: 3, reps: [10, 12], rir: '1-2', rest: 120, video: 'oDKu4Y-hQtA', side: 'por brazo' },
@@ -712,6 +737,10 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (!state.local[id]) state.local[id] = JSON.parse(JSON.stringify((store.sessions[id] && store.sessions[id].sets) || {}));
     return state.local[id];
   }
+  // Un ejercicio pinta sus series planificadas, y más si esa sesión ya tiene
+  // alguna añadida a mano. La planificación es el objetivo, no el techo.
+  const rowCount = (ex, arr) => Math.max(ex.sets, (arr || []).length);
+  const emptyRow = x => !x || (x.kg == null && x.reps == null && !x.done);
   function rowsFor(exId, k) {
     const sets = editable();
     const arr = sets[exId] || (sets[exId] = []);
@@ -827,28 +856,28 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   // Cuántas series llevas hoy, y el cierre de la sesión cuando están todas.
   const reduceMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   function weekSessionCount() {
-    const t = toDate(today()), mon = new Date(t);
-    mon.setDate(t.getDate() - ((t.getDay() + 6) % 7));
-    const from = ymd(mon), hoy = today(), dates = new Set();
-    const hasWork = m => Object.values(m || {}).some(a => Array.isArray(a) && a.some(x => x && x.reps > 0));
+    const from = mondayOf(today()), hoy = today(), dates = new Set();
     for (const s of state.sessions) if (s.date >= from && s.date <= hoy && hasWork(s.sets)) dates.add(s.date);
     if (hasWork(state.local[sessionId()])) dates.add(hoy);
     return dates.size;
   }
   function renderDayProgress(finishedEx) {
     const d = findDay(state.day) || DAYS[0], sets = setsFor();
-    const total = d.ex.reduce((a, e) => a + e.sets, 0);
-    const doneOf = e => (sets[e.id] || []).slice(0, e.sets).filter(x => x && x.done).length;
+    const planned = d.ex.reduce((a, e) => a + e.sets, 0);
+    const total = d.ex.reduce((a, e) => a + rowCount(e, sets[e.id]), 0);
+    const doneOf = e => (sets[e.id] || []).filter(x => x && x.done).length;
     const done = d.ex.reduce((a, e) => a + doneOf(e), 0);
+    const extra = total - planned;
     const p = $('dayprog');
-    if (p) p.textContent = d.focus + ' · ' + done + ' de ' + total + ' series hechas · ' + fmtDate(today());
+    if (p) p.textContent = d.focus + ' · ' + done + ' de ' + total + ' series hechas'
+      + (extra > 0 ? ' (' + extra + (extra === 1 ? ' añadida)' : ' añadidas)') : '') + ' · ' + fmtDate(today());
     const box = $('done-banner'), complete = total > 0 && done >= total;
     if (box) {
       if (complete) {
         const n = weekSessionCount();
         box.textContent = '';
         box.append(h('b', { text: '✓ Sesión completada' }),
-          h('span', { text: total + ' series de ' + d.name + '. ' + (n === 1 ? 'Primera sesión de esta semana.' : n + '.ª sesión de esta semana.') + (n >= 6 ? ' Semana completa.' : '') }));
+          h('span', { text: total + ' series de ' + d.name + (extra > 0 ? ', ' + extra + ' por encima del plan' : '') + '. ' + (n === 1 ? 'Primera sesión de esta semana.' : n + '.ª sesión de esta semana.') + (n >= 6 ? ' Semana completa.' : '') }));
         box.hidden = false;
       } else box.hidden = true;
     }
@@ -860,7 +889,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       if (box) box.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
       return;
     }
-    const next = d.ex.find(e => doneOf(e) < e.sets);
+    const next = d.ex.find(e => doneOf(e) < rowCount(e, sets[e.id]));
     say(next ? finishedEx.name + ' hecho. Siguiente: ' + next.name : finishedEx.name + ' hecho.');
   }
 
@@ -883,7 +912,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const grid = h('div', { class: 'sets' },
       h('div', { class: 'set-row set-head', 'aria-hidden': 'true' },
         h('span', { text: '' }), h('span', { text: ex.load === 'lastre' ? 'Lastre kg' : 'kg' }), h('span', { text: 'Reps' }), h('span', { text: '' })));
-    for (let k = 0; k < ex.sets; k++) grid.append(renderSetRow(ex, k, sets[k], last && last.sets[k]));
+    for (let k = 0, n = rowCount(ex, sets); k < n; k++) grid.append(renderSetRow(ex, k, sets[k], last && last.sets[k]));
     li.append(grid,
       h('div', { class: 'effort', 'data-role': 'effort', hidden: true }),
       h('p', { class: 'pr-note', 'data-role': 'pr', role: 'status', hidden: true }),
@@ -928,13 +957,26 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       box.append(h('span', { text: 'Todavía no hay registros de este ejercicio.' }));
     }
     li.querySelectorAll('.set-row[data-set]').forEach(row => {
-      const lv = last ? last.sets[Number(row.dataset.set)] : null;
-      row.querySelector('input.kg').placeholder = lv ? (lv.kg != null ? fmtKg(lv.kg) : '') : (ex.load === 'lastre' ? '0' : '–');
-      row.querySelector('input.reps').placeholder = lv ? String(lv.reps) : ex.reps[0] + '-' + ex.reps[1];
+      setPlaceholders(row, ex, last ? last.sets[Number(row.dataset.set)] : null);
     });
+    updateFoot(li, ex);
+  }
+
+  function setPlaceholders(row, ex, lv) {
+    row.querySelector('input.kg').placeholder = lv ? (lv.kg != null ? fmtKg(lv.kg) : '') : (ex.load === 'lastre' ? '0' : '–');
+    row.querySelector('input.reps').placeholder = lv ? String(lv.reps) : ex.reps[0] + '-' + ex.reps[1];
+  }
+
+  function updateFoot(li, ex) {
     const foot = li.querySelector('[data-role="foot"]');
+    if (!foot) return;
+    const arr = setsFor()[ex.id] || [], n = rowCount(ex, arr);
     foot.textContent = '';
-    foot.hidden = true;
+    foot.append(h('button', { class: 'btn small', type: 'button', 'data-act': 'addset' }, '+ Añadir serie'));
+    if (n > ex.sets && emptyRow(arr[n - 1])) {
+      foot.append(h('button', { class: 'btn small', type: 'button', 'data-act': 'delset' }, 'Quitar la última'));
+    }
+    foot.hidden = false;
   }
 
   function updateEffort(li, ex) {
@@ -965,6 +1007,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     arr[k] = Object.assign({}, arr[k], { [inp.dataset.field]: v });
     row.classList.remove('need');
     scheduleSave();
+    updateFoot(li, EX[li.dataset.ex]);
     if (row.classList.contains('done')) updatePrNote(li, EX[li.dataset.ex]);
   });
   list.addEventListener('keydown', e => {
@@ -996,6 +1039,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         scheduleSave();
         updatePrNote(li, ex);
         updateEffort(li, ex);
+        updateFoot(li, ex);
         renderDayProgress();
         return;
       }
@@ -1008,7 +1052,8 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       scheduleSave();
       updatePrNote(li, ex);
       updateEffort(li, ex);
-      const finished = arr.slice(0, ex.sets).filter(x => x && x.done).length >= ex.sets;
+      updateFoot(li, ex);
+      const finished = arr.filter(x => x && x.done).length >= rowCount(ex, arr);
       renderDayProgress(finished ? ex : null);
       startTimer(ex.rest);
     } else if (btn.dataset.effort) {
@@ -1017,6 +1062,24 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       if (!eff[ex.id]) delete eff[ex.id];
       scheduleSave();
       updateEffort(li, ex);
+    } else if (btn.dataset.act === 'addset') {
+      const arr = setsFor()[ex.id] || [], n = rowCount(ex, arr);
+      rowsFor(ex.id, n);
+      const last = lastFor(ex.id);
+      const row = renderSetRow(ex, n, null, last && last.sets[n]);
+      setPlaceholders(row, ex, last ? last.sets[n] : null);
+      li.querySelector('.sets').append(row);
+      updateFoot(li, ex);
+      renderDayProgress();
+      row.querySelector('input.kg').focus();
+    } else if (btn.dataset.act === 'delset') {
+      const arr = editable()[ex.id] || [];
+      if (arr.length > ex.sets) arr.pop();
+      const rows = li.querySelectorAll('.set-row[data-set]');
+      if (rows.length > ex.sets) rows[rows.length - 1].remove();
+      scheduleSave();
+      updateFoot(li, ex);
+      renderDayProgress();
     } else if (btn.dataset.act === 'progress') {
       flush();
       state.progEx = ex.id;
@@ -1082,7 +1145,68 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const cur = win(0, 6), prev = win(7, 13);
     return { entries, cur, prev, rate: cur.n >= 3 && prev.n >= 3 ? (cur.avg - prev.avg) / prev.avg * 100 : null };
   }
+  // Rejilla de constancia: semanas en filas, las seis sesiones de la rotación
+  // en columnas. Cada hueco es una sesión que no ocurrió, que es justo lo que
+  // no se ve en una lista de sesiones hechas.
+  const STREAK_WEEKS = 8;
+  const mondayOf = date => { const t = toDate(date), m = new Date(t); m.setDate(t.getDate() - ((t.getDay() + 6) % 7)); return ymd(m); };
+  const hasWork = m => Object.values(m || {}).some(a => Array.isArray(a) && a.some(x => x && x.reps > 0));
+  function streakData() {
+    const byWeek = new Map();
+    const mark = (date, day) => {
+      const w = mondayOf(date);
+      if (!byWeek.has(w)) byWeek.set(w, new Set());
+      byWeek.get(w).add(day);
+    };
+    let first = null;
+    for (const s of state.sessions) {
+      if (!hasWork(s.sets)) continue;
+      mark(s.date, s.day);
+      if (!first || s.date < first) first = s.date;
+    }
+    if (hasWork(state.local[sessionId()])) { mark(today(), state.day); if (!first || today() < first) first = today(); }
+    const thisWeek = mondayOf(today());
+    // Sin historial se enseñan 4 semanas: las suficientes para que el vacío se
+    // vea sin llenar la pantalla de filas que nunca existieron.
+    const startFrom = first ? mondayOf(first) : ymd(new Date(toDate(thisWeek).getTime() - 21 * 86400000));
+    const weeks = [];
+    for (let w = thisWeek; w >= startFrom && weeks.length < STREAK_WEEKS; w = ymd(new Date(toDate(w).getTime() - 7 * 86400000))) weeks.unshift(w);
+    return { weeks, byWeek, total: [...byWeek.values()].reduce((a, set) => a + set.size, 0) };
+  }
+  function renderStreak() {
+    const box = $('streak');
+    if (!box) return;
+    const { weeks, byWeek, total } = streakData();
+    box.textContent = '';
+    const t = h('table', { class: 'cgrid' });
+    const head = h('tr', null, h('th', { scope: 'col' }, h('span', { class: 'vh', text: 'Semana' })));
+    for (const d of DAYS) head.append(h('th', { scope: 'col', title: d.name }, h('span', { 'aria-hidden': 'true', text: d.short }), h('span', { class: 'vh', text: d.name })));
+    head.append(h('th', { scope: 'col' }, h('span', { class: 'vh', text: 'Sesiones de la semana' })));
+    t.append(h('thead', null, head));
+    const body = h('tbody');
+    for (const w of weeks) {
+      const set = byWeek.get(w) || new Set();
+      const tr = h('tr', null, h('th', { scope: 'row', text: fmtDate(w).replace(/^[^,]+,\s*/, '') }));
+      for (const d of DAYS) {
+        const on = set.has(d.key);
+        tr.append(h('td', null, h('span', {
+          class: 'cbox' + (on ? ' on' : ''), style: on ? '--disc:' + d.disc + ';--disc-ink:' + d.ink : null,
+          title: d.name + (on ? ' hecho' : ' sin hacer')
+        }, h('span', { class: 'vh', text: d.name + (on ? ': hecho' : ': sin hacer') }))));
+      }
+      tr.append(h('td', { class: 'cnum', text: set.size + '/6' }));
+      body.append(tr);
+    }
+    t.append(body);
+    box.append(t);
+    const week = (byWeek.get(mondayOf(today())) || new Set()).size;
+    box.append(h('p', { class: 'chart-note', text: total === 0
+      ? 'Todavía no hay ninguna sesión registrada, así que la rejilla está vacía entera.'
+      : total + (total === 1 ? ' sesión' : ' sesiones') + ' en ' + weeks.length + (weeks.length === 1 ? ' semana' : ' semanas') + '. Esta semana llevas ' + week + ' de 6.' }));
+  }
+
   function renderProgress() {
+    renderStreak();
     const { entries, cur, prev, rate } = weightTrend();
 
     const stats = $('bw-stats');
@@ -2035,6 +2159,14 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     L.push('FASE');
     L.push(!ph.started ? 'Todavía sin sesiones registradas'
       : (ph.reentry ? 'Semana ' + ph.week + ' de ' + REENTRY_WEEKS + ' de reentrada' : 'Semana ' + ph.week + ', volumen') + ' (primera sesión el ' + fmtDate(ph.first) + ')');
+    const st = streakData();
+    L.push('', 'CONSTANCIA (semanas de lunes a domingo, sesiones de la rotación hechas)');
+    if (!st.weeks.length) L.push('Sin semanas que mostrar');
+    for (const w of st.weeks) {
+      const set = st.byWeek.get(w) || new Set();
+      const names = DAYS.filter(d => set.has(d.key)).map(d => d.short);
+      L.push(fmtDate(w).replace(/^[^,]+,\s*/, '') + ': ' + (names.length ? names.join(' ') : 'ninguna') + ' (' + set.size + '/6)');
+    }
     L.push('', 'PESO');
     L.push(cur.avg != null ? 'Media 7 días: ' + fmtKg(cur.avg) + ' kg (' + cur.n + (cur.n === 1 ? ' pesaje)' : ' pesajes)') : 'Sin pesajes esta semana');
     if (prev.avg != null) L.push('Semana anterior: ' + fmtKg(prev.avg) + ' kg');
