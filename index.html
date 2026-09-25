@@ -131,6 +131,8 @@ a{color:var(--accent)}
 .form-msg{min-height:1.3em;margin:6px 0 0;font-size:13px;color:var(--muted)}
 .form-msg.err{color:var(--bad)}
 .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0}
+.stats.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (min-width:560px){.stats.four{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:6px;min-width:0}
 .stat span{font-size:12px;color:var(--muted)}
 .stat strong{font:700 22px/1.1 var(--body);white-space:nowrap}
@@ -328,6 +330,10 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     <p class="backup-text">Mismo papel en el plan, distinto alimento. Cambia uno por otro sin recalcular nada.</p>
     <div id="food-swaps"></div>
 
+    <h2 class="sec next">Suplementos</h2>
+    <p class="backup-text">Lo único que vale la pena de todo lo que venden. Lo demás, incluidos los «mass gainers» y cualquier cosa que prometa atajos hormonales, es dinero tirado.</p>
+    <div id="food-supps"></div>
+
     <h2 class="sec next">Lista de la compra</h2>
     <p class="backup-text">Para 7 días, con las cantidades de tu plan. Marca lo que ya tengas.</p>
     <div class="shop-head"><span id="shop-count"></span><button class="linkbtn" type="button" id="shop-reset">Desmarcar todo</button></div>
@@ -364,6 +370,16 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       <div>
         <h3>Descarga</h3>
         <p>Cada 6-8 semanas, o antes si el rendimiento cae dos sesiones seguidas en varios ejercicios, haz una semana con la mitad de series, el mismo peso o algo menos y RIR 3-4. Después retomas donde lo dejaste.</p>
+        <p>Esa semana come a mantenimiento. Activa «Semana de descarga» en Comida y el plan baja 300 kcal durante 7 días, sin tocar tu ajuste. Forzar superávit sin estímulo solo suma grasa.</p>
+      </div>
+      <div>
+        <h3>Muévete fuera del gimnasio</h3>
+        <p>El error clásico del volumen es volverse sedentario porque «estás ganando masa». Mantén entre 8.000 y 10.000 pasos al día y dos o tres sesiones cortas de cardio suave por semana, de 15 a 20 minutos, en días que no choquen con pierna.</p>
+        <p>No te va a comer el músculo. Te mantiene sensible a la insulina, limita la grasa que ganas y, lo más práctico, te abre el apetito para las seis comidas. Los pasos no los cuento yo: eso ya lo hace el móvil, y duplicarlo aquí solo añadiría una pantalla más que mirar.</p>
+      </div>
+      <div>
+        <h3>Agua y fibra</h3>
+        <p>Entre 35 y 45 ml de agua por kilo de peso al día, más si hace calor o la sesión es larga. Comida tiene tu rango ya calculado. De fibra, entre 25 y 35 g diarios, que con la avena, la verdura, la papa y la fruta del plan ya salen; si te quedas corto, la app te avisa en el total del día.</p>
       </div>
       <div>
         <h3>Control del volumen</h3>
@@ -384,7 +400,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
         <h3>Tus datos</h3>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </div>
-      <p class="app-version">Versión 7 · 24 de septiembre de 2026</p>
+      <p class="app-version">Versión 8 · 25 de septiembre de 2026</p>
     </div>
   </section>
 </main>
@@ -505,7 +521,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
 
   // ---- almacenamiento en el móvil ----
   const KEY = 'rutina-volumen.v1';
-  const emptyStore = () => ({ v: 1, sessions: {}, bw: {}, waist: {}, shop: {}, kcalAdj: 0, adjDate: null, lastBackup: null, backupSnooze: null });
+  const emptyStore = () => ({ v: 1, sessions: {}, bw: {}, waist: {}, shop: {}, kcalAdj: 0, adjDate: null, deloadUntil: null, lastBackup: null, backupSnooze: null });
   let storageOk = true, changed = false;
   function readStore() {
     try {
@@ -515,7 +531,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       const raw = localStorage.getItem(KEY);
       if (!raw) return emptyStore();
       const d = JSON.parse(raw);
-      return { v: 1, sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
+      return { v: 1, sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, deloadUntil: isYmd(d.deloadUntil) ? d.deloadUntil : null, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
     } catch (e) {
       storageOk = false;
       return emptyStore();
@@ -1444,20 +1460,20 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
   const REF_KG = 80, KCAL_KG = 37, PROT_LO = 1.6, PROT_HI = 2.2, ADJ_STEP = 150, ADJ_MIN = -600, ADJ_MAX = 900;
   const F = {
     huevos:    { n: 'Huevos enteros',            q: 'eggs',                             u: 'ud', step: 1,  p: 6,    k: 70,  cat: 'Refrigerados', pack: 'Se venden por docena' },
-    avena:     { n: 'Avena en hojuelas',         q: 'old fashioned oats',               u: 'g',  step: 10, p: 0.13, k: 3.8, cat: 'Despensa',     pack: 'Un envase grande dura varias semanas', x: true },
-    leche:     { n: 'Leche entera',              q: 'whole milk',                       u: 'ml', step: 50, p: 0.032, k: 0.6, cat: 'Refrigerados' },
-    platano:   { n: 'Plátano',                   q: 'bananas',                          u: 'ud', step: 1,  p: 1.3,  k: 105, cat: 'Fruta y verdura', x: true },
-    yogur:     { n: 'Yogur griego natural',      q: 'plain greek yogurt',               u: 'g',  step: 10, p: 0.1,  k: 0.6, cat: 'Refrigerados' },
+    avena:     { n: 'Avena en hojuelas',         q: 'old fashioned oats',               u: 'g',  step: 10, p: 0.13, k: 3.8, fb: 0.1, cat: 'Despensa',     pack: 'Un envase grande dura varias semanas', x: true },
+    leche:     { n: 'Leche entera',              q: 'whole milk',                       u: 'ml', step: 50, p: 0.032, k: 0.6, fb: 0, cat: 'Refrigerados' },
+    platano:   { n: 'Plátano',                   q: 'bananas',                          u: 'ud', step: 1,  p: 1.3,  k: 105, fb: 2.6, cat: 'Fruta y verdura', x: true },
+    yogur:     { n: 'Yogur griego natural',      q: 'plain greek yogurt',               u: 'g',  step: 10, p: 0.1,  k: 0.6, fb: 0, cat: 'Refrigerados' },
     crema:     { n: 'Mantequilla de cacahuate',  q: 'peanut butter',                    u: 'g',  step: 5,  p: 0.23, k: 6,   cat: 'Despensa',     pack: 'Un frasco dura 2-3 semanas', x: true },
-    pollo:     { n: 'Pechuga de pollo',          q: 'boneless skinless chicken breast', u: 'g',  step: 25, p: 0.23, k: 1.2, cat: 'Carne y pescado' },
-    arroz:     { n: 'Arroz blanco (en crudo)',   q: 'white rice',                       u: 'g',  step: 10, p: 0.07, k: 3.6, cat: 'Despensa',     pack: 'Una bolsa de 5 lb dura semanas', x: true },
-    brocoli:   { n: 'Brócoli congelado',         q: 'frozen broccoli',                  u: 'g',  step: 50, p: 0.026, k: 0.35, cat: 'Congelados' },
-    aceite:    { n: 'Aceite de oliva',           q: 'olive oil',                        u: 'cda', step: 1, p: 0,    k: 120, cat: 'Despensa',     pack: 'Una botella dura más de un mes', x: true },
-    tortillas: { n: 'Tortillas de harina',       q: 'flour tortillas',                  u: 'ud', step: 1,  p: 3,    k: 140, cat: 'Despensa', x: true },
-    carne:     { n: 'Carne molida magra 93/7',   q: 'lean ground beef 93 7',            u: 'g',  step: 25, p: 0.21, k: 1.5, cat: 'Carne y pescado' },
-    papa:      { n: 'Papa',                      q: 'russet potatoes',                  u: 'g',  step: 50, p: 0.02, k: 0.77, cat: 'Fruta y verdura', x: true },
-    ensalada:  { n: 'Ensalada verde',            q: 'salad mix',                        u: 'g',  step: 50, p: 0.01, k: 0.2, cat: 'Fruta y verdura' },
-    requeson:  { n: 'Requesón (cottage cheese)', q: 'cottage cheese',                   u: 'g',  step: 25, p: 0.11, k: 0.9, cat: 'Refrigerados' }
+    pollo:     { n: 'Pechuga de pollo',          q: 'boneless skinless chicken breast', u: 'g',  step: 25, p: 0.23, k: 1.2, fb: 0, cat: 'Carne y pescado' },
+    arroz:     { n: 'Arroz blanco (en crudo)',   q: 'white rice',                       u: 'g',  step: 10, p: 0.07, k: 3.6, fb: 0.004, cat: 'Despensa',     pack: 'Una bolsa de 5 lb dura semanas', x: true },
+    brocoli:   { n: 'Brócoli congelado',         q: 'frozen broccoli',                  u: 'g',  step: 50, p: 0.026, k: 0.35, fb: 0.026, cat: 'Congelados' },
+    aceite:    { n: 'Aceite de oliva',           q: 'olive oil',                        u: 'cda', step: 1, p: 0,    k: 120, fb: 0, cat: 'Despensa',     pack: 'Una botella dura más de un mes', x: true },
+    tortillas: { n: 'Tortillas de harina',       q: 'flour tortillas',                  u: 'ud', step: 1,  p: 3,    k: 140, fb: 1.5, cat: 'Despensa', x: true },
+    carne:     { n: 'Carne molida magra 93/7',   q: 'lean ground beef 93 7',            u: 'g',  step: 25, p: 0.21, k: 1.5, fb: 0, cat: 'Carne y pescado' },
+    papa:      { n: 'Papa',                      q: 'russet potatoes',                  u: 'g',  step: 50, p: 0.02, k: 0.77, fb: 0.022, cat: 'Fruta y verdura', x: true },
+    ensalada:  { n: 'Ensalada verde',            q: 'salad mix',                        u: 'g',  step: 50, p: 0.01, k: 0.2, fb: 0.015, cat: 'Fruta y verdura' },
+    requeson:  { n: 'Requesón (cottage cheese)', q: 'cottage cheese',                   u: 'g',  step: 25, p: 0.11, k: 0.9, fb: 0, cat: 'Refrigerados' }
   };
   const MEALS = [
     { n: 'Desayuno',       w: 'Al levantarte',              items: [['huevos', 3], ['avena', 80], ['leche', 250], ['platano', 1]] },
@@ -1474,6 +1490,12 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     { t: 'En vez de avena', o: [['Pan integral', 'whole wheat bread'], ['Cereal de trigo integral', 'shredded wheat cereal'], ['Tortitas de avena', 'pancake mix']] },
     { t: 'En vez de requesón o yogur', o: [['Kéfir', 'kefir'], ['Leche con proteína', 'fairlife protein milk'], ['Proteína en polvo', 'whey protein powder']] },
     { t: 'Verdura, la que quieras', o: [['Espinaca congelada', 'frozen spinach'], ['Judía verde', 'green beans'], ['Zanahoria', 'carrots'], ['Pimiento', 'bell peppers']] }
+  ];
+  const SUPPS = [
+    { id: 'creatina', n: 'Creatina monohidratada', q: 'creatine monohydrate powder', cat: 'Suplementos', pack: 'Un bote de 500 g dura más de 3 meses',
+      d: '3 a 5 g al día, todos los días, a la hora que quieras y mezclada con lo que sea. Sin fase de carga y sin ciclos. Es el suplemento con más respaldo para ganar músculo, y de los más baratos.' },
+    { id: 'whey', n: 'Proteína en polvo', q: 'whey protein powder', cat: 'Suplementos', pack: 'Opcional', opt: true,
+      d: 'Comodidad, no necesidad. Si llegas a tu proteína comiendo, no te hace falta. Un scoop suma unos 24 g de proteína por 120 kcal, útil el día que te quedas corto.' }
   ];
   const STORES = [
     { n: 'Walmart', u: q => 'https://www.walmart.com/search?q=' + encodeURIComponent(q) },
@@ -1499,7 +1521,11 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     return Math.max(f.step, Math.round(raw / f.step) * f.step);
   };
   const unitText = (f, a) => (f.u === 'ud' ? a + (a === 1 ? ' unidad' : ' unidades') : f.u === 'cda' ? a + (a === 1 ? ' cucharada' : ' cucharadas') : a + ' ' + f.u);
-  const kcalTarget = kg => Math.round(kg * KCAL_KG) + (store.kcalAdj || 0);
+  // Semana de descarga: se come a mantenimiento, unas 300 kcal por debajo del
+  // objetivo de volumen, sin tocar el ajuste guardado. Caduca sola a los 7 días.
+  const DELOAD_KCAL = 300;
+  const deloadOn = () => !!(store.deloadUntil && isYmd(store.deloadUntil) && diffDays(today(), store.deloadUntil) >= 0);
+  const kcalTarget = kg => Math.round(kg * KCAL_KG) + (store.kcalAdj || 0) - (deloadOn() ? DELOAD_KCAL : 0);
   function planFor(kg) {
     const target = kcalTarget(kg), wf = kg / REF_KG;
     let fixK = 0, flexK = 0;
@@ -1508,7 +1534,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       if (f.x) flexK += f.k * base * wf; else fixK += f.k * base * wf;
     }
     const s = flexK > 0 ? Math.min(1.8, Math.max(0.55, (target - fixK) / flexK)) : 1;
-    let p = 0, k = 0;
+    let p = 0, k = 0, fib = 0;
     const flex = [];
     const meals = MEALS.map(m => ({
       n: m.n, w: m.w,
@@ -1516,6 +1542,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
         const f = F[id], a = amountFor(f, f.x ? base * s : base, kg);
         p += f.p * a;
         k += f.k * a;
+        fib += (f.fb || 0) * a;
         const it = { id, f, a };
         if (f.x) {
           const step = f.step, ref = base * wf;
@@ -1541,9 +1568,10 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       const d = best.na - best.fx.it.a;
       k += d * best.fx.it.f.k;
       p += d * best.fx.it.f.p;
+      fib += d * (best.fx.it.f.fb || 0);
       best.fx.it.a = best.na;
     }
-    return { meals, p, k, target };
+    return { meals, p, k, fib, target };
   }
   function renderFood() {
     const kg = planKg();
@@ -1560,10 +1588,16 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     }
     const plan = planFor(kg);
     const adj = store.kcalAdj || 0;
-    targets.append(h('div', { class: 'stats' },
+    targets.append(h('div', { class: 'stats four' },
       stat('Calorías al día', Math.round(plan.target / 10) * 10 + ' kcal'),
       stat('Proteína', Math.round(kg * PROT_LO) + '-' + Math.round(kg * PROT_HI) + ' g'),
-      stat('Grasa mínima', Math.round(kg * 0.8) + ' g')));
+      stat('Grasa mínima', Math.round(kg * 0.8) + ' g'),
+      stat('Agua', nf1.format(kg * 0.035) + '-' + nf1.format(kg * 0.045) + ' L')));
+    const deload = deloadOn();
+    targets.append(h('div', { class: 'adjust' },
+      h('span', { class: 'tile-label', text: 'Semana de descarga' }),
+      h('button', { class: 'btn small' + (deload ? ' primary' : ''), type: 'button', 'data-deload': '1', 'aria-pressed': String(deload) }, deload ? 'Activa, quitar' : 'Activar'),
+      h('span', { class: 'tile-delta', text: deload ? 'Comes a mantenimiento, ' + DELOAD_KCAL + ' kcal menos, hasta el ' + fmtDate(store.deloadUntil) + '.' : 'En la semana de descarga baja el estímulo, así que se come a mantenimiento.' })));
     const minus = h('button', { class: 'adj-btn', type: 'button', 'data-adj': -ADJ_STEP, 'aria-label': 'Quitar ' + ADJ_STEP + ' calorías' }, '−');
     const plus = h('button', { class: 'adj-btn', type: 'button', 'data-adj': ADJ_STEP, 'aria-label': 'Añadir ' + ADJ_STEP + ' calorías' }, '+');
     minus.disabled = adj <= ADJ_MIN;
@@ -1623,10 +1657,21 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     tot.append(h('div', { class: 'tile' },
       h('div', { class: 'tile-top' },
         h('div', null, h('div', { class: 'tile-label', text: 'Total del día' }), h('div', { class: 'tile-value', text: Math.round(plan.k / 10) * 10 + ' kcal' })),
-        h('div', { class: 'tile-delta', text: Math.round(plan.p) + ' g de proteína · ' + nf1.format(plan.p / kg) + ' g por kilo' })),
-      h('p', { class: 'tile-note' }, chip, h('span', { text: advice + ' Margen de más o menos un 10 %, y no hace falta que peses la verdura ni la ensalada.' }))));
+        h('div', { class: 'tile-delta', text: Math.round(plan.p) + ' g de proteína · ' + Math.round(plan.fib) + ' g de fibra · ' + nf1.format(plan.p / kg) + ' g por kilo' })),
+      h('p', { class: 'tile-note' }, chip, h('span', { text: advice + ' Margen de más o menos un 10 %, y no hace falta que peses la verdura ni la ensalada.' })),
+      plan.fib < 25 ? h('p', { class: 'tile-note' }, h('span', { class: 'chip low', text: 'Poca fibra' }), h('span', { text: 'Por debajo de los 25 g al día. Súmale verdura o fruta, que con este volumen de comida lo vas a notar.' })) : null));
+    renderSupps();
     renderSwaps();
     renderShop(plan);
+  }
+  function renderSupps() {
+    const box = $('food-supps');
+    box.textContent = '';
+    for (const s of SUPPS) {
+      box.append(h('div', { class: 'meal' },
+        h('div', { class: 'meal-head' }, h('h3', { text: s.n }), s.opt ? h('span', { text: 'Opcional' }) : null),
+        h('div', { class: 'food-row' }, h('span', { class: 'food-name', text: s.d }), h('span', null), storeLinks(s.q, s.n))));
+    }
   }
   function renderSwaps() {
     const box = $('food-swaps');
@@ -1662,6 +1707,11 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       if (!c) cats.push(c = { n: f.cat, items: [] });
       c.items.push({ id, f, a });
     }
+    for (const s of SUPPS) {
+      let c = cats.find(x => x.n === s.cat);
+      if (!c) cats.push(c = { n: s.cat, items: [] });
+      c.items.push({ id: s.id, f: s, a: null });
+    }
     let done = 0, total = 0;
     for (const c of cats) {
       box.append(h('p', { class: 'shop-cat', text: c.n }));
@@ -1671,9 +1721,10 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
         if (on) done++;
         const cb = h('input', { type: 'checkbox', id: 'shop-' + it.id, 'data-id': it.id });
         cb.checked = on;
+        const sub = it.a == null ? (it.f.pack || '') : weeklyText(it.f, it.a) + (it.f.pack ? ' · ' + it.f.pack : '');
         const main = h('div', { class: 'shop-main' },
           h('b', { text: it.f.n }),
-          h('span', { class: 'food-sub', text: weeklyText(it.f, it.a) + (it.f.pack ? ' · ' + it.f.pack : '') }));
+          h('span', { class: 'food-sub', text: sub }));
         box.append(h('div', { class: 'shop-item' + (on ? ' on' : '') }, cb, main, storeLinks(it.f.q, it.f.n)));
       }
     }
@@ -1690,6 +1741,15 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     $('shop-count').textContent = Math.min(n, tot) + ' de ' + tot + ' marcados';
   });
   $('food-targets').addEventListener('click', e => {
+    const dl = e.target.closest('button[data-deload]');
+    if (dl) {
+      if (deloadOn()) store.deloadUntil = null;
+      else { const d = new Date(); d.setDate(d.getDate() + 6); store.deloadUntil = ymd(d); }
+      changed = true;
+      persistNow();
+      renderFood();
+      return;
+    }
     const b = e.target.closest('button[data-adj]');
     if (!b) return;
     const v = b.dataset.adj;
