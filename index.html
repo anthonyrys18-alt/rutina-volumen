@@ -147,6 +147,7 @@ a{color:var(--accent)}
 .backup-status{margin:0 0 10px;font-size:13px;color:var(--muted)}
 .backup-status.warn{color:var(--warn);font-weight:600}
 .backup-actions{display:flex;flex-wrap:wrap;gap:8px}
+.summary-out{width:100%;margin-top:8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);padding:10px;font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical}
 details.sess{border:1px solid var(--line);border-radius:12px;background:var(--surface);margin-bottom:8px}
 details.sess summary{cursor:pointer;list-style:none;padding:12px 14px;display:flex;justify-content:space-between;gap:12px;align-items:baseline}
 details.sess summary::-webkit-details-marker{display:none}
@@ -264,6 +265,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
   <div class="banner info" id="update" role="status" hidden><span>Hay una versión nueva de la app.</span><button class="btn primary small" type="button" id="update-btn">Actualizar</button></div>
   <section id="tab-entreno" role="tabpanel" aria-labelledby="tab-btn-entreno">
     <div class="banner info" id="install" hidden></div>
+    <div class="banner info" id="phase" hidden></div>
     <div class="banner nag" id="backup-nag" role="status" hidden></div>
     <div class="days" id="days" role="tablist" aria-label="Día de la rutina"></div>
     <p class="banner" id="banner" hidden></p>
@@ -311,6 +313,14 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
       <input class="vh" id="import-file" type="file" accept="application/json,.json">
     </div>
     <p class="form-msg" id="backup-msg" role="status" aria-live="polite"></p>
+
+    <h2 class="sec next">Resumen para Claude</h2>
+    <p class="backup-text">Copia tus últimas semanas en texto y pégalas en tu conversación con Claude para que las interprete: fase, peso, cintura, objetivo de comida y cómo va la fuerza de cada ejercicio.</p>
+    <div class="backup-actions">
+      <button class="btn" id="summary-btn" type="button">Copiar resumen</button>
+    </div>
+    <p class="form-msg" id="summary-msg" role="status" aria-live="polite"></p>
+    <textarea class="summary-out" id="summary-out" readonly hidden rows="12" aria-label="Resumen para copiar a mano"></textarea>
 
     <h2 class="sec next">Historial</h2>
     <div id="history"></div>
@@ -364,6 +374,15 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
         </ul>
       </div>
       <div>
+        <h3>Reentrada</h3>
+        <p>Vuelves de un parón, así que las 3 primeras semanas van más suaves: en cada serie deja 2 o 3 repeticiones en reserva en vez de apretar, y come a mantenimiento. La app ya muestra esos RIR en Entreno y baja el objetivo de calorías sola.</p>
+        <p>Las semanas se cuentan desde tu primera sesión registrada, no desde hoy. Desde la semana 4 pasa a RIR 1-2 y al superávit de volumen. Si el primer día acabas con agujetas que te impiden entrenar al siguiente, te pasaste: la reentrada existe justo para eso.</p>
+      </div>
+      <div>
+        <h3>Pedirme opinión</h3>
+        <p>En Progreso tienes «Copiar resumen». Te pone en el portapapeles tus últimas semanas en texto y lo pegas en una conversación con Claude para que las interprete. La app no lleva IA dentro a propósito: meter una clave en una página pública es regalarla, y una IA sin tu historial daría peores respuestas que la conversación que ya tienes abierta.</p>
+      </div>
+      <div>
         <h3>Si te saltas un día</h3>
         <p>Sigue con el siguiente de la lista en vez de juntar dos sesiones. La etiqueta «Toca» marca el día que sigue en la rotación según tu última sesión guardada.</p>
       </div>
@@ -400,7 +419,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
         <h3>Tus datos</h3>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </div>
-      <p class="app-version">Versión 8 · 25 de septiembre de 2026</p>
+      <p class="app-version">Versión 9 · 25 de septiembre de 2026</p>
     </div>
   </section>
 </main>
@@ -637,7 +656,31 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     }
   }
 
+  // Reentrada: las 3 primeras semanas desde tu primera sesión registrada se
+  // entrena con más margen y se come a mantenimiento. Volver de un parón con
+  // el acelerador a fondo solo trae agujetas que impiden entrenar al día
+  // siguiente, y superávit sin capacidad de entrenar es grasa.
+  const REENTRY_WEEKS = 3;
+  const RE_RIR = { '0-1': '1-2', '1-2': '2-3', '2': '3' };
+  function phase() {
+    const first = state.sessions.length ? state.sessions[state.sessions.length - 1].date : null;
+    if (!first) return { started: false, week: 0, reentry: true };
+    const week = Math.floor(diffDays(first, today()) / 7) + 1;
+    return { started: true, week, first, reentry: week <= REENTRY_WEEKS };
+  }
+  const rirFor = ex => (phase().reentry ? (RE_RIR[ex.rir] || ex.rir) : ex.rir);
+  function renderPhase() {
+    const box = $('phase'), ph = phase();
+    box.textContent = '';
+    if (!ph.reentry) { box.hidden = true; return; }
+    box.append(ph.started
+      ? h('span', { text: 'Semana ' + ph.week + ' de ' + REENTRY_WEEKS + ' de reentrada. Deja 2 o 3 repeticiones en reserva en vez de apretar, y come a mantenimiento. Desde la semana ' + (REENTRY_WEEKS + 1) + ' subes carga y calorías.' })
+      : h('span', { text: 'Vuelves de un parón, así que las 3 primeras semanas son de reentrada: más margen en cada serie y calorías de mantenimiento. Las semanas empiezan a contar cuando registres tu primera sesión.' }));
+    box.hidden = false;
+  }
+
   function renderDay() {
+    renderPhase();
     const d = findDay(state.day) || DAYS[0];
     const total = d.ex.reduce((a, e) => a + e.sets, 0);
     const head = $('dayhead');
@@ -655,7 +698,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     const li = h('li', { class: 'ex', id: 'ex-' + ex.id, 'data-ex': ex.id });
     const rx = h('div', { class: 'rx' },
       h('span', null, h('strong', { text: ex.sets + ' × ' + ex.reps[0] + '-' + ex.reps[1] }), ex.side ? ' ' + ex.side : ''),
-      h('span', { text: 'RIR ' + ex.rir }),
+      h('span', { text: 'RIR ' + rirFor(ex) }),
       h('span', { text: 'Descanso ' + fmtRest(ex.rest) }),
       h('a', { class: 'vid', href: YT(ex.video), target: '_blank', rel: 'noopener noreferrer' }, 'Técnica ↗'));
     li.append(h('div', { class: 'ex-head' },
@@ -1012,6 +1055,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
   // ---- cintura ----
   const fmtCm = n => nf1.format(n);
   const signedUnit = (n, unit) => (n === 0 ? 'sin cambios' : (n > 0 ? '+' : '−') + nf1.format(Math.abs(n)) + ' ' + unit);
+  const rateText = r => (r < 0 ? 'bajó un ' + nf2.format(Math.abs(r)) + ' %' : 'subió un ' + nf2.format(r) + ' %');
   function waistEntries() {
     return Object.entries(store.waist)
       .filter(([d, v]) => isYmd(d) && typeof v === 'number')
@@ -1457,7 +1501,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
   // x: true = alimento flexible. Los anclajes de proteína sólo escalan con el
   // peso; los flexibles absorben además el ajuste de calorías, que es como se
   // sube o se baja una dieta sin tocar la proteína.
-  const REF_KG = 80, KCAL_KG = 37, PROT_LO = 1.6, PROT_HI = 2.2, ADJ_STEP = 150, ADJ_MIN = -600, ADJ_MAX = 900;
+  const REF_KG = 80, KCAL_KG = 37, KCAL_KG_RE = 34.5, PROT_LO = 1.6, PROT_HI = 2.2, ADJ_STEP = 150, ADJ_MIN = -600, ADJ_MAX = 900;
   const F = {
     huevos:    { n: 'Huevos enteros',            q: 'eggs',                             u: 'ud', step: 1,  p: 6,    k: 70,  cat: 'Refrigerados', pack: 'Se venden por docena' },
     avena:     { n: 'Avena en hojuelas',         q: 'old fashioned oats',               u: 'g',  step: 10, p: 0.13, k: 3.8, fb: 0.1, cat: 'Despensa',     pack: 'Un envase grande dura varias semanas', x: true },
@@ -1525,7 +1569,7 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
   // objetivo de volumen, sin tocar el ajuste guardado. Caduca sola a los 7 días.
   const DELOAD_KCAL = 300;
   const deloadOn = () => !!(store.deloadUntil && isYmd(store.deloadUntil) && diffDays(today(), store.deloadUntil) >= 0);
-  const kcalTarget = kg => Math.round(kg * KCAL_KG) + (store.kcalAdj || 0) - (deloadOn() ? DELOAD_KCAL : 0);
+  const kcalTarget = kg => Math.round(kg * (phase().reentry ? KCAL_KG_RE : KCAL_KG)) + (store.kcalAdj || 0) - (deloadOn() ? DELOAD_KCAL : 0);
   function planFor(kg) {
     const target = kcalTarget(kg), wf = kg / REF_KG;
     let fixK = 0, flexK = 0;
@@ -1613,27 +1657,32 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     // hasta entonces no se vuelve a proponer otro; a mano sigue pudiendo.
     const sinceAdj = store.adjDate ? diffDays(store.adjDate, today()) : null;
     const waiting = sinceAdj != null && sinceAdj < 14;
+    const ph = phase();
     const sug = h('p', { class: 'tile-note' });
-    if (rate == null) {
+    if (ph.reentry && rate != null && rate <= 0.5) {
+      sug.append(h('span', { class: 'chip hold', text: 'Reentrada' }),
+        h('span', { text: (ph.started ? 'Semana ' + ph.week + ' de ' + REENTRY_WEEKS + '. ' : '') + 'Ahora comes a mantenimiento, así que no subir de peso es lo esperado. El superávit empieza en la semana ' + (REENTRY_WEEKS + 1) + ', y desde ahí te propongo ajustes con tu ritmo real.' }));
+    } else if (rate == null) {
       sug.append(h('span', { text: 'Con 3 pesajes en cada una de las dos últimas semanas te propongo el ajuste yo, con tu ritmo real.' }));
     } else if (waiting) {
       sug.append(h('span', { class: 'chip hold', text: 'Dale tiempo' }),
-        h('span', { text: 'Cambiaste la comida ' + (sinceAdj === 0 ? 'hoy mismo' : 'hace ' + sinceAdj + (sinceAdj === 1 ? ' día' : ' días')) + '. Un cambio tarda unas 2 semanas en notarse en la báscula, así que vuelve a mirar el ' + fmtDate(ymd(new Date(toDate(store.adjDate).getTime() + 14 * 86400000))) + '. Ahora mismo subes al ' + nf2.format(rate) + ' % por semana.' }));
+        h('span', { text: 'Cambiaste la comida ' + (sinceAdj === 0 ? 'hoy mismo' : 'hace ' + sinceAdj + (sinceAdj === 1 ? ' día' : ' días')) + '. Un cambio tarda unas 2 semanas en notarse en la báscula, así que vuelve a mirar el ' + fmtDate(ymd(new Date(toDate(store.adjDate).getTime() + 14 * 86400000))) + '. Ahora mismo tu peso ' + rateText(rate) + ' por semana.' }));
     } else if (rate < 0.25 && adj < ADJ_MAX) {
       sug.append(h('span', { class: 'chip low', text: 'Te has estancado' }),
-        h('span', { text: 'Tu peso subió ' + nf2.format(rate) + ' % esta semana, por debajo del 0,25 % que buscamos.' }),
+        h('span', { text: 'Tu peso ' + rateText(rate) + ' esta semana, por debajo del 0,25 % que buscamos.' }),
         h('button', { class: 'btn primary small', type: 'button', 'data-adj': ADJ_STEP }, 'Subir ' + ADJ_STEP + ' kcal'));
     } else if (rate > 0.5 && adj > ADJ_MIN) {
       sug.append(h('span', { class: 'chip bad', text: 'Subes muy rápido' }),
-        h('span', { text: 'Tu peso subió ' + nf2.format(rate) + ' % esta semana, por encima del 0,5 %. Si se repite 2-3 semanas, baja la comida.' }),
+        h('span', { text: 'Tu peso ' + rateText(rate) + ' esta semana, por encima del 0,5 %. Si se repite 2-3 semanas, baja la comida.' }),
         h('button', { class: 'btn small', type: 'button', 'data-adj': -ADJ_STEP }, 'Bajar ' + ADJ_STEP + ' kcal'));
     } else {
-      sug.append(h('span', { class: 'chip up', text: '✓ Buen ritmo' }), h('span', { text: 'Subes al ' + nf2.format(rate) + ' % por semana. No toques nada.' }));
+      sug.append(h('span', { class: 'chip up', text: '✓ Buen ritmo' }), h('span', { text: 'Tu peso ' + rateText(rate) + ' por semana. No toques nada.' }));
     }
     targets.append(h('div', { class: 'tile' }, sug));
     basis.textContent = 'Calculado con tu media de los últimos 7 días, ' + fmtKg(kg) + ' kg'
-      + (cur.n ? ' (' + cur.n + (cur.n === 1 ? ' pesaje' : ' pesajes') + ')' : '')
-      + '. Cuando cambies el ajuste, suben o bajan la avena, el arroz, la papa, las tortillas y las grasas; la proteína se queda donde está.';
+      + (cur.n ? ' (' + cur.n + (cur.n === 1 ? ' pesaje' : ' pesajes') + ')' : '') + '. '
+      + (ph.reentry ? 'Estás en reentrada, así que va a mantenimiento; desde la semana ' + (REENTRY_WEEKS + 1) + ' sube solo al objetivo de volumen. ' : '')
+      + 'Cuando cambies el ajuste, suben o bajan la avena, el arroz, la papa, las tortillas y las grasas; la proteína se queda donde está.';
 
     const box = $('food-plan');
     box.textContent = '';
@@ -1767,6 +1816,77 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
     changed = true;
     persistNow();
     renderFood();
+  });
+
+  // ---- resumen para pegar en Claude ----
+  function claudeSummary() {
+    const L = [], kg = planKg(), { cur, prev, rate } = weightTrend(), ph = phase();
+    L.push('Resumen de mi app Rutina de Volumen · ' + fmtDate(today()), '');
+    L.push('FASE');
+    L.push(!ph.started ? 'Todavía sin sesiones registradas'
+      : (ph.reentry ? 'Semana ' + ph.week + ' de ' + REENTRY_WEEKS + ' de reentrada' : 'Semana ' + ph.week + ', volumen') + ' (primera sesión el ' + fmtDate(ph.first) + ')');
+    L.push('', 'PESO');
+    L.push(cur.avg != null ? 'Media 7 días: ' + fmtKg(cur.avg) + ' kg (' + cur.n + (cur.n === 1 ? ' pesaje)' : ' pesajes)') : 'Sin pesajes esta semana');
+    if (prev.avg != null) L.push('Semana anterior: ' + fmtKg(prev.avg) + ' kg');
+    L.push(rate != null ? 'Ritmo: ' + (rate >= 0 ? '+' : '−') + nf2.format(Math.abs(rate)) + ' % por semana' : 'Ritmo: faltan pesajes para calcularlo');
+    const w = waistEntries();
+    if (w.length) {
+      const last = w[w.length - 1];
+      let ref = null;
+      for (let i = w.length - 2; i >= 0; i--) if (diffDays(w[i][0], last[0]) >= 21) { ref = w[i]; break; }
+      L.push('Cintura: ' + fmtCm(last[1]) + ' cm el ' + fmtDate(last[0]) + (ref ? ' (' + signedUnit(last[1] - ref[1], 'cm') + ' en ' + weeksText(diffDays(ref[0], last[0])) + ')' : ''));
+    }
+    L.push('', 'COMIDA');
+    if (kg != null) {
+      L.push('Objetivo: ' + Math.round(kcalTarget(kg) / 10) * 10 + ' kcal al día'
+        + (store.kcalAdj ? ' · ajuste ' + (store.kcalAdj > 0 ? '+' : '−') + Math.abs(store.kcalAdj) + ' kcal desde el ' + fmtDate(store.adjDate) : ' · sin ajuste'));
+      if (deloadOn()) L.push('Semana de descarga activa hasta el ' + fmtDate(store.deloadUntil));
+    } else L.push('Sin peso apuntado, no hay objetivo calculado');
+    L.push('', 'FUERZA (mejor serie convertida a 1RM estimado)');
+    let any = false;
+    for (const d of DAYS) for (const ex of d.ex) {
+      const { metric, pts } = strengthSeries(ex);
+      if (!pts.length) continue;
+      any = true;
+      const u = metric === 'reps' ? 'reps' : 'kg';
+      const fv = v => (metric === 'reps' ? String(Math.round(v)) : nf1.format(v));
+      const lastPt = pts[pts.length - 1];
+      if (pts.length === 1) { L.push('- ' + ex.name + ': ' + fv(lastPt.v) + ' ' + u + ' (1 sesión, ' + lastPt.best + ')'); continue; }
+      const tr = strengthTrend(pts);
+      const tag = tr && tr.plateau ? 'estancado' : !tr || tr.delta === 0 ? 'igual' : tr.delta > 0 ? 'subiendo' : 'bajando';
+      L.push('- ' + ex.name + ': ' + fv(pts[0].v) + ' → ' + fv(lastPt.v) + ' ' + u + ' en ' + pts.length + ' sesiones · ' + tag + ' · última ' + lastPt.best);
+    }
+    if (!any) L.push('Sin series registradas todavía');
+    L.push('', 'ÚLTIMAS SESIONES');
+    const recent = state.sessions.slice(0, 6);
+    if (!recent.length) L.push('Ninguna');
+    for (const s of recent) {
+      const d = findDay(s.day), parts = [];
+      for (const [exId, arr] of Object.entries(s.sets || {})) {
+        const done = Array.isArray(arr) ? arr.filter(x => x && x.reps > 0) : [];
+        if (!done.length) continue;
+        const ex = EX[exId];
+        parts.push((ex ? ex.name : exId) + ' ' + done.map(x => fmtSet(ex, x)).join('/'));
+      }
+      L.push(fmtDate(s.date) + ' · ' + (d ? d.name : s.day) + ': ' + (parts.join(' | ') || 'sin series'));
+    }
+    return L.join('\n');
+  }
+  function summaryMsg(text, err) { const m = $('summary-msg'); m.textContent = text; m.classList.toggle('err', !!err); }
+  $('summary-btn').addEventListener('click', async () => {
+    flush();
+    const text = claudeSummary(), out = $('summary-out');
+    try {
+      await navigator.clipboard.writeText(text);
+      out.hidden = true;
+      summaryMsg('Copiado. Pégalo en tu conversación con Claude.');
+    } catch (e) {
+      out.value = text;
+      out.hidden = false;
+      out.focus();
+      out.select();
+      summaryMsg('Este navegador no me deja copiar solo. Copia el texto del recuadro a mano.', true);
+    }
   });
 
   // ---- pestañas y días ----
