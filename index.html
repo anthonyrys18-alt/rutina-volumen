@@ -255,6 +255,12 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
 .guide p,.guide li{margin:0;font-size:15px}
 .guide ul{margin:0;padding-left:18px;display:grid;gap:6px}
 .guide .app-version{margin:0;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.guide details.g{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--surface)}
+.guide details.g summary{cursor:pointer;list-style:none;margin:0;font:800 20px/1.1 var(--display);text-transform:uppercase;letter-spacing:.02em;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.guide details.g summary::-webkit-details-marker{display:none}
+.guide details.g summary::after{content:'+';color:var(--muted);font-size:22px;font-weight:400;line-height:1}
+.guide details.g[open] summary{margin-bottom:10px}
+.guide details.g[open] summary::after{content:'\2212'}
 
 .timer{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--timer-bg);color:var(--timer-ink);padding:10px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .timer.done{--timer-bg:var(--ok);--timer-ink:var(--surface)}
@@ -468,100 +474,106 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
 
   <section id="tab-guia" role="tabpanel" aria-labelledby="tab-btn-guia" hidden>
     <div class="guide">
-      <div>
-        <h3>Cómo anotar</h3>
+      <details class="g" open>
+        <summary>Cómo anotar</summary>
         <p>El peso viene ya puesto con el de la última vez, así que solo lo tocas cuando subes carga. Las repeticiones van vacías a propósito: con el número anterior delante pararías ahí en vez de pelear por una más. Escribe las reps y toca ✓; la serie queda marcada, arranca el descanso y se guarda en el móvil. Si una serie supera tu mejor marca de ese ejercicio, la app te lo avisa como récord.</p>
         <p>Bajo el nombre del día ves cuántas series llevas de las que tocan, y al marcar la última sale el aviso de sesión completada con la cuenta de sesiones de esta semana.</p>
-      </div>
-      <div>
-        <h3>¿Cómo fue?</h3>
+      </details>
+      <details class="g" open>
+        <summary>¿Cómo fue?</summary>
         <p>Al marcar la primera serie de un ejercicio aparecen tres botones: fácil, justo y al límite. Es el RIR dicho en una palabra, para que no tengas que calcular nada con el pulso a 140: fácil son 3 repeticiones o más de sobra, justo son 1 o 2, al límite es ninguna.</p>
         <p>No es un adorno. Si marcas fácil, la próxima vez la app te dirá «Sube carga» aunque no llegaras al tope del rango, porque el rango se te quedó corto. Y va dentro del resumen que copias, que es lo que separa una tabla de números de algo interpretable: 60 kg × 8 al límite y 60 kg × 8 fácil no son la misma sesión.</p>
-      </div>
-      <div>
-        <h3>RIR</h3>
+      </details>
+      <details class="g" open>
+        <summary>RIR</summary>
         <p>Son las repeticiones que te quedan en reserva al terminar la serie. Con RIR 1-2 paras cuando todavía podrías hacer 1 o 2 más con buena técnica. Con RIR 0, la última repetición es la última que sale limpia.</p>
-      </div>
-      <div>
-        <h3>Series de más</h3>
+      </details>
+      <details class="g" open>
+        <summary>Series de más</summary>
         <p>Debajo de cada ejercicio tienes «+ Añadir serie». El plan marca las series que te tocan, no un techo: si un día te sobra tiempo y haces una cuarta, se apunta como las demás y entra en la cuenta del día y en tus registros. Mientras esté vacía puedes quitarla, y si la dejas sin rellenar no se guarda.</p>
         <p>Eso sí, añadir series todas las semanas deja de ser un extra y pasa a ser otro plan distinto sin haberlo pensado. Si te pasa, dímelo y revisamos el volumen en serio.</p>
-      </div>
-      <div>
-        <h3>Progresión</h3>
+      </details>
+      <details class="g" open>
+        <summary>Progresión</summary>
         <p>Trabaja dentro del rango de repeticiones. Cuando completes todas las series en el tope del rango, sube el peso lo mínimo que permita el material y vuelve a la parte baja. La etiqueta «Sube carga» aparece cuando la última sesión cumplió esa condición, o cuando la marcaste como fácil.</p>
-      </div>
-      <div>
-        <h3>Descansos y calentamiento</h3>
+      </details>
+      <details class="g" open>
+        <summary>Descansos y calentamiento</summary>
         <ul>
           <li>2-3 minutos en los dos primeros ejercicios de cada día, en fondos y en dominadas; 1-2 minutos en el resto. El temporizador ya trae ese tiempo para cada ejercicio.</li>
           <li>Antes del primer ejercicio de cada grupo muscular, haz 2-3 series de aproximación (50 % × 10, 70 % × 5, 85 % × 3). No hace falta anotarlas.</li>
           <li>La primera semana deja una repetición más en reserva mientras calibras los pesos.</li>
         </ul>
-      </div>
-      <div>
-        <h3>Voz</h3>
+      </details>
+      <details class="g" open>
+        <summary>Voz</summary>
         <p>El altavoz de arriba a la derecha enciende y apaga los avisos hablados: cuándo se acaba el descanso, qué ejercicio toca después y cuándo cierras la sesión. Así no sacas el móvil del bolsillo entre series.</p>
         <p>Usa la voz que ya trae el iPhone, funciona sin conexión y respeta el interruptor de silencio del teléfono. El botón se queda como lo dejes.</p>
-      </div>
-      <div>
-        <h3>Reentrada</h3>
+      </details>
+      <details class="g" open>
+        <summary>Reentrada</summary>
         <p>Vuelves de un parón, así que las 3 primeras semanas van más suaves: en cada serie deja 2 o 3 repeticiones en reserva en vez de apretar, y come a mantenimiento. La app ya muestra esos RIR en Entreno y baja el objetivo de calorías sola.</p>
         <p>Las semanas se cuentan desde tu primera sesión registrada, no desde hoy. Desde la semana 4 pasa a RIR 1-2 y al superávit de volumen. Si el primer día acabas con agujetas que te impiden entrenar al siguiente, te pasaste: la reentrada existe justo para eso.</p>
-      </div>
-      <div>
-        <h3>Pedirme opinión</h3>
+      </details>
+      <details class="g" open>
+        <summary>Pedirme opinión</summary>
         <p>En Progreso tienes «Copiar resumen». Te pone en el portapapeles tus últimas semanas en texto y lo pegas en una conversación con Claude para que las interprete. La app no lleva IA dentro a propósito: meter una clave en una página pública es regalarla, y una IA sin tu historial daría peores respuestas que la conversación que ya tienes abierta.</p>
-      </div>
-      <div>
-        <h3>Si te saltas un día</h3>
+      </details>
+      <details class="g" open>
+        <summary>Si te saltas un día</summary>
         <p>Sigue con el siguiente de la lista en vez de juntar dos sesiones. La etiqueta «Toca» marca el día que sigue en la rotación según tu última sesión guardada.</p>
-      </div>
-      <div>
-        <h3>Descarga</h3>
+      </details>
+      <details class="g" open>
+        <summary>Descarga</summary>
         <p>Cada 6-8 semanas, o antes si el rendimiento cae dos sesiones seguidas en varios ejercicios, haz una semana con la mitad de series, el mismo peso o algo menos y RIR 3-4. Después retomas donde lo dejaste.</p>
         <p>Esa semana come a mantenimiento. Activa «Semana de descarga» en Comida y el plan baja 300 kcal durante 7 días, sin tocar tu ajuste. Forzar superávit sin estímulo solo suma grasa.</p>
-      </div>
-      <div>
-        <h3>Muévete fuera del gimnasio</h3>
+      </details>
+      <details class="g" open>
+        <summary>Muévete fuera del gimnasio</summary>
         <p>El error clásico del volumen es volverse sedentario porque «estás ganando masa». Mantén entre 8.000 y 10.000 pasos al día y dos o tres sesiones cortas de cardio suave por semana, de 15 a 20 minutos, en días que no choquen con pierna.</p>
-        <p>No te va a comer el músculo. Te mantiene sensible a la insulina, limita la grasa que ganas y, lo más práctico, te abre el apetito para las seis comidas. Los pasos no los cuento yo: eso ya lo hace el móvil, y duplicarlo aquí solo añadiría una pantalla más que mirar.</p>
-      </div>
-      <div>
-        <h3>Agua y fibra</h3>
+        <p>No te va a comer el músculo. Te mantiene sensible a la insulina, limita la grasa que ganas y, lo más práctico, te abre el apetito para las cinco comidas. Los pasos no los cuento yo: eso ya lo hace el móvil, y duplicarlo aquí solo añadiría una pantalla más que mirar.</p>
+      </details>
+      <details class="g" open>
+        <summary>Agua y fibra</summary>
         <p>Entre 35 y 45 ml de agua por kilo de peso al día, más si hace calor o la sesión es larga. Comida tiene tu rango ya calculado. De fibra, entre 25 y 35 g diarios, que con la avena, la verdura, la papa y la fruta del plan ya salen; si te quedas corto, la app te avisa en el total del día.</p>
-      </div>
-      <div>
-        <h3>Constancia</h3>
+      </details>
+      <details class="g" open>
+        <summary>Sueño</summary>
+        <p>Duerme entre 7 y 9 horas. El músculo se construye durmiendo: con poco sueño rindes menos en el entreno, te cuesta más comer limpio y el superávit se va más a grasa que a músculo. Si una semana duermes mal, no lo compenses comiendo más; se arregla durmiendo más.</p>
+      </details>
+      <details class="g" open>
+        <summary>Constancia</summary>
         <p>Arriba de Progreso hay una rejilla: una fila por semana y una columna por cada sesión de la rotación. El cuadro se enciende con el color del día cuando esa sesión queda registrada.</p>
         <p>Está pensada para enseñar los huecos, no los aciertos. Una lista de sesiones hechas siempre se ve bien porque solo contiene lo que sí hiciste; la rejilla enseña también lo que falta, y ahí se ve si lo que se te escapa siempre es el mismo día.</p>
-      </div>
-      <div>
-        <h3>Marcar las comidas</h3>
+      </details>
+      <details class="g" open>
+        <summary>Marcar las comidas</summary>
         <p>Debajo de cada comida hay tres botones: según el plan, comí otra cosa, y no la hice. Tres estados y no un contador de calorías, porque el plan ya sabe cuántas lleva cada comida; lo único que falta saber es si te la comiste.</p>
         <p>Una comida cambiada no suma calorías en el total del día, porque no sé qué comiste, y meter ahí el número del plan sería inventármelo. Y una comida sin marcar no cuenta como fallada: cuenta como que no sé qué pasó.</p>
         <p>Esto arregla algo que estaba mal. Antes, si la báscula no se movía, la app te proponía subir 150 kcal sin saber si te estabas comiendo el plan. Ahora, si en dos semanas te saltaste una de cada cinco comidas marcadas, en vez del botón te dice que el objetivo no es el problema.</p>
-      </div>
-      <div>
-        <h3>Control del volumen</h3>
+      </details>
+      <details class="g" open>
+        <summary>Control del volumen</summary>
         <ul>
           <li>Pésate por la mañana entre 3 y 7 días por semana. La pestaña Progreso calcula la media semanal y el ritmo.</li>
           <li>El objetivo es subir entre un 0,25 % y un 0,5 % del peso corporal por semana.</li>
           <li>Si la media no se mueve en 2 semanas, añade 150-200 kcal al día. Si sube más rápido de lo previsto durante 2-3 semanas, quita lo mismo.</li>
           <li>Proteína: 1,6-2,2 g por kilo de peso al día.</li>
+          <li>Cintura: mídela una vez por semana en Progreso, en ayunas y a la altura del ombligo. Si sube más de 1 cm al mes, el superávit se está yendo a grasa: quita 150-200 kcal al día y vuelve a medir en 2 semanas.</li>
         </ul>
-      </div>
-      <div>
-        <h3>Comida</h3>
+      </details>
+      <details class="g" open>
+        <summary>Comida</summary>
         <p>La pestaña Comida calcula tus calorías y tu proteína con la media de peso de los últimos 7 días, y reparte el día en cantidades concretas. Es un punto de partida, y quien decide si comes bien es la báscula.</p>
         <p>Por eso lleva un ajuste. Cuando tengas 3 pesajes en cada una de las dos últimas semanas, la app mira tu ritmo real y te propone subir o bajar 150 kcal con un botón; también puedes moverlo tú a mano. Al cambiarlo suben o bajan la avena, el arroz, la papa, las tortillas y las grasas, mientras la proteína se mantiene, que es como se ajusta una dieta de verdad. La app no cuenta lo que comes; para eso tendrías que llevar tú la cuenta aparte.</p>
+        <p>Suplementos, en la misma pestaña Comida: creatina monohidratada, 3 a 5 g al día, todos los días, sin fase de carga ni ciclos. Es lo único con respaldo serio para ganar músculo; la proteína en polvo es comodidad, no necesidad.</p>
         <p>No soy dietista. Si tienes alguna condición médica, alergias o tomas medicación, consúltalo antes con un profesional.</p>
-      </div>
-      <div>
-        <h3>Tus datos</h3>
+      </details>
+      <details class="g" open>
+        <summary>Tus datos</summary>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
-      </div>
-      <p class="app-version">Versión 14 · 25 de septiembre de 2026</p>
+      </details>
+      <p class="app-version">Versión 15 · 25 de septiembre de 2026</p>
     </div>
   </section>
 </main>
