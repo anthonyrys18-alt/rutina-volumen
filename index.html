@@ -67,6 +67,10 @@ a{color:var(--accent)}
 .brand h1{margin:0;font:800 26px/1 var(--display);letter-spacing:.02em;text-transform:uppercase}
 .sync{font-size:12px;color:var(--muted)}
 .sync.err{color:var(--bad)}
+.brand-right{display:flex;align-items:center;gap:8px;min-width:0}
+.voice-btn{appearance:none;flex:none;width:36px;height:36px;margin:-6px -6px -6px 0;display:grid;place-items:center;border:0;border-radius:10px;background:none;color:var(--accent);cursor:pointer}
+.voice-btn svg{width:21px;height:21px}
+.voice-btn.off{color:var(--muted)}
 .tabs{display:flex;gap:2px;margin-inline:-12px}
 .tab{appearance:none;border:0;background:none;padding:10px 12px 11px;font-weight:600;font-size:14px;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer}
 .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
@@ -78,6 +82,9 @@ a{color:var(--accent)}
 .banner.nag{margin:0 0 18px;display:grid;gap:10px}
 .nag-actions{display:flex;flex-wrap:wrap;gap:8px}
 .pr-note{margin:0;padding:8px 10px;border-radius:10px;background:var(--ok-soft);color:var(--ok);font-size:13px;font-weight:600}
+.done-banner{margin:0 0 12px;padding:11px 13px;background:var(--ok-soft);color:var(--ok);display:grid;gap:3px}
+.done-banner b{font:800 21px/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
+.done-banner span{font-size:13px;font-weight:600}
 
 .days{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
 .day{position:relative;appearance:none;display:grid;justify-items:center;gap:4px;padding:13px 2px 9px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;min-width:0;-webkit-tap-highlight-color:transparent}
@@ -128,6 +135,10 @@ a{color:var(--accent)}
 .btn{appearance:none;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 12px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none}
 .btn.small{padding:7px 10px;font-size:13px}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.effort{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.effort-q{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.effort-btn{appearance:none;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);border-radius:999px;padding:8px 13px;font-size:13px;font-weight:700;cursor:pointer}
+.effort-btn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 
 .sec{margin:4px 0 12px;font:800 24px/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
 .sec.next{margin-top:32px}
@@ -278,11 +289,17 @@ body{background:radial-gradient(120% 60% at 50% 0%, var(--surface-2) 0%, var(--b
 .btn.primary{background-image:linear-gradient(100deg, var(--gold-1), var(--gold-2));border-color:transparent;color:var(--accent-ink);box-shadow:0 6px 18px -10px var(--accent)}
 :focus-visible{outline-color:var(--accent)}
 
-.pr-note{position:relative;overflow:hidden;border:1px solid color-mix(in srgb, var(--ok) 28%, transparent)}
-.pr-note::after{content:'';position:absolute;inset:0;background:linear-gradient(104deg, transparent 32%, var(--sheen) 50%, transparent 68%);transform:translateX(-110%);animation:sheen 1.05s .12s cubic-bezier(.3,.6,.3,1)}
+.pr-note,.done-banner{position:relative;overflow:hidden;border:1px solid color-mix(in srgb, var(--ok) 28%, transparent)}
+.done-banner{box-shadow:var(--lift)}
+.pr-note::after,.done-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(104deg, transparent 32%, var(--sheen) 50%, transparent 68%);transform:translateX(-110%);animation:sheen 1.05s .12s cubic-bezier(.3,.6,.3,1)}
 @keyframes sheen{to{transform:translateX(110%)}}
 
 .chip{transition:background-color .2s ease}
+.voice-btn{transition:color .18s ease, transform .14s ease}
+.voice-btn:active{transform:scale(.9)}
+.effort-btn{transition:background-color .18s ease, border-color .18s ease, color .18s ease, transform .14s ease}
+.effort-btn:active{transform:translateY(1px)}
+.effort-btn.on{background-image:linear-gradient(100deg, var(--gold-1), var(--gold-2));border-color:transparent;box-shadow:0 5px 14px -9px var(--accent)}
 .exlist>.ex{animation:rise .36s cubic-bezier(.2,.8,.2,1) both}
 .exlist>.ex:nth-child(2){animation-delay:.04s}
 .exlist>.ex:nth-child(3){animation-delay:.08s}
@@ -311,7 +328,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
-  .pr-note::after{display:none}
+  .pr-note::after,.done-banner::after{display:none}
 }
 </style>
 </head>
@@ -320,7 +337,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   <div class="bar-inner">
     <div class="brand">
       <h1><img src="icons/icon-192.png" alt="" width="28" height="28" decoding="async"><span class="word">Rutina de Volumen</span></h1>
-      <span class="sync" id="sync" role="status" aria-live="polite">Datos en este móvil</span>
+      <span class="brand-right"><span class="sync" id="sync" role="status" aria-live="polite">Datos en este móvil</span><button class="voice-btn" id="voice-btn" type="button"></button></span>
     </div>
     <nav class="tabs" role="tablist" aria-label="Secciones">
       <button class="tab" type="button" role="tab" id="tab-btn-entreno" aria-controls="tab-entreno" aria-selected="true" data-tab="entreno">Entreno</button>
@@ -340,6 +357,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     <div class="days" id="days" role="tablist" aria-label="Día de la rutina"></div>
     <p class="banner" id="banner" hidden></p>
     <div class="dayhead" id="dayhead"></div>
+    <div class="banner done-banner" id="done-banner" role="status" hidden></div>
     <ol class="exlist" id="exlist"></ol>
   </section>
 
@@ -425,7 +443,13 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     <div class="guide">
       <div>
         <h3>Cómo anotar</h3>
-        <p>Escribe el peso y las repeticiones de cada serie y toca ✓. La serie queda marcada, arranca el descanso y se guarda en el móvil. Los números en gris dentro de cada casilla son los de la última vez que hiciste ese ejercicio. Si una serie supera tu mejor marca de ese ejercicio, la app te lo avisa como récord.</p>
+        <p>El peso viene ya puesto con el de la última vez, así que solo lo tocas cuando subes carga. Las repeticiones van vacías a propósito: con el número anterior delante pararías ahí en vez de pelear por una más. Escribe las reps y toca ✓; la serie queda marcada, arranca el descanso y se guarda en el móvil. Si una serie supera tu mejor marca de ese ejercicio, la app te lo avisa como récord.</p>
+        <p>Bajo el nombre del día ves cuántas series llevas de las que tocan, y al marcar la última sale el aviso de sesión completada con la cuenta de sesiones de esta semana.</p>
+      </div>
+      <div>
+        <h3>¿Cómo fue?</h3>
+        <p>Al marcar la primera serie de un ejercicio aparecen tres botones: fácil, justo y al límite. Es el RIR dicho en una palabra, para que no tengas que calcular nada con el pulso a 140: fácil son 3 repeticiones o más de sobra, justo son 1 o 2, al límite es ninguna.</p>
+        <p>No es un adorno. Si marcas fácil, la próxima vez la app te dirá «Sube carga» aunque no llegaras al tope del rango, porque el rango se te quedó corto. Y va dentro del resumen que copias, que es lo que separa una tabla de números de algo interpretable: 60 kg × 8 al límite y 60 kg × 8 fácil no son la misma sesión.</p>
       </div>
       <div>
         <h3>RIR</h3>
@@ -433,7 +457,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       </div>
       <div>
         <h3>Progresión</h3>
-        <p>Trabaja dentro del rango de repeticiones. Cuando completes todas las series en el tope del rango, sube el peso lo mínimo que permita el material y vuelve a la parte baja. La etiqueta «Sube carga» aparece cuando la última sesión ya cumplió esa condición.</p>
+        <p>Trabaja dentro del rango de repeticiones. Cuando completes todas las series en el tope del rango, sube el peso lo mínimo que permita el material y vuelve a la parte baja. La etiqueta «Sube carga» aparece cuando la última sesión cumplió esa condición, o cuando la marcaste como fácil.</p>
       </div>
       <div>
         <h3>Descansos y calentamiento</h3>
@@ -442,6 +466,11 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
           <li>Antes del primer ejercicio de cada grupo muscular, haz 2-3 series de aproximación (50 % × 10, 70 % × 5, 85 % × 3). No hace falta anotarlas.</li>
           <li>La primera semana deja una repetición más en reserva mientras calibras los pesos.</li>
         </ul>
+      </div>
+      <div>
+        <h3>Voz</h3>
+        <p>El altavoz de arriba a la derecha enciende y apaga los avisos hablados: cuándo se acaba el descanso, qué ejercicio toca después y cuándo cierras la sesión. Así no sacas el móvil del bolsillo entre series.</p>
+        <p>Usa la voz que ya trae el iPhone, funciona sin conexión y respeta el interruptor de silencio del teléfono. El botón se queda como lo dejes.</p>
       </div>
       <div>
         <h3>Reentrada</h3>
@@ -489,7 +518,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <h3>Tus datos</h3>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </div>
-      <p class="app-version">Versión 11 · 25 de septiembre de 2026</p>
+      <p class="app-version">Versión 12 · 25 de septiembre de 2026</p>
     </div>
   </section>
 </main>
@@ -610,7 +639,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
 
   // ---- almacenamiento en el móvil ----
   const KEY = 'rutina-volumen.v1';
-  const emptyStore = () => ({ v: 1, sessions: {}, bw: {}, waist: {}, shop: {}, kcalAdj: 0, adjDate: null, deloadUntil: null, lastBackup: null, backupSnooze: null });
+  const emptyStore = () => ({ v: 1, sessions: {}, bw: {}, waist: {}, shop: {}, kcalAdj: 0, adjDate: null, deloadUntil: null, voice: true, lastBackup: null, backupSnooze: null });
   let storageOk = true, changed = false;
   function readStore() {
     try {
@@ -620,7 +649,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       const raw = localStorage.getItem(KEY);
       if (!raw) return emptyStore();
       const d = JSON.parse(raw);
-      return { v: 1, sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, deloadUntil: isYmd(d.deloadUntil) ? d.deloadUntil : null, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
+      return { v: 1, sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, deloadUntil: isYmd(d.deloadUntil) ? d.deloadUntil : null, voice: d.voice !== false, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
     } catch (e) {
       storageOk = false;
       return emptyStore();
@@ -652,7 +681,15 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     } catch (e) { /* opcional */ }
   }
 
-  const state = { tab: 'entreno', day: null, dayPicked: false, sessions: [], local: {}, progEx: null };
+  const state = { tab: 'entreno', day: null, dayPicked: false, sessions: [], local: {}, effort: {}, progEx: null };
+  // Esfuerzo real con el que terminaste cada ejercicio. Sin esto, «estancado»
+  // no distingue entre chocar con un muro y no haber apretado.
+  const EFFORTS = [
+    ['facil', 'Fácil', 'Te sobraban 3 o más repeticiones'],
+    ['justo', 'Justo', 'Te sobraban 1 o 2 repeticiones'],
+    ['limite', 'Al límite', 'No te sobraba ninguna']
+  ];
+  const EFFORT_NAME = Object.fromEntries(EFFORTS.map(([k, n]) => [k, n]));
 
   function sessionsSorted() {
     return Object.entries(store.sessions)
@@ -681,6 +718,21 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     while (arr.length <= k) arr.push({ kg: null, reps: null, done: false });
     return arr;
   }
+  function effortFor() { const id = sessionId(); return state.effort[id] || (store.sessions[id] && store.sessions[id].effort) || {}; }
+  function editableEffort() {
+    const id = sessionId();
+    if (!state.effort[id]) state.effort[id] = Object.assign({}, (store.sessions[id] && store.sessions[id].effort) || {});
+    return state.effort[id];
+  }
+  function lastEffort(exId) {
+    const cur = sessionId();
+    for (const s of state.sessions) {
+      if (s.id === cur) continue;
+      if (s.effort && s.effort[exId]) return s.effort[exId];
+      if (s.sets && s.sets[exId]) return null;
+    }
+    return null;
+  }
   function lastFor(exId) {
     const cur = sessionId();
     for (const s of state.sessions) {
@@ -694,9 +746,16 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   function progression(ex, last) {
     if (!last) return null;
     const [lo, hi] = ex.reps;
-    const s = last.sets;
+    const s = last.sets, eff = lastEffort(ex.id);
     if (s.length >= ex.sets && s.slice(0, ex.sets).every(x => x.reps >= hi)) return { cls: 'up', text: 'Sube carga', why: 'La última vez llegaste a ' + hi + ' en todas las series.' };
-    if (s.some(x => x.reps < lo)) return { cls: 'low', text: 'Por debajo del rango', why: 'Alguna serie no llegó a ' + lo + ' repeticiones. Mantén la carga o bájala un poco.' };
+    // Quedarse corto manda sobre el «fácil»: si una serie no llegó al rango y
+    // aun así te sobró margen, el problema no fue el peso, fue parar antes.
+    if (s.some(x => x.reps < lo)) {
+      return eff === 'facil'
+        ? { cls: 'low', text: 'Aprieta más', why: 'Marcaste esa sesión como fácil y aun así alguna serie no llegó a ' + lo + ' repeticiones. No te sobraba peso: paraste antes de tiempo. Misma carga y llega al rango.' }
+        : { cls: 'low', text: 'Por debajo del rango', why: 'Alguna serie no llegó a ' + lo + ' repeticiones. Mantén la carga o bájala un poco.' };
+    }
+    if (eff === 'facil') return { cls: 'up', text: 'Sube carga', why: 'Marcaste la última sesión como fácil, así que te sobra margen aunque no llegaras al tope del rango.' };
     return { cls: 'hold', text: 'Misma carga, más reps', why: 'Busca llegar a ' + hi + ' en todas las series.' };
   }
   function suggestedDay() {
@@ -757,14 +816,56 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     head.textContent = '';
     head.append(
       h('h2', { text: d.long + ' · ' + d.name }),
-      h('p', { text: d.focus + ' · ' + d.ex.length + ' ejercicios · ' + total + ' series · sesión de hoy, ' + fmtDate(today()) }));
+      h('p', { id: 'dayprog' }));
     const list = $('exlist');
     list.textContent = '';
     const sets = setsFor();
     d.ex.forEach((ex, i) => list.append(renderEx(ex, i, sets[ex.id] || [])));
+    renderDayProgress();
+  }
+
+  // Cuántas series llevas hoy, y el cierre de la sesión cuando están todas.
+  const reduceMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function weekSessionCount() {
+    const t = toDate(today()), mon = new Date(t);
+    mon.setDate(t.getDate() - ((t.getDay() + 6) % 7));
+    const from = ymd(mon), hoy = today(), dates = new Set();
+    const hasWork = m => Object.values(m || {}).some(a => Array.isArray(a) && a.some(x => x && x.reps > 0));
+    for (const s of state.sessions) if (s.date >= from && s.date <= hoy && hasWork(s.sets)) dates.add(s.date);
+    if (hasWork(state.local[sessionId()])) dates.add(hoy);
+    return dates.size;
+  }
+  function renderDayProgress(finishedEx) {
+    const d = findDay(state.day) || DAYS[0], sets = setsFor();
+    const total = d.ex.reduce((a, e) => a + e.sets, 0);
+    const doneOf = e => (sets[e.id] || []).slice(0, e.sets).filter(x => x && x.done).length;
+    const done = d.ex.reduce((a, e) => a + doneOf(e), 0);
+    const p = $('dayprog');
+    if (p) p.textContent = d.focus + ' · ' + done + ' de ' + total + ' series hechas · ' + fmtDate(today());
+    const box = $('done-banner'), complete = total > 0 && done >= total;
+    if (box) {
+      if (complete) {
+        const n = weekSessionCount();
+        box.textContent = '';
+        box.append(h('b', { text: '✓ Sesión completada' }),
+          h('span', { text: total + ' series de ' + d.name + '. ' + (n === 1 ? 'Primera sesión de esta semana.' : n + '.ª sesión de esta semana.') + (n >= 6 ? ' Semana completa.' : '') }));
+        box.hidden = false;
+      } else box.hidden = true;
+    }
+    if (!finishedEx) return;
+    if (complete) {
+      say('Sesión completada. ' + total + ' series.');
+      // Al marcar la última serie no queda nada que anotar más abajo, así que
+      // el aviso se trae a la vista en vez de dejarlo arriba sin que se vea.
+      if (box) box.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
+      return;
+    }
+    const next = d.ex.find(e => doneOf(e) < e.sets);
+    say(next ? finishedEx.name + ' hecho. Siguiente: ' + next.name : finishedEx.name + ' hecho.');
   }
 
   function renderEx(ex, i, sets) {
+    const last = lastFor(ex.id);
     const li = h('li', { class: 'ex', id: 'ex-' + ex.id, 'data-ex': ex.id });
     const rx = h('div', { class: 'rx' },
       h('span', null, h('strong', { text: ex.sets + ' × ' + ex.reps[0] + '-' + ex.reps[1] }), ex.side ? ' ' + ex.side : ''),
@@ -782,14 +883,21 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const grid = h('div', { class: 'sets' },
       h('div', { class: 'set-row set-head', 'aria-hidden': 'true' },
         h('span', { text: '' }), h('span', { text: ex.load === 'lastre' ? 'Lastre kg' : 'kg' }), h('span', { text: 'Reps' }), h('span', { text: '' })));
-    for (let k = 0; k < ex.sets; k++) grid.append(renderSetRow(ex, k, sets[k]));
-    li.append(grid, h('p', { class: 'pr-note', 'data-role': 'pr', role: 'status', hidden: true }), h('div', { class: 'ex-foot', 'data-role': 'foot' }));
-    fillLast(li, ex, lastFor(ex.id));
+    for (let k = 0; k < ex.sets; k++) grid.append(renderSetRow(ex, k, sets[k], last && last.sets[k]));
+    li.append(grid,
+      h('div', { class: 'effort', 'data-role': 'effort', hidden: true }),
+      h('p', { class: 'pr-note', 'data-role': 'pr', role: 'status', hidden: true }),
+      h('div', { class: 'ex-foot', 'data-role': 'foot' }));
+    fillLast(li, ex, last);
     updatePrNote(li, ex);
+    updateEffort(li, ex);
     return li;
   }
 
-  function renderSetRow(ex, k, v) {
+  // El peso se rellena con el de la última vez para no reescribirlo en cada
+  // serie. Las repeticiones no: puestas ahí te harían parar en el número
+  // anterior en vez de buscar una más.
+  function renderSetRow(ex, k, v, lv) {
     v = v || {};
     const row = h('div', { class: 'set-row' + (v.done ? ' done' : ''), 'data-set': String(k) });
     const kg = h('input', {
@@ -800,7 +908,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       id: 'in-' + ex.id + '-' + k + '-reps', class: 'reps', type: 'text', inputmode: 'numeric', pattern: '[0-9]*', enterkeyhint: 'done', autocomplete: 'off',
       'data-field': 'reps', 'aria-label': 'Serie ' + (k + 1) + ', repeticiones'
     });
-    kg.value = v.kg != null ? fmtKg(v.kg) : '';
+    kg.value = v.kg != null ? fmtKg(v.kg) : (lv && lv.kg != null ? fmtKg(lv.kg) : '');
     reps.value = v.reps != null ? String(v.reps) : '';
     const chk = h('button', { class: 'chk', type: 'button', 'aria-pressed': String(!!v.done), 'aria-label': 'Serie ' + (k + 1) + ' hecha, empezar descanso' });
     chk.innerHTML = CHECK_SVG;
@@ -826,8 +934,21 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     });
     const foot = li.querySelector('[data-role="foot"]');
     foot.textContent = '';
-    if (last && last.sets.some(s => s.kg != null && s.kg > 0)) foot.append(h('button', { class: 'btn small', type: 'button', 'data-act': 'copy' }, 'Copiar pesos de la última vez'));
-    foot.hidden = !foot.childElementCount;
+    foot.hidden = true;
+  }
+
+  function updateEffort(li, ex) {
+    const box = li.querySelector('[data-role="effort"]');
+    if (!box) return;
+    const any = (setsFor()[ex.id] || []).some(x => x && x.done);
+    if (!any) { box.hidden = true; box.textContent = ''; return; }
+    const cur = effortFor()[ex.id] || null;
+    box.textContent = '';
+    box.append(h('span', { class: 'effort-q', text: '¿Cómo fue?' }));
+    for (const [k, name, why] of EFFORTS) {
+      box.append(h('button', { class: 'effort-btn' + (cur === k ? ' on' : ''), type: 'button', 'data-effort': k, title: why, 'aria-pressed': String(cur === k) }, name));
+    }
+    box.hidden = false;
   }
 
   // ---- entrada de series ----
@@ -864,6 +985,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const ex = EX[li.dataset.ex];
     if (btn.classList.contains('chk')) {
       unlockAudio();
+      unlockVoice();
       const row = btn.closest('.set-row');
       const k = Number(row.dataset.set);
       const arr = rowsFor(ex.id, k);
@@ -873,6 +995,8 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         btn.setAttribute('aria-pressed', 'false');
         scheduleSave();
         updatePrNote(li, ex);
+        updateEffort(li, ex);
+        renderDayProgress();
         return;
       }
       const repsIn = row.querySelector('input.reps');
@@ -883,17 +1007,16 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       btn.setAttribute('aria-pressed', 'true');
       scheduleSave();
       updatePrNote(li, ex);
+      updateEffort(li, ex);
+      const finished = arr.slice(0, ex.sets).filter(x => x && x.done).length >= ex.sets;
+      renderDayProgress(finished ? ex : null);
       startTimer(ex.rest);
-    } else if (btn.dataset.act === 'copy') {
-      const last = lastFor(ex.id);
-      if (!last) return;
-      li.querySelectorAll('.set-row[data-set]').forEach(row => {
-        const k = Number(row.dataset.set), lv = last.sets[k];
-        if (!lv || lv.kg == null) return;
-        const arr = rowsFor(ex.id, k);
-        if (arr[k].kg == null) { arr[k] = Object.assign({}, arr[k], { kg: lv.kg }); row.querySelector('input.kg').value = fmtKg(lv.kg); }
-      });
+    } else if (btn.dataset.effort) {
+      const eff = editableEffort();
+      eff[ex.id] = eff[ex.id] === btn.dataset.effort ? undefined : btn.dataset.effort;
+      if (!eff[ex.id]) delete eff[ex.id];
       scheduleSave();
+      updateEffort(li, ex);
     } else if (btn.dataset.act === 'progress') {
       flush();
       state.progEx = ex.id;
@@ -934,7 +1057,11 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       while (a.length && a[a.length - 1].kg == null && a[a.length - 1].reps == null && !a[a.length - 1].done) a.pop();
       if (a.length) clean[exId] = a;
     }
-    if (Object.keys(clean).length) store.sessions[id] = { date, day, sets: clean, updatedAt: new Date().toISOString() };
+    const eff = {};
+    for (const [exId, v] of Object.entries(state.effort[id] || (store.sessions[id] && store.sessions[id].effort) || {})) {
+      if (clean[exId] && EFFORT_NAME[v]) eff[exId] = v;
+    }
+    if (Object.keys(clean).length) store.sessions[id] = { date, day, sets: clean, effort: eff, updatedAt: new Date().toISOString() };
     else delete store.sessions[id];
     changed = true;
   }
@@ -1524,7 +1651,9 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       if (!Array.isArray(arr) || !/^[a-z0-9-]{1,60}$/.test(exId)) continue;
       sets[exId] = arr.slice(0, 12).map(x => ({ kg: validKg(x && x.kg), reps: validReps(x && x.reps), done: !!(x && x.done) }));
     }
-    return { date: s.date, day: s.day, sets, updatedAt: typeof s.updatedAt === 'string' ? s.updatedAt : new Date().toISOString() };
+    const effort = {};
+    if (isObj(s.effort)) for (const [exId, v] of Object.entries(s.effort)) if (sets[exId] && EFFORT_NAME[v]) effort[exId] = v;
+    return { date: s.date, day: s.day, sets, effort, updatedAt: typeof s.updatedAt === 'string' ? s.updatedAt : new Date().toISOString() };
   }
   $('import-file').addEventListener('change', async e => {
     const input = e.target;
@@ -1889,6 +2018,17 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   });
 
   // ---- resumen para pegar en Claude ----
+  // Esfuerzo de la última sesión que trabajó ese ejercicio. Si esa sesión no
+  // lo marcó, devuelve nada en vez de rescatar el de una sesión más vieja:
+  // pegar un esfuerzo antiguo a la serie de ayer diría algo que no pasó.
+  function latestEffort(exId) {
+    for (const s of state.sessions) {
+      if (s.effort && s.effort[exId]) return s.effort[exId];
+      if (s.sets && s.sets[exId]) return null;
+    }
+    return null;
+  }
+  const effortWord = v => (EFFORT_NAME[v] || '').toLowerCase();
   function claudeSummary() {
     const L = [], kg = planKg(), { cur, prev, rate } = weightTrend(), ph = phase();
     L.push('Resumen de mi app Rutina de Volumen · ' + fmtDate(today()), '');
@@ -1921,10 +2061,11 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       const u = metric === 'reps' ? 'reps' : 'kg';
       const fv = v => (metric === 'reps' ? String(Math.round(v)) : nf1.format(v));
       const lastPt = pts[pts.length - 1];
-      if (pts.length === 1) { L.push('- ' + ex.name + ': ' + fv(lastPt.v) + ' ' + u + ' (1 sesión, ' + lastPt.best + ')'); continue; }
+      const eff = latestEffort(ex.id), effTxt = eff ? ' · esfuerzo ' + effortWord(eff) : '';
+      if (pts.length === 1) { L.push('- ' + ex.name + ': ' + fv(lastPt.v) + ' ' + u + ' (1 sesión, ' + lastPt.best + ')' + effTxt); continue; }
       const tr = strengthTrend(pts);
       const tag = tr && tr.plateau ? 'estancado' : !tr || tr.delta === 0 ? 'igual' : tr.delta > 0 ? 'subiendo' : 'bajando';
-      L.push('- ' + ex.name + ': ' + fv(pts[0].v) + ' → ' + fv(lastPt.v) + ' ' + u + ' en ' + pts.length + ' sesiones · ' + tag + ' · última ' + lastPt.best);
+      L.push('- ' + ex.name + ': ' + fv(pts[0].v) + ' → ' + fv(lastPt.v) + ' ' + u + ' en ' + pts.length + ' sesiones · ' + tag + ' · última ' + lastPt.best + effTxt);
     }
     if (!any) L.push('Sin series registradas todavía');
     L.push('', 'ÚLTIMAS SESIONES');
@@ -1936,7 +2077,8 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         const done = Array.isArray(arr) ? arr.filter(x => x && x.reps > 0) : [];
         if (!done.length) continue;
         const ex = EX[exId];
-        parts.push((ex ? ex.name : exId) + ' ' + done.map(x => fmtSet(ex, x)).join('/'));
+        const eff = s.effort && s.effort[exId];
+        parts.push((ex ? ex.name : exId) + ' ' + done.map(x => fmtSet(ex, x)).join('/') + (eff ? ' (' + effortWord(eff) + ')' : ''));
       }
       L.push(fmtDate(s.date) + ' · ' + (d ? d.name : s.day) + ': ' + (parts.join(' | ') || 'sin series'));
     }
@@ -1982,6 +2124,49 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     state.dayPicked = true;
     renderDays();
     renderDay();
+  });
+
+  // ---- voz ----
+  // Síntesis del sistema: funciona sin conexión y sin coste. iOS exige que la
+  // primera vez salga de un toque, así que se «despierta» al marcar una serie.
+  const voiceOn = () => store.voice !== false;
+  let voiceReady = false;
+  function unlockVoice() {
+    if (voiceReady || !voiceOn() || !('speechSynthesis' in window)) return;
+    try {
+      const u = new SpeechSynthesisUtterance(' ');
+      u.volume = 0;
+      u.lang = 'es-ES';
+      speechSynthesis.speak(u);
+      voiceReady = true;
+    } catch (e) { /* sin voz */ }
+  }
+  function say(text) {
+    if (!voiceOn() || !('speechSynthesis' in window)) return;
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'es-ES';
+      u.rate = 1.03;
+      speechSynthesis.speak(u);
+    } catch (e) { /* sin voz */ }
+  }
+  const SPK_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 8.5a5 5 0 0 1 0 7"/></svg>';
+  const SPK_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9.5l4 5M21 9.5l-4 5"/></svg>';
+  function renderVoiceBtn() {
+    const b = $('voice-btn'), on = voiceOn();
+    b.innerHTML = on ? SPK_ON : SPK_OFF;
+    b.setAttribute('aria-pressed', String(on));
+    b.setAttribute('aria-label', on ? 'Voz activada, tocar para silenciar' : 'Voz silenciada, tocar para activar');
+    b.classList.toggle('off', !on);
+  }
+  $('voice-btn').addEventListener('click', () => {
+    store.voice = !voiceOn();
+    changed = true;
+    persistNow();
+    renderVoiceBtn();
+    if (voiceOn()) { voiceReady = false; unlockVoice(); say('Voz activada'); }
+    else if ('speechSynthesis' in window) { try { speechSynthesis.cancel(); } catch (e) { /* nada */ } }
   });
 
   // ---- temporizador ----
@@ -2045,6 +2230,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     $('timer').classList.add('done');
     $('t-label').textContent = 'Descanso terminado';
     beep();
+    say('Descanso terminado');
     try { if (navigator.vibrate) navigator.vibrate([180, 90, 180]); } catch (e) { /* sin vibración */ }
     T.hideT = setTimeout(stopTimer, 8000);
   }
@@ -2122,6 +2308,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   $('waist-date').value = today();
   populateExerciseSelect();
   renderInstall();
+  renderVoiceBtn();
   renderDays();
   renderDay();
   renderProgress();
