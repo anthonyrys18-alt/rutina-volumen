@@ -257,6 +257,8 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
 .adj-btn{appearance:none;width:44px;height:44px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:700 22px/1 var(--body);cursor:pointer}
 .adj-btn:disabled{opacity:.4;cursor:default}
 .swap-body{padding:0 14px 6px}
+.cat-intro{margin:0;padding:2px 0 8px;font-size:13px;color:var(--muted)}
+.food-note{grid-column:1 / -1;font-size:12.5px;line-height:1.35;color:var(--muted);padding-top:3px;border-left:2px solid var(--line);padding-left:8px;margin-top:4px}
 .swap-body .food-row:first-child{border-top:0}
 .shop-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin:0 0 4px}
 .shop-head span{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -483,6 +485,11 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     <div id="food-plan"></div>
     <div id="food-total"></div>
 
+    <h2 class="sec next">Qué puedo comer</h2>
+    <p class="backup-text">Todo lo que encaja en un volumen limpio, por el papel que cumple cada cosa. No es una lista de permitidos y prohibidos: casi nada está fuera, lo que cambia es cuánto te cuesta meterlo. Toca una categoría para abrirla.</p>
+    <div id="food-catalog"></div>
+    <p class="chart-note">Valores de la versión común de cada alimento, en crudo salvo donde diga lo contrario. Salen de tablas de composición estándar y varían alrededor de un 10 % según marca y corte; la etiqueta del paquete manda sobre esto.</p>
+
     <h2 class="sec next">Cambios</h2>
     <p class="backup-text">Mismo papel en el plan, distinto alimento. Cambia uno por otro sin recalcular nada.</p>
     <div id="food-swaps"></div>
@@ -585,6 +592,13 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <p>Está pensada para enseñar los huecos, no los aciertos. Una lista de sesiones hechas siempre se ve bien porque solo contiene lo que sí hiciste; la rejilla enseña también lo que falta, y ahí se ve si lo que se te escapa siempre es el mismo día.</p>
       </details>
       <details class="g" open>
+        <summary>Qué puedo comer</summary>
+        <p>En Comida, debajo del plan, tienes el catálogo completo por categorías: carne y pescado, huevos y lácteos, legumbres, cereales, fruta, verdura, grasas y bebidas. Cada alimento trae su porción, sus calorías y su proteína, y el enlace para buscarlo en las tres tiendas.</p>
+        <p>No es una lista de permitidos y prohibidos. En volumen casi nada está fuera; lo que cambia es cuánto te cuesta meterlo. Por eso las categorías van por el papel que cumple cada cosa: la proteína es lo que no se toca, los cereales y las grasas son lo que sube y baja cuando ajustas calorías, y la verdura es volumen y fibra que apenas suma.</p>
+        <p>Las bebidas están separadas en tres: las que puedes beber sin contar, las que traen calorías que te sirven, y las que conviene limitar. En esa última, lo único con un coste real es el alcohol: baja la síntesis de proteína y te rompe el sueño profundo, que es justo donde se construye el músculo. Lo demás son calorías vacías, que en volumen molestan menos de lo que la gente cree.</p>
+        <p>Los números son de la versión común de cada alimento, en crudo salvo donde diga lo contrario, y salen de tablas de composición estándar. Varían alrededor de un 10 % según marca y corte: la etiqueta del paquete manda siempre sobre lo que diga la app.</p>
+      </details>
+      <details class="g" open>
         <summary>Marcar las comidas</summary>
         <p>Debajo de cada comida hay tres botones: según el plan, comí otra cosa, y no la hice. Tres estados y no un contador de calorías, porque el plan ya sabe cuántas lleva cada comida; lo único que falta saber es si te la comiste.</p>
         <p>Una comida cambiada no suma calorías en el total del día, porque no sé qué comiste, y meter ahí el número del plan sería inventármelo. Y una comida sin marcar no cuenta como fallada: cuenta como que no sé qué pasó.</p>
@@ -612,7 +626,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <summary>Tus datos</summary>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </details>
-      <p class="app-version">Versión 18 · 25 de septiembre de 2026</p>
+      <p class="app-version">Versión 19 · 28 de septiembre de 2026</p>
     </div>
   </section>
 </main>
@@ -2113,6 +2127,116 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     { t: 'En vez de requesón o yogur', o: [['Kéfir', 'kefir'], ['Leche con proteína', 'fairlife protein milk'], ['Proteína en polvo', 'whey protein powder']] },
     { t: 'Verdura, la que quieras', o: [['Espinaca congelada', 'frozen spinach'], ['Judía verde', 'green beans'], ['Zanahoria', 'carrots'], ['Pimiento', 'bell peppers']] }
   ];
+  // Catálogo de referencia. Los valores son de la versión común de cada
+  // alimento, en crudo salvo donde diga lo contrario, y salen de tablas de
+  // composición estándar: varían alrededor de un 10 % según marca y corte, y
+  // la etiqueta del paquete siempre manda sobre esto.
+  // [nombre, porción, kcal, proteína, búsqueda en tienda, nota]
+  const CATALOG = [
+    { t: 'Proteína · carne y pescado', d: 'En crudo. Es la parte del plan que no se toca cuando subes o bajas calorías.', o: [
+      ['Pechuga de pollo', '100 g', 120, 23, 'boneless skinless chicken breast'],
+      ['Muslo de pollo deshuesado', '100 g', 145, 19, 'boneless skinless chicken thighs', 'Más jugoso y más barato que la pechuga'],
+      ['Pavo molido 93/7', '100 g', 150, 19, 'lean ground turkey'],
+      ['Carne molida de res 93/7', '100 g', 150, 21, 'lean ground beef 93 7'],
+      ['Carne molida de res 80/20', '100 g', 250, 17, 'ground beef 80 20', 'Más barata y con el doble de grasa: cuenta esas calorías'],
+      ['Lomo de cerdo', '100 g', 120, 21, 'pork loin'],
+      ['Bistec de res (top sirloin)', '100 g', 130, 22, 'top sirloin steak'],
+      ['Tilapia', '100 g', 95, 20, 'tilapia fillets'],
+      ['Bacalao', '100 g', 82, 18, 'cod fillet'],
+      ['Salmón', '100 g', 205, 20, 'salmon fillet', 'La grasa que trae es omega-3: dos raciones por semana valen la pena'],
+      ['Camarón', '100 g', 85, 20, 'frozen shrimp'],
+      ['Atún en lata en agua', '1 lata escurrida', 130, 29, 'canned tuna in water', 'La opción más barata por gramo de proteína']
+    ] },
+    { t: 'Proteína · huevos y lácteos', o: [
+      ['Huevo entero', '1 grande', 70, 6, 'eggs'],
+      ['Claras de huevo', '100 ml', 52, 11, 'liquid egg whites', 'Proteína sin grasa cuando ya vas justo de calorías'],
+      ['Yogur griego natural', '100 g', 60, 10, 'plain greek yogurt'],
+      ['Requesón (cottage cheese) 2 %', '100 g', 90, 11, 'cottage cheese', 'Caseína: la de digestión lenta, por eso va antes de dormir'],
+      ['Leche entera', '250 ml', 150, 8, 'whole milk'],
+      ['Leche 2 %', '250 ml', 122, 8, '2 percent milk'],
+      ['Queso cheddar', '30 g', 115, 7, 'cheddar cheese'],
+      ['Queso mozzarella', '30 g', 78, 7, 'part skim mozzarella'],
+      ['Proteína en polvo', '1 scoop (30 g)', 120, 24, 'whey protein powder', 'Comodidad, no necesidad']
+    ] },
+    { t: 'Proteína vegetal y legumbres', d: 'Ya cocidas o de lata escurridas, que es como las vas a comer.', o: [
+      ['Lentejas cocidas', '100 g', 116, 9, 'dry lentils', '8 g de fibra'],
+      ['Frijoles negros de lata', '100 g escurridos', 90, 6, 'canned black beans', '7 g de fibra'],
+      ['Garbanzos de lata', '100 g escurridos', 120, 6, 'canned chickpeas', '6 g de fibra'],
+      ['Tofu firme', '100 g', 145, 16, 'firm tofu'],
+      ['Edamame', '100 g', 120, 11, 'frozen edamame']
+    ] },
+    { t: 'Carbohidratos · cereales y tubérculos', d: 'En seco o en crudo. Esta es la parte que sube y baja cuando ajustas calorías.', o: [
+      ['Arroz blanco', '100 g en seco', 360, 7, 'white rice'],
+      ['Arroz integral', '100 g en seco', 360, 8, 'brown rice', '3,5 g de fibra'],
+      ['Avena en hojuelas', '100 g', 380, 13, 'old fashioned oats', '10 g de fibra'],
+      ['Pasta', '100 g en seco', 360, 12, 'pasta'],
+      ['Papa', '100 g en crudo', 77, 2, 'russet potatoes', '2 g de fibra y mucha saciedad por caloría'],
+      ['Camote', '100 g en crudo', 86, 2, 'sweet potatoes', '3 g de fibra'],
+      ['Tortilla de harina', '1 unidad', 140, 3, 'flour tortillas'],
+      ['Tortilla de maíz', '1 unidad', 55, 2, 'corn tortillas'],
+      ['Pan integral', '1 rebanada', 80, 4, 'whole wheat bread'],
+      ['Bagel', '1 unidad', 250, 10, 'plain bagel', 'Denso y fácil de comer: útil en volumen'],
+      ['Cereal de trigo integral', '60 g', 200, 7, 'shredded wheat cereal']
+    ] },
+    { t: 'Fruta', d: 'Casi cualquiera vale. Las densas van bien alrededor del gimnasio.', o: [
+      ['Plátano', '1 mediano', 105, 1, 'bananas'],
+      ['Manzana', '1 mediana', 95, 0, 'apples', '4 g de fibra'],
+      ['Naranja', '1 mediana', 62, 1, 'oranges'],
+      ['Uvas', '100 g', 69, 1, 'grapes'],
+      ['Piña', '100 g', 50, 1, 'pineapple'],
+      ['Fresas', '100 g', 32, 1, 'strawberries'],
+      ['Arándanos', '100 g', 57, 1, 'blueberries'],
+      ['Mango', '100 g', 60, 1, 'mango'],
+      ['Dátiles', '2 unidades', 133, 1, 'medjool dates', 'Azúcar concentrado: 130 kcal en dos bocados, antes de entrenar'],
+      ['Pasas', '40 g', 120, 1, 'raisins']
+    ] },
+    { t: 'Verdura', d: 'Apenas suman calorías y sí fibra, agua y volumen. No hace falta pesarlas.', o: [
+      ['Brócoli', '100 g', 35, 3, 'frozen broccoli'],
+      ['Espinaca', '100 g', 23, 3, 'fresh spinach'],
+      ['Ensalada verde mixta', '100 g', 20, 1, 'salad mix'],
+      ['Zanahoria', '100 g', 41, 1, 'carrots'],
+      ['Pimiento', '100 g', 31, 1, 'bell peppers'],
+      ['Calabacín', '100 g', 17, 1, 'zucchini'],
+      ['Champiñones', '100 g', 22, 3, 'mushrooms'],
+      ['Judía verde', '100 g', 31, 2, 'green beans'],
+      ['Tomate', '100 g', 18, 1, 'tomatoes']
+    ] },
+    { t: 'Grasas', d: 'Densas: una cucharada de más son 120 kcal que no ves. Pésalas o cuéntalas.', o: [
+      ['Aceite de oliva', '1 cucharada', 120, 0, 'olive oil'],
+      ['Aceite de aguacate', '1 cucharada', 124, 0, 'avocado oil'],
+      ['Mantequilla de cacahuate', '30 g', 180, 7, 'peanut butter'],
+      ['Almendras', '30 g', 170, 6, 'almonds'],
+      ['Nueces', '30 g', 185, 4, 'walnuts'],
+      ['Anacardos', '30 g', 155, 5, 'cashews'],
+      ['Aguacate', 'medio mediano', 160, 2, 'avocados', '5 g de fibra'],
+      ['Semillas de chía', '20 g', 97, 3, 'chia seeds', '7 g de fibra'],
+      ['Linaza molida', '15 g', 80, 3, 'ground flaxseed'],
+      ['Aceitunas', '30 g', 35, 0, 'olives']
+    ] },
+    { t: 'Bebidas · sin calorías', d: 'Bebe lo que quieras de estas. Tu objetivo de agua está arriba, en tus números del día.', o: [
+      ['Agua', 'libre', 0, 0, null],
+      ['Agua mineral con gas', 'libre', 0, 0, 'sparkling water'],
+      ['Café solo', '240 ml', 2, 0, 'ground coffee', 'Hasta unos 400 mg de cafeína al día, y nada 8 horas antes de dormir'],
+      ['Té verde o negro', '240 ml', 2, 0, 'green tea'],
+      ['Refresco light o zero', '355 ml', 0, 0, 'diet soda', 'Cero calorías de verdad. Si te ayuda a no beber del azucarado, úsalo']
+    ] },
+    { t: 'Bebidas · con calorías útiles', d: 'En volumen las calorías líquidas juegan a tu favor: entran sin llenarte.', o: [
+      ['Leche entera', '250 ml', 150, 8, 'whole milk'],
+      ['Batido de proteína en agua', '1 scoop', 120, 24, 'whey protein powder'],
+      ['Batido de proteína en leche', '1 scoop + 250 ml', 270, 32, 'whey protein powder'],
+      ['Batido de volumen casero', 'ver nota', 775, 48, null, 'Leche 300 ml, avena 50 g, 1 plátano, 30 g de mantequilla de cacahuate y 1 scoop. Es la forma más fácil de meter 775 kcal el día que no te entra la comida'],
+      ['Leche con chocolate', '250 ml', 190, 8, 'chocolate milk', 'La bebida post-entreno de toda la vida, y de las más baratas'],
+      ['Zumo de naranja', '250 ml', 112, 2, 'orange juice', 'Calorías que no sacian: en volumen es una ventaja, en definición un problema']
+    ] },
+    { t: 'Lo que conviene limitar', d: 'Nada de esto está prohibido. Lo que cambia es lo que te cuesta.', o: [
+      ['Alcohol · cerveza', '355 ml', 150, 0, null, 'Baja la síntesis de proteína y te rompe el sueño profundo, que es donde se construye el músculo. Es lo único de esta lista con un coste real'],
+      ['Alcohol · copa de vino', '150 ml', 125, 0, null],
+      ['Alcohol · destilado', '44 ml', 97, 0, null],
+      ['Refresco azucarado', '355 ml', 140, 0, null, 'Calorías y nada más. En volumen no te matan, pero hay formas mejores de meter 140 kcal'],
+      ['Bebida energética', '473 ml', 220, 0, null, 'Azúcar más cafeína a la hora equivocada: el problema no son las calorías, es el sueño'],
+      ['«Mass gainer»', '2 scoops', 1250, 50, null, 'Azúcar y maltodextrina a precio de suplemento. Lo mismo te sale por un tercio con el batido casero de arriba']
+    ] }
+  ];
   const SUPPS = [
     { id: 'creatina', n: 'Creatina monohidratada', q: 'creatine monohydrate powder', cat: 'Suplementos', pack: 'Un bote de 500 g dura más de 3 meses',
       d: '3 a 5 g al día, todos los días, a la hora que quieras y mezclada con lo que sea. Sin fase de carga y sin ciclos. Es el suplemento con más respaldo para ganar músculo, y de los más baratos.' },
@@ -2223,6 +2347,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       basis.textContent = '';
       $('food-plan').textContent = '';
       $('food-total').textContent = '';
+      renderCatalog();
       renderSwaps();
       renderShop(null);
       return;
@@ -2338,6 +2463,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
           + '. Las que no marcaste no cuentan como falladas: cuentan como que no sé qué pasó.'
         : 'Marca cada comida y en una semana te digo cuánto del plan estás comiendo de verdad. Sin ese dato, cuando la báscula no se mueva no sabré si es que comes poco o que el objetivo es bajo.' }))));
     renderSupps();
+    renderCatalog();
     renderSwaps();
     renderShop(plan);
   }
@@ -2424,6 +2550,25 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       box.append(h('div', { class: 'meal' },
         h('div', { class: 'meal-head' }, h('h3', { text: s.n }), s.opt ? h('span', { text: 'Opcional' }) : null),
         h('div', { class: 'food-row' }, h('span', { class: 'food-name', text: s.d }), h('span', null), storeLinks(s.q, s.n))));
+    }
+  }
+  function renderCatalog() {
+    const box = $('food-catalog');
+    box.textContent = '';
+    for (const g of CATALOG) {
+      const body = h('div', { class: 'swap-body' });
+      if (g.d) body.append(h('p', { class: 'cat-intro', text: g.d }));
+      for (const [n, per, k, p, q, note] of g.o) {
+        body.append(h('div', { class: 'food-row' },
+          h('span', { class: 'food-name', text: n }),
+          h('span', { class: 'food-amt', text: per }),
+          h('span', { class: 'food-sub', text: (p >= 1 ? p + ' g proteína · ' : '') + (k > 0 ? k + ' kcal' : 'sin calorías') }),
+          note ? h('span', { class: 'food-note', text: note }) : null,
+          q ? storeLinks(q, n) : null));
+      }
+      box.append(h('details', { class: 'sess' },
+        h('summary', null, h('b', { text: g.t }), h('span', { text: g.o.length + ' opciones' })),
+        body));
     }
   }
   function renderSwaps() {
