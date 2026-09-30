@@ -86,14 +86,6 @@ a{color:var(--accent)}
 .done-banner b{font:800 21px/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
 .done-banner span{font-size:13px;font-weight:600}
 
-.lvl{margin:0 0 12px;display:grid;gap:8px}
-.lvl-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-.lvl-btn{appearance:none;display:grid;justify-items:center;gap:2px;padding:9px 4px 8px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--muted);cursor:pointer;min-width:0;-webkit-tap-highlight-color:transparent}
-.lvl-btn b{font:800 15px/1.1 var(--display);text-transform:uppercase;letter-spacing:.03em;color:var(--ink)}
-.lvl-btn small{font-size:10.5px;line-height:1.1;text-align:center}
-.lvl-btn.on{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-.lvl-btn.on b{color:var(--accent)}
-.lvl-note{margin:0;font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
 .days{display:grid;grid-template-columns:repeat(var(--cols,6),minmax(0,1fr));gap:6px}
 .day{position:relative;appearance:none;display:grid;justify-items:center;gap:4px;padding:13px 2px 9px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;min-width:0;-webkit-tap-highlight-color:transparent}
 .day .disc{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 50% 50%,var(--bg) 0 2.5px,var(--p-edge) 2.6px 3.6px,var(--disc) 3.7px);box-shadow:inset 0 0 0 1px var(--p-edge)}
@@ -316,9 +308,6 @@ body{background:radial-gradient(120% 60% at 50% 0%, var(--surface-2) 0%, var(--b
 .sec{position:relative;padding-left:14px}
 .sec::before{content:'';position:absolute;left:0;top:.12em;bottom:.12em;width:4px;border-radius:4px;background:linear-gradient(var(--gold-1), var(--gold-2))}
 
-.lvl-btn{transition:transform .16s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease}
-.lvl-btn:active{transform:scale(.97)}
-.lvl-btn.on{box-shadow:inset 0 0 0 1px var(--accent), 0 6px 18px -12px var(--accent)}
 .day{transition:transform .16s ease, box-shadow .2s ease, border-color .2s ease}
 .day:active{transform:scale(.96)}
 .day[aria-selected="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent), 0 6px 18px -10px var(--accent)}
@@ -408,12 +397,15 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     <div class="banner info" id="install" hidden></div>
     <div class="banner info" id="phase" hidden></div>
     <div class="banner nag" id="backup-nag" role="status" hidden></div>
-    <div class="lvl" id="level"></div>
     <div class="days" id="days" role="tablist" aria-label="Día de la rutina"></div>
     <p class="banner" id="banner" hidden></p>
     <div class="dayhead" id="dayhead"></div>
     <div class="banner done-banner" id="done-banner" role="status" hidden></div>
     <ol class="exlist" id="exlist"></ol>
+
+    <h2 class="sec next">Todos los ejercicios</h2>
+    <p class="backup-text">Los 41 ejercicios de la app por el músculo que trabajan, con lo que distingue a cada uno de los que se le parecen y dónde cae en tu semana. Toca un grupo para abrirlo.</p>
+    <div id="ex-catalog"></div>
   </section>
 
   <section id="tab-progreso" role="tabpanel" aria-labelledby="tab-btn-progreso" hidden>
@@ -535,16 +527,10 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <p>La <b>hiperextensión a 45°</b> del viernes entró en el sitio de la patada de glúteo. Trabaja erectores, glúteo e isquios a la vez, y el glúteo ya venía servido por el hip thrust, la zancada y el peso muerto rumano.</p>
       </details>
       <details class="g" open>
-        <summary>Niveles</summary>
-        <p>Arriba de Entreno eliges entre tres programas. Los tres salen del mismo catálogo de ejercicios, con los mismos videos: lo que cambia son los días, las series y el margen que dejas en cada una.</p>
-        <ul>
-          <li><b>Principiante</b>, 3 días de cuerpo completo, 48 series a la semana, RIR 2-3. Cada músculo se trabaja tres veces por semana con poco volumen, que es lo que más rinde cuando el límite es la técnica y aparecer.</li>
-          <li><b>Intermedio</b>, 4 días de torso y pierna, 70 series. El salto de verdad frente a principiante es la frecuencia repartida, no apretar más.</li>
-          <li><b>Avanzado</b>, 6 días de empuje, tirón y pierna dos veces, 113 series. Pide seis días libres a la semana, comer y dormir para recuperarlo.</li>
-        </ul>
-        <p>La app te sugiere uno mirando cuántas sesiones has registrado en las últimas 8 semanas: menos de 1,5 por semana es principiante, hasta 4,5 es intermedio, por encima avanzado. El nivel se mide por lo que sostienes, no por lo fuerte que te sientes, y ocho semanas es la ventana más corta en la que una frecuencia se distingue de una buena racha.</p>
-        <p>Puedes elegir el que quieras, pero empezar por arriba es la forma más común de acabar entrenando cero días. Tu historial no se borra al cambiar: la fuerza de cada ejercicio se sigue arrastrando porque los ejercicios son los mismos. Lo que sí cambia es la rejilla de constancia, que tiene las columnas del programa activo.</p>
-        <p>No hay un nivel «élite», y no es por hacerme el interesante. A partir de avanzado lo que cambia no es una tabla con más series: son bloques de especialización, periodización y técnicas de intensidad que hay que ajustar sobre la marcha mirando cómo respondes. Eso necesita a alguien observándote, y un menú desplegable no lo sustituye. Cualquier app que te venda un botón de «élite» te está vendiendo la palabra.</p>
+        <summary>Todos los ejercicios</summary>
+        <p>Al final de Entreno están los 41 ejercicios de la app agrupados por el músculo que trabajan. Cada uno dice qué lo distingue de los que se le parecen, en qué día cae y con qué series, y lleva su enlace de técnica.</p>
+        <p>Tres de ellos no están en la semana y salen marcados como alternativa: el curl con barra Z, el curl predicador y la patada de glúteo. Se quedaron fuera porque el bíceps y el glúteo ya venían servidos, no porque sean malos. Si quieres cambiar uno de la semana por alguno de ellos, ahí tienes el sitio donde mirarlo.</p>
+        <p>Antes había tres programas para elegir, principiante, intermedio y avanzado. Ahora hay uno solo, la semana de seis días. Si en algún momento registraste sesiones con otro, no se han borrado: siguen en tus datos y en la gráfica de fuerza, y la rejilla de constancia te dice cuántas quedaron fuera de sus columnas.</p>
       </details>
       <details class="g" open>
         <summary>RIR</summary>
@@ -643,7 +629,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <summary>Tus datos</summary>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </details>
-      <p class="app-version">Versión 20 · 30 de septiembre de 2026</p>
+      <p class="app-version">Versión 21 · 30 de septiembre de 2026</p>
     </div>
   </section>
 </main>
@@ -735,93 +721,88 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (!LIB[id]) console.error('Ejercicio desconocido en el plan: ' + id);
     return Object.assign({ id, name: id, video: '' }, LIB[id], { sets, reps, rir, rest });
   };
-  const DISCS = ['var(--p-lun)', 'var(--p-mar)', 'var(--p-mie)', 'var(--p-jue)', 'var(--p-vie)', 'var(--p-sab)'];
-  const INKS = ['#FFFFFF', '#FFFFFF', '#1A1403', '#FFFFFF', '#15140E', '#FFFFFF'];
-  const mkDay = (key, i, name, focus, ex) => ({ key, short: 'D' + (i + 1), long: 'Día ' + (i + 1), name, focus, disc: DISCS[i], ink: INKS[i], ex });
-
-  const D_PRINC = [
-    mkDay('p1', 0, 'Cuerpo completo A', 'Cuádriceps y empuje', [
-      rx('hack-squat', 3, [6, 10], '2-3', 150),
-      rx('press-inclinado-maquina', 3, [8, 12], '2-3', 150),
-      rx('remo-apoyo-pecho', 3, [8, 12], '2-3', 150),
-      rx('jalon-neutro', 3, [8, 12], '2-3', 120),
-      rx('lateral-cable', 2, [12, 15], '1-2', 90),
-      rx('curl-barra-z', 2, [8, 12], '1-2', 90)
-    ]),
-    mkDay('p2', 1, 'Cuerpo completo B', 'Isquios y pecho', [
-      rx('peso-muerto-rumano', 3, [6, 10], '2-3', 150),
-      rx('press-plano-mancuernas', 3, [8, 12], '2-3', 150),
-      rx('jalon-prono', 3, [8, 12], '2-3', 150),
-      rx('prensa', 3, [10, 15], '2-3', 120),
-      rx('posterior-maquina', 2, [12, 15], '1-2', 90),
-      rx('pressdown-cuerda', 2, [10, 15], '1-2', 90)
-    ]),
-    mkDay('p3', 2, 'Cuerpo completo C', 'Glúteo y hombro', [
-      rx('hip-thrust', 3, [8, 12], '2-3', 150),
-      rx('press-hombro', 3, [6, 10], '2-3', 150),
-      rx('remo-unilateral-cable', 3, [10, 12], '2-3', 120),
-      rx('curl-femoral-sentado', 3, [10, 15], '1-2', 90),
-      rx('gemelo-pie', 2, [8, 12], '1-2', 90),
-      rx('curl-martillo', 2, [10, 12], '1-2', 90)
-    ])
+  // Un solo programa: la semana de seis días. Los días que tuvieron otros
+  // programas se siguen aceptando al validar para no tirar historial de una
+  // copia vieja, aunque ya no tengan columna donde salir.
+  const DAY_KEYS = D_AVANZ.map(d => d.key);
+  const LEGACY_KEYS = ['p1', 'p2', 'p3', 'i1', 'i2', 'i3', 'i4'];
+  const ALL_KEYS = DAY_KEYS.concat(LEGACY_KEYS);
+  const DAYS = D_AVANZ;
+  const WEEK_SETS = DAYS.reduce((a, d) => a + d.ex.reduce((b, e) => b + e.sets, 0), 0);
+  const EX = {};
+  DAYS.forEach(d => d.ex.forEach(e => { EX[e.id] = e; }));
+  // Todos los ejercicios de la app agrupados por el músculo que trabajan, con
+  // lo que distingue a cada uno de los que se le parecen. Los que no están en
+  // la semana salen igual, marcados como alternativa.
+  const MUSCLES = [
+    { g: 'Pecho', ex: [
+      ['press-inclinado-maquina', 'Porción clavicular, la parte alta del pecho. Carga guiada, así que puedes apretar sin pelearte con el equilibrio.'],
+      ['press-inclinado-neutro', 'Porción clavicular con agarre neutro, que deja el hombro en mejor posición que el agarre prono.'],
+      ['press-plano-mancuernas', 'Porción esternal. Con mancuernas el pecho baja más que con barra, y se estira más abajo.'],
+      ['fondos', 'Pecho bajo y tríceps a la vez. Inclinado hacia delante carga más pecho; vertical, más tríceps.'],
+      ['pec-deck', 'Aislamiento sin codo. Mantiene tensión en el estiramiento, que es donde el pecho más responde.']
+    ] },
+    { g: 'Hombro', ex: [
+      ['press-hombro', 'Deltoides anterior, que ya trabaja en todos los press de pecho. Por eso con tres series basta.'],
+      ['lateral-cable', 'Deltoides medial. Desde polea baja hay tensión abajo, donde el músculo está alargado.'],
+      ['lateral-mancuernas', 'Deltoides medial con la resistencia máxima arriba. Es la curva contraria a la del cable: por eso están los dos.'],
+      ['posterior-maquina', 'Deltoides posterior, el que ensancha el hombro visto de atrás y compensa tanto empuje.'],
+      ['face-pull', 'Deltoides posterior más los rotadores externos. Lo que mantiene el hombro sano cuando hay mucho press.']
+    ] },
+    { g: 'Espalda', ex: [
+      ['remo-apoyo-pecho', 'Espalda media con el pecho apoyado: no puedes tirar con la lumbar, así que va todo a la espalda.'],
+      ['remo-barra-t', 'Espalda media con más carga. Aquí el erector sí trabaja para sostener el tronco.'],
+      ['remo-unilateral-cable', 'Un lado cada vez, con más recorrido porque el hombro puede viajar más adelante y atrás.'],
+      ['jalon-neutro', 'Dorsal con agarre neutro, el más cómodo de hombro y el que más deja apretar.'],
+      ['jalon-prono', 'Dorsal con agarre abierto, más énfasis en la anchura.'],
+      ['dominadas', 'Dorsal con tu propio peso. Pasando de 10 repeticiones toca lastre.'],
+      ['pullover-cable', 'Dorsal sin flexionar el codo: el único que lo trabaja sin que el bíceps se lleve parte.']
+    ] },
+    { g: 'Trapecio', ex: [
+      ['encogimiento', 'Trapecio superior, la línea del cuello al hombro. Los remos trabajan el medio y el inferior; este es el único que entra al de arriba.']
+    ] },
+    { g: 'Bíceps y braquial', ex: [
+      ['curl-bayesiano', 'Cabeza larga del bíceps. Cruza el hombro, así que con el brazo por detrás del cuerpo empieza la serie estirada.'],
+      ['curl-martillo', 'Braquial y braquiorradial en agarre neutro. El braquial empuja el bíceps hacia arriba y engrosa el brazo por dentro.'],
+      ['curl-barra-z', 'Curl supinado clásico. La barra Z carga menos la muñeca que la recta.'],
+      ['curl-predicador', 'Brazo por delante del cuerpo, que acorta la cabeza larga y deja más trabajo a la corta.']
+    ] },
+    { g: 'Tríceps', ex: [
+      ['overhead-cable', 'Cabeza larga del tríceps, que cruza el hombro: con el brazo por encima de la cabeza empieza estirada.'],
+      ['skull-crusher-cable', 'Cabeza larga también, con el brazo más bajo. El cable mantiene tensión donde la barra la pierde.'],
+      ['pressdown-cuerda', 'Cabezas lateral y medial, con el brazo pegado al cuerpo.']
+    ] },
+    { g: 'Antebrazo', ex: [
+      ['curl-inverso', 'Extensores del antebrazo y braquiorradial, en pronación. Vas a mover mucho menos peso, y es lo normal.'],
+      ['curl-muneca', 'Flexores del antebrazo, la masa grande de la cara interna. Deja que la barra ruede hasta los dedos.']
+    ] },
+    { g: 'Cuádriceps', ex: [
+      ['hack-squat', 'Cuádriceps con el tronco apoyado, así que la carga no se la lleva la espalda.'],
+      ['prensa', 'Cuádriceps y glúteo con mucha carga y poco riesgo técnico.'],
+      ['zancada', 'Una pierna cada vez: cuádriceps y glúteo, y además te obliga a estabilizar.'],
+      ['extension-cuadriceps', 'Aislamiento del cuádriceps, el único que llega al recto femoral con la cadera extendida.']
+    ] },
+    { g: 'Isquiosurales', ex: [
+      ['peso-muerto-rumano', 'Isquios desde la cadera, con la rodilla casi fija. El otro papel que tienen.'],
+      ['curl-femoral-sentado', 'Isquios desde la rodilla con la cadera flexionada, que los deja estirados. Produce más crecimiento que tumbado.'],
+      ['curl-femoral-tumbado', 'Isquios desde la rodilla con la cadera extendida, en posición más corta.']
+    ] },
+    { g: 'Glúteo', ex: [
+      ['hip-thrust', 'Glúteo en su posición más corta, con la tensión máxima arriba.'],
+      ['patada-gluteo', 'Aislamiento de glúteo, una pierna cada vez.']
+    ] },
+    { g: 'Gemelo y sóleo', ex: [
+      ['gemelo-pie', 'Gemelo. Nace por encima de la rodilla, así que solo trabaja con la pierna estirada.'],
+      ['gemelo-sentado', 'Sóleo. Nace debajo de la rodilla, y es el que queda cuando la doblas.']
+    ] },
+    { g: 'Erectores lumbares', ex: [
+      ['hiperextension', 'Erectores, glúteo e isquios a la vez. Sube hasta alinear el cuerpo y para ahí.']
+    ] },
+    { g: 'Abdomen', ex: [
+      ['crunch-polea', 'Recto abdominal con carga, flexionando la columna.'],
+      ['elevacion-piernas', 'Abdomen bajo y flexores de cadera, colgado de la barra.']
+    ] }
   ];
-
-  const D_INTER = [
-    mkDay('i1', 0, 'Torso A', 'Pecho y espalda', [
-      rx('press-inclinado-maquina', 3, [6, 10], '1-2', 150),
-      rx('remo-apoyo-pecho', 3, [8, 12], '1-2', 150),
-      rx('press-hombro', 3, [8, 12], '1-2', 150),
-      rx('jalon-neutro', 3, [8, 12], '1-2', 120),
-      rx('lateral-cable', 3, [12, 15], '0-1', 90),
-      rx('curl-barra-z', 2, [8, 12], '0-1', 90)
-    ]),
-    mkDay('i2', 1, 'Pierna A', 'Cuádriceps e isquios', [
-      rx('hack-squat', 4, [6, 10], '1-2', 150),
-      rx('peso-muerto-rumano', 3, [6, 10], '2', 150),
-      rx('prensa', 3, [10, 15], '1-2', 120),
-      rx('curl-femoral-sentado', 3, [10, 15], '0-1', 90),
-      rx('gemelo-pie', 3, [8, 12], '0-1', 90)
-    ]),
-    mkDay('i3', 2, 'Torso B', 'Pecho y dorsal', [
-      rx('press-plano-mancuernas', 3, [8, 12], '1-2', 150),
-      rx('dominadas', 3, [6, 10], '1-2', 150),
-      rx('remo-barra-t', 3, [8, 12], '1-2', 150),
-      rx('pec-deck', 3, [10, 15], '0-1', 90),
-      rx('lateral-mancuernas', 3, [12, 20], '0-1', 90),
-      rx('overhead-cable', 2, [10, 15], '0-1', 90),
-      rx('curl-martillo', 2, [10, 12], '0-1', 90)
-    ]),
-    mkDay('i4', 3, 'Pierna B', 'Glúteo y cuádriceps', [
-      rx('hip-thrust', 4, [8, 12], '1-2', 150),
-      rx('zancada', 3, [8, 12], '1-2', 150),
-      rx('extension-cuadriceps', 3, [12, 15], '0-1', 90),
-      rx('curl-femoral-tumbado', 3, [10, 15], '0-1', 90),
-      rx('gemelo-sentado', 3, [12, 20], '0-1', 90),
-      rx('elevacion-piernas', 2, [8, 15], '1-2', 90)
-    ])
-  ];
-
-  const weekSets = d => d.reduce((a, x) => a + x.ex.reduce((b, e) => b + e.sets, 0), 0);
-  const LEVELS = [
-    { id: 'princ', name: 'Principiante', d: D_PRINC,
-      sub: 'Menos volumen y más margen en cada serie. La técnica y aparecer son el límite, no las series.' },
-    { id: 'inter', name: 'Intermedio', d: D_INTER,
-      sub: 'Torso y pierna dos veces por semana. El salto real respecto a principiante es la frecuencia, no la dureza.' },
-    { id: 'avanz', name: 'Avanzado', d: D_AVANZ, wd: true,
-      sub: 'Empuje, tirón y pierna dos veces. Pide seis días libres a la semana y dormir para recuperarlo.' }
-  ];
-  for (const l of LEVELS) { l.days = l.d.length; l.sets = weekSets(l.d); }
-  const LEVEL_IDS = LEVELS.map(l => l.id);
-  const ALL_KEYS = LEVELS.flatMap(l => l.d.map(x => x.key));
-
-  let DAYS = D_AVANZ, DAY_KEYS = [], EX = {}, LV = LEVELS[2];
-  function bindLevel() {
-    LV = LEVELS.find(l => l.id === store.level) || LEVELS[2];
-    DAYS = LV.d;
-    DAY_KEYS = DAYS.map(d => d.key);
-    EX = {};
-    DAYS.forEach(d => d.ex.forEach(e => { EX[e.id] = e; }));
-  }
   const findDay = k => DAYS.find(d => d.key === k) || null;
   const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
@@ -880,7 +861,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
 
   // ---- almacenamiento en el móvil ----
   const KEY = 'rutina-volumen.v1';
-  const emptyStore = () => ({ v: 1, level: 'avanz', sessions: {}, bw: {}, waist: {}, shop: {}, meals: {}, kcalAdj: 0, adjDate: null, deloadUntil: null, voice: true, lastBackup: null, backupSnooze: null });
+  const emptyStore = () => ({ v: 1, sessions: {}, bw: {}, waist: {}, shop: {}, meals: {}, kcalAdj: 0, adjDate: null, deloadUntil: null, voice: true, lastBackup: null, backupSnooze: null });
   let storageOk = true, changed = false;
   // Solo sobreviven fechas reales, comidas que existen y los tres estados.
   function cleanMeals(raw) {
@@ -902,14 +883,13 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       const raw = localStorage.getItem(KEY);
       if (!raw) return emptyStore();
       const d = JSON.parse(raw);
-      return { v: 1, level: LEVEL_IDS.includes(d.level) ? d.level : 'avanz', sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, meals: cleanMeals(d.meals), kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, deloadUntil: isYmd(d.deloadUntil) ? d.deloadUntil : null, voice: d.voice !== false, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
+      return { v: 1, sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, meals: cleanMeals(d.meals), kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, deloadUntil: isYmd(d.deloadUntil) ? d.deloadUntil : null, voice: d.voice !== false, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
     } catch (e) {
       storageOk = false;
       return emptyStore();
     }
   }
   let store = readStore();
-  bindLevel();
 
   function persistNow() {
     if (!changed || !storageOk) return storageOk;
@@ -1023,64 +1003,34 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const mine = state.sessions.find(x => DAY_KEYS.includes(x.day));
     if (mine) return DAY_KEYS[(DAY_KEYS.indexOf(mine.day) + 1) % DAY_KEYS.length];
     const wd = new Date().getDay();
-    return LV.wd && wd >= 1 && wd <= DAY_KEYS.length ? DAY_KEYS[wd - 1] : DAY_KEYS[0];
+    return wd >= 1 && wd <= DAY_KEYS.length ? DAY_KEYS[wd - 1] : DAY_KEYS[0];
   }
 
-  // El nivel que te toca sale de lo que has sostenido, no de cómo te sientes.
-  // Ocho semanas es la ventana más corta en la que una frecuencia semanal se
-  // distingue de una buena racha.
-  const LVL_WEEKS = 8;
-  function sessionsIn(weeks) {
-    const from = ymd(new Date(toDate(today()).getTime() - weeks * 7 * 86400000));
-    const dates = new Set();
-    for (const s of state.sessions) if (s.date >= from && hasWork(s.sets)) dates.add(s.date + '_' + s.day);
-    return dates.size;
-  }
-  function suggestLevel() {
-    const n = sessionsIn(LVL_WEEKS), perWeek = n / LVL_WEEKS;
-    if (perWeek < 1.5) return { id: 'princ', n, perWeek };
-    if (perWeek < 4.5) return { id: 'inter', n, perWeek };
-    return { id: 'avanz', n, perWeek };
-  }
-  function renderLevel() {
-    const box = $('level');
+  function renderExCatalog() {
+    const box = $('ex-catalog');
     if (!box) return;
-    const sug = suggestLevel();
+    const dayOf = {};
+    DAYS.forEach(d => d.ex.forEach(e => { dayOf[e.id] = d; }));
     box.textContent = '';
-    const row = h('div', { class: 'lvl-row', role: 'radiogroup', 'aria-label': 'Nivel del programa' });
-    for (const l of LEVELS) {
-      const on = l.id === LV.id;
-      row.append(h('button', {
-        class: 'lvl-btn' + (on ? ' on' : ''), type: 'button', role: 'radio', 'data-level': l.id,
-        'aria-checked': String(on),
-        'aria-label': l.name + ', ' + l.days + ' días por semana, ' + l.sets + ' series'
-      },
-        h('b', { text: l.name }),
-        h('small', { text: l.days + ' días · ' + l.sets + ' series' })));
+    for (const g of MUSCLES) {
+      const body = h('div', { class: 'swap-body' });
+      for (const [id, why] of g.ex) {
+        const e = LIB[id];
+        if (!e) continue;
+        const d = dayOf[id];
+        body.append(h('div', { class: 'food-row' },
+          h('span', { class: 'food-name', text: e.name }),
+          h('span', { class: 'food-amt', text: d ? d.short + ' · ' + e.sets + '×' + e.reps[0] + '-' + e.reps[1] : 'Alternativa' }),
+          h('span', { class: 'food-sub', text: d ? d.long + ' · ' + d.name + ' · RIR ' + rirFor(e) : 'Fuera de la semana, por si quieres cambiar alguno' }),
+          h('span', { class: 'food-note', text: why }),
+          h('div', { class: 'stores' },
+            h('a', { class: 'store', href: YT(e.video), target: '_blank', rel: 'noopener noreferrer', 'aria-label': 'Ver la técnica de ' + e.name }, 'Técnica ↗'))));
+      }
+      box.append(h('details', { class: 'sess' },
+        h('summary', null, h('b', { text: g.g }), h('span', { text: g.ex.length + (g.ex.length === 1 ? ' ejercicio' : ' ejercicios') })),
+        body));
     }
-    box.append(row, h('p', { class: 'lvl-note' },
-      h('span', { text: LV.sub }),
-      sug.id === LV.id ? null : h('span', { class: 'chip ' + (LEVEL_IDS.indexOf(sug.id) < LEVEL_IDS.indexOf(LV.id) ? 'low' : 'up'), text: 'Te pega ' + LEVELS.find(l => l.id === sug.id).name.toLowerCase() }),
-      sug.id === LV.id ? null : h('span', { text: sug.n === 0
-        ? 'No tienes ninguna sesión registrada, así que por lo que sé estás empezando. Cambia cuando la rejilla de Progreso diga otra cosa.'
-        : 'Llevas ' + sug.n + (sug.n === 1 ? ' sesión' : ' sesiones') + ' en ' + LVL_WEEKS + ' semanas, ' + nf1.format(sug.perWeek) + ' por semana. El nivel se mide por lo que sostienes.' })));
   }
-  $('level').addEventListener('click', e => {
-    const b = e.target.closest('button[data-level]');
-    if (!b || b.dataset.level === store.level) return;
-    flush();
-    store.level = b.dataset.level;
-    changed = true;
-    persistNow();
-    bindLevel();
-    state.dayPicked = false;
-    state.day = suggestedDay();
-    renderLevel();
-    renderDays();
-    renderDay();
-    populateExerciseSelect();
-    if (state.tab === 'progreso') renderProgress();
-  });
 
   function renderDays() {
     const box = $('days');
@@ -1391,7 +1341,6 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (persistNow()) setSync('Guardado en este móvil');
     askPersist();
     state.sessions = sessionsSorted();
-    renderLevel();
     renderDays();
     renderBackupNag();
     if (state.tab === 'progreso') renderProgress();
@@ -1490,9 +1439,9 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     box.append(t);
     const week = (byWeek.get(mondayOf(today())) || new Set()).size;
     box.append(h('p', { class: 'chart-note', text: (total === 0
-      ? 'Todavía no hay ninguna sesión de ' + LV.name.toLowerCase() + ' registrada, así que la rejilla está vacía entera.'
+      ? 'Todavía no hay ninguna sesión registrada, así que la rejilla está vacía entera.'
       : total + (total === 1 ? ' sesión' : ' sesiones') + ' en ' + weeks.length + (weeks.length === 1 ? ' semana' : ' semanas') + '. Esta semana llevas ' + week + ' de ' + DAYS.length + '.')
-      + (other ? ' Hay ' + other + (other === 1 ? ' sesión más de otro programa, que no cabe' : ' sesiones más de otro programa, que no caben') + ' en esta rejilla; la fuerza de cada ejercicio sí las cuenta.' : '') }));
+      + (other ? ' Hay ' + other + (other === 1 ? ' sesión más de un programa anterior, que no cabe' : ' sesiones más de un programa anterior, que no caben') + ' en esta rejilla; la fuerza de cada ejercicio sí las cuenta.' : '') }));
   }
 
   function renderProgress() {
@@ -2726,13 +2675,13 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const L = [], kg = planKg(), { cur, prev, rate } = weightTrend(), ph = phase();
     L.push('Resumen de mi app Rutina de Volumen · ' + fmtDate(today()), '');
     L.push('PROGRAMA');
-    L.push(LV.name + ': ' + LV.days + ' días por semana, ' + LV.sets + ' series. Sugerido por mis registros: ' + LEVELS.find(l => l.id === suggestLevel().id).name);
+    L.push('Empuje, tirón y pierna dos veces: ' + DAYS.length + ' días por semana, ' + WEEK_SETS + ' series.');
     L.push('', 'FASE');
     L.push(!ph.started ? 'Todavía sin sesiones registradas'
       : (ph.reentry ? 'Semana ' + ph.week + ' de ' + REENTRY_WEEKS + ' de reentrada' : 'Semana ' + ph.week + ', volumen') + ' (primera sesión el ' + fmtDate(ph.first) + ')');
     const st = streakData();
     L.push('', 'CONSTANCIA (semanas de lunes a domingo, sesiones de la rotación hechas)');
-    if (st.other) L.push('(' + st.other + ' sesiones más de otro nivel, fuera de esta rejilla)');
+    if (st.other) L.push('(' + st.other + ' sesiones más de un programa anterior, fuera de esta rejilla)');
     if (!st.weeks.length) L.push('Sin semanas que mostrar');
     for (const w of st.weeks) {
       const set = st.byWeek.get(w) || new Set();
@@ -3003,11 +2952,9 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   window.addEventListener('storage', e => {
     if (e.key !== KEY) return;
     store = readStore();
-    bindLevel();
     state.local = {};
     state.sessions = sessionsSorted();
     if (!state.dayPicked || !findDay(state.day)) state.day = suggestedDay();
-    renderLevel();
     renderDays();
     if (!(document.activeElement && list.contains(document.activeElement))) renderDay();
     if (state.tab === 'progreso') renderProgress();
@@ -3021,7 +2968,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   populateExerciseSelect();
   renderInstall();
   renderVoiceBtn();
-  renderLevel();
+  renderExCatalog();
   renderDays();
   renderDay();
   renderProgress();
