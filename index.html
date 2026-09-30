@@ -88,7 +88,8 @@ a{color:var(--accent)}
 .done-banner b{font:800 21px/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
 .done-banner span{font-size:13px;font-weight:600}
 
-.gymsw{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin:0 0 12px}
+.ctx{display:flex;align-items:center;flex-wrap:wrap;gap:10px 20px;margin:0 0 12px}
+.gymsw{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px}
 .gymsw-l{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .gymsw-row{display:inline-grid;grid-template-columns:repeat(2,auto);gap:3px;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
 .gym-btn{appearance:none;border:0;background:none;color:var(--muted);border-radius:999px;padding:0 14px;min-height:38px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent}
@@ -411,7 +412,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     <div class="banner info" id="install" hidden></div>
     <div class="banner info" id="phase" hidden></div>
     <div class="banner nag" id="backup-nag" role="status" hidden></div>
-    <div class="gymsw" id="gym"></div>
+    <div class="ctx"><div class="gymsw" id="gym"></div><div class="gymsw" id="unit"></div></div>
     <div class="days" id="days" role="tablist" aria-label="Día de la rutina"></div>
     <p class="banner" id="banner" hidden></p>
     <div class="dayhead" id="dayhead"></div>
@@ -431,7 +432,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     <h2 class="sec next">Peso corporal</h2>
     <form id="bw-form" class="bw-form" autocomplete="off" novalidate>
       <label class="field" for="bw-date"><span>Fecha</span><input id="bw-date" type="date"></label>
-      <label class="field" for="bw-kg"><span>Peso en ayunas (kg)</span><input id="bw-kg" type="text" inputmode="decimal" placeholder="80,4"></label>
+      <label class="field" for="bw-kg"><span id="bw-label">Peso en ayunas (kg)</span><input id="bw-kg" type="text" inputmode="decimal" placeholder="80,4"></label>
       <button class="btn primary" id="bw-save" type="submit">Guardar</button>
     </form>
     <p class="form-msg" id="bw-msg" role="status" aria-live="polite"></p>
@@ -522,7 +523,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       <details class="g" open>
         <summary>¿Cómo fue?</summary>
         <p>Al marcar la primera serie de un ejercicio aparecen tres botones: fácil, justo y al límite. Es el RIR dicho en una palabra, para que no tengas que calcular nada con el pulso a 140: fácil son 3 repeticiones o más de sobra, justo son 1 o 2, al límite es ninguna.</p>
-        <p>No es un adorno. Si marcas fácil, la próxima vez la app te dirá «Sube carga» aunque no llegaras al tope del rango, porque el rango se te quedó corto. Y va dentro del resumen que copias, que es lo que separa una tabla de números de algo interpretable: 60 kg × 8 al límite y 60 kg × 8 fácil no son la misma sesión.</p>
+        <p>No es un adorno. Si marcas fácil, la próxima vez la app te dirá «Sube carga» aunque no llegaras al tope del rango, porque el rango se te quedó corto. Y va dentro del resumen que copias, que es lo que separa una tabla de números de algo interpretable: 8 repeticiones al límite y 8 fácil con el mismo peso no son la misma sesión.</p>
       </details>
       <details class="g" open>
         <summary>Por qué está cada ejercicio</summary>
@@ -553,10 +554,16 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <p>Arriba de Entreno eliges dónde entrenas hoy, EōS o Planet Fitness. La rutina es la misma en los dos; cambian tres ejercicios y cambia cómo se leen los pesos.</p>
         <p>Planet Fitness no tiene racks ni barras olímpicas: todo lo de barra va en la máquina Smith, y la mayoría de clubes no tiene hack squat. Por eso allí el <b>hack squat</b> pasa a sentadilla en Smith, el <b>peso muerto rumano</b> a rumano en Smith, y el <b>hip thrust</b> a hip thrust en Smith, con las mismas series y el mismo RIR. El remo del miércoles es con mancuerna en los dos gimnasios, porque la barra T tampoco suele estar. EōS tiene racks, barras y mancuernas hasta 150 lb, así que allí va todo tal cual.</p>
         <p>Lo que sí varía de un Planet Fitness a otro, las máquinas de curl femoral y de pantorrilla y el press inclinado en máquina, lleva una nota en su ejercicio que solo aparece allí.</p>
-        <p>Lo importante: una máquina o una polea de otra marca tiene otra palanca y otra relación de polea, así que 40 kg en la placa de un gimnasio no son 40 kg en el otro. Por eso la app separa el historial por gimnasio en máquinas, poleas y Smith: la «última vez», la etiqueta de progresión, los récords y la gráfica salen del mismo gimnasio. Lo de mancuerna, barra y peso corporal pesa igual en todas partes y se comparte.</p>
+        <p>Lo importante: una máquina o una polea de otra marca tiene otra palanca y otra relación de polea, así que el mismo número en la placa no pesa lo mismo en un gimnasio que en el otro. Por eso la app separa el historial por gimnasio en máquinas, poleas y Smith: la «última vez», la etiqueta de progresión, los récords y la gráfica salen del mismo gimnasio. Lo de mancuerna, barra y peso corporal pesa igual en todas partes y se comparte.</p>
         <p>Cada ejercicio dice debajo de las series con qué se hace. Cuando es una máquina, va entre comillas el nombre en inglés que suele llevar en la placa, como «Leg Press», «Seated Leg Curl» o «Lat Pulldown», para que la encuentres sin buscar. Las poleas dicen además qué agarre poner: cuerda, maneral de una mano o barra.</p>
         <p>Elige el gimnasio antes de la primera serie. Si se te olvida y ya anotaste algo, cámbialo igual: lo de hoy se mueve contigo, y el hack squat que marcaste por error pasa a ser la sentadilla en Smith que hiciste de verdad.</p>
         <p>Y si puedes elegir, haz cada ejercicio casi siempre en el mismo sitio. Alternar sin orden deja dos historiales a medias en cada máquina, y la progresión doble necesita comparar una sesión con la anterior.</p>
+      </details>
+      <details class="g" open>
+        <summary>Kilos o libras</summary>
+        <p>Debajo del gimnasio, arriba de Entreno, eliges si ves y escribes los pesos en kg o en lb. En EōS y en Planet Fitness las mancuernas, los discos y las placas de las máquinas vienen en libras, así que lo cómodo es lb.</p>
+        <p>Por dentro la app lo guarda todo en kilos y la unidad solo decide cómo te lo enseña, así que puedes cambiarla cuando quieras sin perder nada: las 45 lb que anotes hoy salen como 20,4 kg si vuelves a kilos. Cambian a la vez las series, la última vez, los récords, la gráfica de fuerza, tu peso corporal y el resumen que copias.</p>
+        <p>Lo que la app no puede adivinar es un número escrito con la unidad equivocada. Si tienes puesto kg y escribes 45 pensando en la mancuerna de 45 lb, se guardan 45 kg, que son 99 lb, y la progresión y los récords de ese ejercicio salen mal. Elige la unidad antes de anotar la primera serie. La comida sigue en gramos, y la proteína y el agua se siguen explicando por kilo de peso porque así se escriben esas reglas; las cantidades te las da calculadas igual.</p>
       </details>
       <details class="g" open>
         <summary>RIR</summary>
@@ -666,7 +673,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <summary>Tus datos</summary>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </details>
-      <p class="app-version">Versión 24 · 30 de septiembre de 2026</p>
+      <p class="app-version">Versión 25 · 30 de septiembre de 2026</p>
     </div>
   </section>
 </main>
@@ -717,7 +724,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     { key: 'jue', short: 'Jue', long: 'Jueves', name: 'Push B', focus: 'Pecho', disc: 'var(--p-jue)', ink: '#FFFFFF', ex: [
       { id: 'press-inclinado-maquina', name: 'Press inclinado en máquina', sets: 3, reps: [6, 10], rir: '1-2', rest: 150, video: '7_scLkTCwTU' },
       { id: 'press-plano-mancuernas', name: 'Press plano con mancuernas', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'VmB1G1K7v94' },
-      { id: 'fondos', name: 'Fondos en paralelas', sets: 3, reps: [6, 12], rir: '1-2', rest: 150, video: 'vi1-BOcj3cQ', load: 'lastre', note: 'Con lastre cuando pases de 12 repeticiones. Sin lastre, deja la casilla de kg vacía.' },
+      { id: 'fondos', name: 'Fondos en paralelas', sets: 3, reps: [6, 12], rir: '1-2', rest: 150, video: 'vi1-BOcj3cQ', load: 'lastre', note: 'Con lastre cuando pases de 12 repeticiones. Sin lastre, deja vacía la casilla del lastre.' },
       { id: 'lateral-mancuernas', name: 'Elevación lateral con mancuernas', sets: 4, reps: [12, 20], rir: '0-1', rest: 90, video: '3VcKaXpzqRo' },
       { id: 'skull-crusher-cable', name: 'Skull crusher en cable', sets: 3, reps: [10, 12], rir: '0-1', rest: 90, video: 'GMQlN-cvnss' },
       { id: 'pressdown-cuerda', name: 'Pressdown con cuerda', sets: 3, reps: [10, 15], rir: '0-1', rest: 90, video: 'vB5OHsJ3EME' }
@@ -726,7 +733,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       { id: 'hack-squat', name: 'Hack squat', sets: 4, reps: [6, 10], rir: '1-2', rest: 150, video: 'm2DiSYKPzqk', note: 'Si tu gimnasio no tiene hack squat, haz la sentadilla con barra en su lugar. Elige una y quédate con ella: los pesos de una y otra no se comparan.', alt: { label: 'Técnica de la sentadilla', video: 'vaMYBmJH-tw' } },
       { id: 'zancada', name: 'Zancada con mancuernas', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'D7KaRcUTQeE', side: 'por pierna' },
       { id: 'curl-femoral-tumbado', name: 'Curl femoral tumbado', sets: 3, reps: [10, 15], rir: '0-1', rest: 90, video: '1Tq3QdYUuHs' },
-      { id: 'hiperextension', name: 'Hiperextensión a 45°', sets: 3, reps: [10, 15], rir: '1-2', rest: 90, video: 'KA2AuDQipSQ', load: 'lastre', note: 'Sube hasta alinear el cuerpo y para ahí, sin arquear de más. Con un disco en el pecho cuando pases de 15 repeticiones; sin disco, deja la casilla de kg vacía.' },
+      { id: 'hiperextension', name: 'Hiperextensión a 45°', sets: 3, reps: [10, 15], rir: '1-2', rest: 90, video: 'KA2AuDQipSQ', load: 'lastre', note: 'Sube hasta alinear el cuerpo y para ahí, sin arquear de más. Con un disco en el pecho cuando pases de 15 repeticiones; sin disco, deja vacía la casilla del lastre.' },
       { id: 'gemelo-sentado', name: 'Pantorrilla sentado en máquina', sets: 4, reps: [12, 20], rir: '0-1', rest: 90, video: '3ZRe_QpvRPg' },
       { id: 'elevacion-piernas', name: 'Elevación de piernas colgado', sets: 3, reps: [8, 15], rir: '1-2', rest: 90, video: 'EYe6dc_i4L0', load: 'lastre', note: 'Si no llegas a 8 con las piernas rectas, hazlas con las rodillas flexionadas.' }
     ] },
@@ -954,17 +961,28 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   const diffDays = (a, b) => Math.round((toDate(b) - toDate(a)) / 86400000);
   const nf1 = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 });
   const nf2 = new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const fmtKg = n => nf1.format(n);
-  const num = v => {
+  const parseNum = v => {
     const t = String(v == null ? '' : v).trim().replace(',', '.');
     if (!t) return null;
     const n = Number(t);
-    return Number.isFinite(n) && n >= 0 && n < 1000 ? n : null;
+    return Number.isFinite(n) && n >= 0 ? n : null;
   };
+  const num = v => { const n = parseNum(v); return n != null && n < 1000 ? n : null; };
+  // Los pesos se guardan siempre en kg. La unidad elegida solo cambia cómo se
+  // ven y en qué se escriben, así que cambiarla nunca toca lo guardado.
+  const LB_PER_KG = 2.20462262185;
+  const U = () => (store.unit === 'lb' ? 'lb' : 'kg');
+  const toU = kg => (U() === 'lb' ? kg * LB_PER_KG : kg);
+  const fromU = v => (U() === 'lb' ? v / LB_PER_KG : v);
+  const fmtW = kg => nf1.format(toU(kg));
+  const fmtWU = kg => fmtW(kg) + ' ' + U();
+  // Peso escrito en la unidad elegida, devuelto en kg. El tope va en kg para
+  // que 1000 lb, que son 454 kg, no se rechacen por el número.
+  const numW = v => { const n = parseNum(v); if (n == null) return null; const kg = fromU(n); return kg < 1000 ? kg : null; };
   const fmtRest = s => Math.floor(s / 60) + ':' + pad(s % 60);
   const fmtSet = (ex, s) => {
-    if (ex && ex.load === 'lastre') return s.kg > 0 ? '+' + fmtKg(s.kg) + '×' + s.reps : s.reps + ' reps';
-    return (s.kg != null ? fmtKg(s.kg) : '?') + '×' + s.reps;
+    if (ex && ex.load === 'lastre') return s.kg > 0 ? '+' + fmtW(s.kg) + '×' + s.reps : s.reps + ' reps';
+    return (s.kg != null ? fmtW(s.kg) : '?') + '×' + s.reps;
   };
   const isYmd = s => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
   const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
@@ -984,7 +1002,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
 
   // ---- almacenamiento en el móvil ----
   const KEY = 'rutina-volumen.v1';
-  const emptyStore = () => ({ v: 1, gym: 'eos', sessions: {}, bw: {}, waist: {}, shop: {}, meals: {}, kcalAdj: 0, adjDate: null, deloadUntil: null, voice: true, lastBackup: null, backupSnooze: null });
+  const emptyStore = () => ({ v: 1, gym: 'eos', unit: 'kg', sessions: {}, bw: {}, waist: {}, shop: {}, meals: {}, kcalAdj: 0, adjDate: null, deloadUntil: null, voice: true, lastBackup: null, backupSnooze: null });
   let storageOk = true, changed = false;
   // Solo sobreviven fechas reales, comidas que existen y los tres estados.
   function cleanMeals(raw) {
@@ -1006,7 +1024,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       const raw = localStorage.getItem(KEY);
       if (!raw) return emptyStore();
       const d = JSON.parse(raw);
-      return { v: 1, gym: d.gym === 'pf' ? 'pf' : 'eos', sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, meals: cleanMeals(d.meals), kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, deloadUntil: isYmd(d.deloadUntil) ? d.deloadUntil : null, voice: d.voice !== false, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
+      return { v: 1, gym: d.gym === 'pf' ? 'pf' : 'eos', unit: d.unit === 'lb' ? 'lb' : 'kg', sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, meals: cleanMeals(d.meals), kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, deloadUntil: isYmd(d.deloadUntil) ? d.deloadUntil : null, voice: d.voice !== false, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
     } catch (e) {
       storageOk = false;
       return emptyStore();
@@ -1173,6 +1191,35 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (state.tab === 'progreso') renderProgress();
   });
 
+  function renderUnit() {
+    const box = $('unit');
+    if (!box) return;
+    box.textContent = '';
+    const row = h('div', { class: 'gymsw-row', role: 'radiogroup', 'aria-label': 'Unidad de peso' });
+    for (const [k, n] of [['kg', 'kilos'], ['lb', 'libras']]) {
+      const on = k === U();
+      row.append(h('button', { class: 'gym-btn' + (on ? ' on' : ''), type: 'button', role: 'radio', 'aria-checked': String(on), 'aria-label': k + ', ' + n, 'data-unit': k }, k));
+    }
+    box.append(h('span', { class: 'gymsw-l', text: 'Pesos en' }), row);
+    $('bw-label').textContent = 'Peso en ayunas (' + U() + ')';
+    $('bw-kg').placeholder = U() === 'lb' ? '175,4' : '80,4';
+  }
+  // Las series se vuelven a pintar desde lo guardado, que está en kg, en vez
+  // de reinterpretar el texto de la casilla. El peso corporal a medio escribir
+  // no está guardado todavía, así que se convierte antes de cambiar.
+  $('unit').addEventListener('click', e => {
+    const b = e.target.closest('button[data-unit]');
+    if (!b || b.dataset.unit === U()) return;
+    const typedBw = numW($('bw-kg').value);
+    store.unit = b.dataset.unit;
+    changed = true;
+    persistNow();
+    if (typedBw != null) $('bw-kg').value = fmtW(typedBw);
+    renderUnit();
+    renderDay();
+    if (state.tab === 'progreso') renderProgress();
+  });
+
   function renderExCatalog() {
     const box = $('ex-catalog');
     if (!box) return;
@@ -1326,7 +1373,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     li.append(h('div', { class: 'last', 'data-role': 'last' }));
     const grid = h('div', { class: 'sets' },
       h('div', { class: 'set-row set-head', 'aria-hidden': 'true' },
-        h('span', { text: '' }), h('span', { text: ex.load === 'lastre' ? 'Lastre kg' : 'kg' }), h('span', { text: 'Reps' }), h('span', { text: '' })));
+        h('span', { text: '' }), h('span', { text: ex.load === 'lastre' ? 'Lastre ' + U() : U() }), h('span', { text: 'Reps' }), h('span', { text: '' })));
     for (let k = 0, n = rowCount(ex, sets); k < n; k++) grid.append(renderSetRow(ex, k, sets[k], last && last.sets[k]));
     li.append(grid,
       h('div', { class: 'effort', 'data-role': 'effort', hidden: true }),
@@ -1346,13 +1393,13 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const row = h('div', { class: 'set-row' + (v.done ? ' done' : ''), 'data-set': String(k) });
     const kg = h('input', {
       id: 'in-' + ex.id + '-' + k + '-kg', class: 'kg', type: 'text', inputmode: 'decimal', enterkeyhint: 'next', autocomplete: 'off',
-      'data-field': 'kg', 'aria-label': 'Serie ' + (k + 1) + ', ' + (ex.load === 'lastre' ? 'lastre en kg' : 'peso en kg')
+      'data-field': 'kg', 'aria-label': 'Serie ' + (k + 1) + ', ' + (ex.load === 'lastre' ? 'lastre' : 'peso') + ' en ' + (U() === 'lb' ? 'libras' : 'kilos')
     });
     const reps = h('input', {
       id: 'in-' + ex.id + '-' + k + '-reps', class: 'reps', type: 'text', inputmode: 'numeric', pattern: '[0-9]*', enterkeyhint: 'done', autocomplete: 'off',
       'data-field': 'reps', 'aria-label': 'Serie ' + (k + 1) + ', repeticiones'
     });
-    kg.value = v.kg != null ? fmtKg(v.kg) : (lv && lv.kg != null ? fmtKg(lv.kg) : '');
+    kg.value = v.kg != null ? fmtW(v.kg) : (lv && lv.kg != null ? fmtW(lv.kg) : '');
     reps.value = v.reps != null ? String(v.reps) : '';
     const chk = h('button', { class: 'chk', type: 'button', 'aria-pressed': String(!!v.done), 'aria-label': 'Serie ' + (k + 1) + ' hecha, empezar descanso' });
     chk.innerHTML = CHECK_SVG;
@@ -1378,7 +1425,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   }
 
   function setPlaceholders(row, ex, lv) {
-    row.querySelector('input.kg').placeholder = lv ? (lv.kg != null ? fmtKg(lv.kg) : '') : (ex.load === 'lastre' ? '0' : '–');
+    row.querySelector('input.kg').placeholder = lv ? (lv.kg != null ? fmtW(lv.kg) : '') : (ex.load === 'lastre' ? '0' : '–');
     row.querySelector('input.reps').placeholder = lv ? String(lv.reps) : ex.reps[0] + '-' + ex.reps[1];
   }
 
@@ -1417,7 +1464,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (!li || !row || row.dataset.set == null) return;
     const k = Number(row.dataset.set);
     const arr = rowsFor(li.dataset.ex, k);
-    let v = num(inp.value);
+    let v = inp.dataset.field === 'kg' ? numW(inp.value) : num(inp.value);
     if (inp.dataset.field === 'reps' && v != null) v = Math.round(v);
     arr[k] = Object.assign({}, arr[k], { [inp.dataset.field]: v });
     row.classList.remove('need');
@@ -1459,7 +1506,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         return;
       }
       const repsIn = row.querySelector('input.reps');
-      const kgV = num(row.querySelector('input.kg').value), repsV = num(repsIn.value);
+      const kgV = numW(row.querySelector('input.kg').value), repsV = num(repsIn.value);
       if (repsV == null || repsV < 1) { row.classList.add('need'); repsIn.focus(); return; }
       arr[k] = { kg: kgV, reps: Math.round(repsV), done: true };
       row.classList.add('done');
@@ -1630,14 +1677,14 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const stats = $('bw-stats');
     stats.textContent = '';
     stats.append(
-      stat('Media 7 días', cur.avg != null ? fmtKg(cur.avg) + ' kg' : '—'),
-      stat('Semana anterior', prev.avg != null ? fmtKg(prev.avg) + ' kg' : '—'),
+      stat('Media 7 días', cur.avg != null ? fmtWU(cur.avg) : '—'),
+      stat('Semana anterior', prev.avg != null ? fmtWU(prev.avg) : '—'),
       stat('Ritmo semanal', rate != null ? (rate >= 0 ? '+' : '−') + nf2.format(Math.abs(rate)) + ' %' : '—'));
 
     const note = $('bw-note');
     note.textContent = '';
     const base = cur.avg != null ? cur.avg : (entries[0] ? entries[0][1] : null);
-    const target = base ? 'Tu objetivo: entre +' + nf2.format(base * 0.0025) + ' y +' + nf2.format(base * 0.005) + ' kg por semana.' : 'Objetivo: subir entre un 0,25 % y un 0,5 % del peso por semana.';
+    const target = base ? 'Tu objetivo: entre +' + nf2.format(toU(base * 0.0025)) + ' y +' + nf2.format(toU(base * 0.005)) + ' ' + U() + ' por semana.' : 'Objetivo: subir entre un 0,25 % y un 0,5 % del peso por semana.';
     if (rate == null) {
       note.append(h('span', { text: 'Con al menos 3 pesajes en cada una de las dos últimas semanas te digo si vas a buen ritmo. ' + target }));
     } else {
@@ -1655,7 +1702,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     entries.slice(0, 7).forEach(([d, v]) => {
       ul.append(h('li', null,
         h('span', { text: fmtDate(d) }),
-        h('span', { class: 'kg', text: fmtKg(v) + ' kg' }),
+        h('span', { class: 'kg', text: fmtWU(v) }),
         h('button', { class: 'x', type: 'button', 'data-date': d, 'aria-label': 'Borrar el pesaje del ' + fmtDate(d) }, 'Borrar')));
     });
 
@@ -1713,7 +1760,8 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const last = pts[pts.length - 1];
     const svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, width: W, height: H, role: 'img', 'aria-label': title + ': ' + pts.length + (pts.length === 1 ? ' sesión' : ' sesiones') + ', la última ' + fmtV(last.v) + ' ' + unit });
 
-    const tickText = v => (step < 1 ? nf1.format(v) : String(Math.round(v)));
+    // Con paso de 2,5, habitual en libras, redondear pondría «58» en la línea de 57,5.
+    const tickText = v => (Number.isInteger(step) ? String(Math.round(v)) : nf1.format(v));
     for (let v = y0; v <= y1 + step / 2; v += step) {
       const yy = y(v);
       svg.append(svgEl('line', { x1: m.l, x2: W - m.r, y1: yy, y2: yy, class: 'grid' }));
@@ -1832,7 +1880,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       const span = diffDays(ref[0], lastD);
       const perMonth = (lastV - ref[1]) / span * 28;
       const w0 = bwAround(ref[0]), w1 = bwAround(lastD);
-      const bwText = w0 != null && w1 != null ? ' En ese tiempo tu peso cambió ' + signedUnit(Math.round((w1 - w0) * 10) / 10, 'kg') + '.' : '';
+      const bwText = w0 != null && w1 != null ? ' En ese tiempo tu peso cambió ' + signedUnit(Math.round(toU(w1 - w0) * 10) / 10, U()) + '.' : '';
       if (perMonth > 1) note.append(h('span', { class: 'chip low', text: '↑ Sube rápido' }), h('span', { text: 'La cintura sube más de 1 cm al mes, señal de que estás ganando grasa de más. Quita 150-200 kcal al día y vuelve a medir en 2 semanas.' + bwText }));
       else note.append(h('span', { class: 'chip up', text: '✓ En rango' }), h('span', { text: 'Ritmo razonable para un volumen limpio.' + bwText }));
     } else {
@@ -1925,11 +1973,14 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (!state.progEx || !EX[state.progEx]) state.progEx = defaultProgEx();
     $('prog-ex').value = state.progEx;
     const ex = EX[state.progEx];
-    const { metric, pts } = strengthSeries(ex);
+    // La serie sale en kg; se pasa a la unidad elegida antes de la gráfica para
+    // que las marcas del eje caigan en números redondos de esa unidad.
+    const series = strengthSeries(ex), metric = series.metric;
+    const pts = metric === 'reps' ? series.pts : series.pts.map(p => Object.assign({}, p, { v: toU(p.v) }));
     const summary = $('prog-summary'), chart = $('prog-chart'), table = $('prog-table');
     summary.textContent = '';
     table.textContent = '';
-    const unit = metric === 'reps' ? 'reps' : 'kg';
+    const unit = metric === 'reps' ? 'reps' : U();
     const fmtV = v => (metric === 'reps' ? String(Math.round(v)) : nf1.format(v));
     $('prog-note').textContent = metric === 'reps'
       ? 'Repeticiones totales de cada sesión.' + (ex.id !== 'elevacion-piernas' ? ' Apunta tu peso corporal para ver la fuerza estimada con tu peso incluido.' : '')
@@ -2003,16 +2054,32 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   }
 
   function bwMsg(text, err) { const m = $('bw-msg'); m.textContent = text; m.classList.toggle('err', !!err); }
+  // Un peso escrito en la otra unidad sale 2,2 veces más alto o más bajo, y
+  // con él se calculan las calorías de Comida. Un salto de más del 15 % sobre
+  // el último pesaje pide tocar Guardar otra vez antes de quedarse.
+  let bwPending = null;
+  $('bw-kg').addEventListener('input', () => { bwPending = null; });
   $('bw-form').addEventListener('submit', e => {
     e.preventDefault();
-    const date = $('bw-date').value, kg = num($('bw-kg').value);
+    const date = $('bw-date').value, kg = numW($('bw-kg').value);
     if (!isYmd(date)) { bwMsg('Elige una fecha.', true); return; }
-    if (kg == null || kg < 25 || kg > 350) { bwMsg('Escribe tu peso en kg, por ejemplo 80,4.', true); return; }
+    if (kg == null || kg < 25 || kg > 350) { bwMsg('Escribe tu peso en ' + U() + ', por ejemplo ' + (U() === 'lb' ? '175,4' : '80,4') + '.', true); return; }
     if (!storageOk) { bwMsg('Este navegador no deja guardar datos.', true); return; }
-    const rounded = Math.round(kg * 10) / 10;
+    // Tres decimales en kg para que un peso escrito en lb vuelva a salir igual.
+    const rounded = Math.round(kg * 1000) / 1000;
+    const ref = Object.entries(store.bw).filter(([d, v]) => isYmd(d) && d !== date && typeof v === 'number').sort((a, b) => b[0].localeCompare(a[0]))[0];
+    const key = date + '|' + rounded;
+    if (ref && Math.abs(rounded - ref[1]) / ref[1] > 0.15 && bwPending !== key) {
+      bwPending = key;
+      const pct = Math.round(Math.abs(rounded - ref[1]) / ref[1] * 100);
+      bwMsg('Eso es un ' + pct + ' % ' + (rounded > ref[1] ? 'más' : 'menos') + ' que tu pesaje del ' + fmtDate(ref[0]) + ', ' + fmtWU(ref[1]) + '. Mira que lo escribiste en ' + U() + '; si está bien, toca Guardar otra vez.', true);
+      return;
+    }
+    bwPending = null;
     store.bw[date] = rounded;
     changed = true;
-    if (persistNow()) { bwMsg('Guardado: ' + fmtKg(rounded) + ' kg el ' + fmtDate(date) + '.'); askPersist(); }
+    const other = U() === 'lb' ? nf1.format(rounded) + ' kg' : nf1.format(rounded * LB_PER_KG) + ' lb';
+    if (persistNow()) { bwMsg('Guardado: ' + fmtWU(rounded) + ' (' + other + ') el ' + fmtDate(date) + '.'); askPersist(); }
     $('bw-kg').value = '';
     renderProgress();
   });
@@ -2077,7 +2144,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   }
   async function exportBackup() {
     flush();
-    const payload = { app: 'rutina-volumen', version: 1, exportedAt: new Date().toISOString(), sessions: store.sessions, bw: store.bw, waist: store.waist, meals: store.meals };
+    const payload = { app: 'rutina-volumen', version: 1, exportedAt: new Date().toISOString(), unit: U(), sessions: store.sessions, bw: store.bw, waist: store.waist, meals: store.meals };
     const json = JSON.stringify(payload, null, 2);
     const name = 'rutina-volumen-' + today() + '.json';
     let done = false;
@@ -2193,7 +2260,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (prev == null || !top || topV < prev + margin) { note.hidden = true; note.textContent = ''; return; }
     note.textContent = metric === 'reps'
       ? 'Nuevo récord. ' + top.reps + ' repeticiones en una serie, ' + Math.round(topV - prev) + ' más que tu mejor marca.'
-      : 'Nuevo récord con ' + fmtSet(ex, top) + '. Tu 1RM estimado sube a ' + nf1.format(topV) + ' kg, ' + nf1.format(topV - prev) + ' kg por encima de tu mejor marca.';
+      : 'Nuevo récord con ' + fmtSet(ex, top) + '. Tu 1RM estimado sube a ' + fmtWU(topV) + ', ' + fmtWU(topV - prev) + ' por encima de tu mejor marca.';
     note.hidden = false;
   }
   const validKg = v => (typeof v === 'number' && Number.isFinite(v) && v >= 0 && v < 1000 ? v : null);
@@ -2227,7 +2294,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         if (!cur || String(s.updatedAt || '') >= String(cur.updatedAt || '')) { store.sessions[id] = cleanSession(s); ns++; }
       }
       for (const [date, kg] of Object.entries(d.bw)) {
-        if (isYmd(date) && typeof kg === 'number' && kg >= 25 && kg <= 350) { store.bw[date] = Math.round(kg * 10) / 10; nb++; }
+        if (isYmd(date) && typeof kg === 'number' && kg >= 25 && kg <= 350) { store.bw[date] = Math.round(kg * 1000) / 1000; nb++; }
       }
       let nm = 0;
       for (const [date, day] of Object.entries(cleanMeals(d.meals))) {
@@ -2240,11 +2307,14 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
           if (isYmd(date) && typeof cm === 'number' && cm >= 40 && cm <= 200) { store.waist[date] = Math.round(cm * 10) / 10; nw++; }
         }
       }
+      // Los datos del archivo van en kg siempre; la unidad es solo cómo verlos.
+      if (d.unit === 'kg' || d.unit === 'lb') store.unit = d.unit;
       changed = true;
       if (!persistNow()) return;
       state.local = {};
       state.sessions = sessionsSorted();
       if (!state.dayPicked) state.day = suggestedDay();
+      renderUnit();
       renderDays();
       renderDay();
       renderProgress();
@@ -2579,7 +2649,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       sug.append(h('span', { class: 'chip up', text: '✓ Buen ritmo' }), h('span', { text: 'Tu peso ' + rateText(rate) + ' por semana. No toques nada.' }));
     }
     targets.append(h('div', { class: 'tile' }, sug));
-    basis.textContent = 'Calculado con tu media de los últimos 7 días, ' + fmtKg(kg) + ' kg'
+    basis.textContent = 'Calculado con tu media de los últimos 7 días, ' + fmtWU(kg)
       + (cur.n ? ' (' + cur.n + (cur.n === 1 ? ' pesaje' : ' pesajes') + ')' : '') + '. '
       + (ph.reentry ? 'Estás en reentrada, así que va a mantenimiento; desde la semana ' + (REENTRY_WEEKS + 1) + ' sube solo al objetivo de volumen. ' : '')
       + 'Cuando cambies el ajuste, suben o bajan la avena, el arroz, la papa, las tortillas y las grasas; la proteína se queda donde está.';
@@ -2866,6 +2936,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     L.push('Resumen de mi app Rutina de Volumen · ' + fmtDate(today()), '');
     L.push('PROGRAMA');
     L.push('Empuje, tirón y pierna dos veces: ' + DAYS.length + ' días por semana, ' + WEEK_SETS + ' series.');
+    L.push('Todos los pesos de este resumen van en ' + (U() === 'lb' ? 'libras (lb)' : 'kilos (kg)') + ', también los de las series sin unidad escrita.');
     const byGym = { eos: 0, pf: 0 };
     for (const x of state.sessions) if (x.gym && hasWork(x.sets)) byGym[x.gym]++;
     L.push('Gimnasios: EōS y Planet Fitness (en Planet Fitness el hack squat, el rumano y el hip thrust van en la Smith). Sesiones: ' + byGym.eos + ' en EōS, ' + byGym.pf + ' en Planet Fitness.');
@@ -2882,8 +2953,8 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       L.push(fmtDate(w).replace(/^[^,]+,\s*/, '') + ': ' + (names.length ? names.join(' ') : 'ninguna') + ' (' + set.size + '/' + DAYS.length + ')');
     }
     L.push('', 'PESO');
-    L.push(cur.avg != null ? 'Media 7 días: ' + fmtKg(cur.avg) + ' kg (' + cur.n + (cur.n === 1 ? ' pesaje)' : ' pesajes)') : 'Sin pesajes esta semana');
-    if (prev.avg != null) L.push('Semana anterior: ' + fmtKg(prev.avg) + ' kg');
+    L.push(cur.avg != null ? 'Media 7 días: ' + fmtWU(cur.avg) + ' (' + cur.n + (cur.n === 1 ? ' pesaje)' : ' pesajes)') : 'Sin pesajes esta semana');
+    if (prev.avg != null) L.push('Semana anterior: ' + fmtWU(prev.avg));
     L.push(rate != null ? 'Ritmo: ' + (rate >= 0 ? '+' : '−') + nf2.format(Math.abs(rate)) + ' % por semana' : 'Ritmo: faltan pesajes para calcularlo');
     const w = waistEntries();
     if (w.length) {
@@ -2917,8 +2988,8 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       if (!pts.length) continue;
       any = true;
       const where = g && !SHARED.has(ex.id) ? ' [' + GYM_NAME[g] + ']' : '';
-      const u = metric === 'reps' ? 'reps' : 'kg';
-      const fv = v => (metric === 'reps' ? String(Math.round(v)) : nf1.format(v));
+      const u = metric === 'reps' ? 'reps' : U();
+      const fv = v => (metric === 'reps' ? String(Math.round(v)) : fmtW(v));
       const lastPt = pts[pts.length - 1];
       const eff = latestEffort(ex.id), effTxt = eff ? ' · esfuerzo ' + effortWord(eff) : '';
       if (pts.length === 1) { L.push('- ' + ex.name + where + ': ' + fv(lastPt.v) + ' ' + u + ' (1 sesión, ' + lastPt.best + ')' + effTxt); continue; }
@@ -3152,14 +3223,18 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   window.addEventListener('offline', idleSync);
   window.addEventListener('storage', e => {
     if (e.key !== KEY) return;
+    const unitBefore = U();
     store = readStore();
     state.local = {};
     state.sessions = sessionsSorted();
     if (!state.gymPicked) state.gym = store.gym;
     if (!state.dayPicked || !findDay(state.day)) state.day = suggestedDay();
     renderGym();
+    renderUnit();
     renderDays();
-    if (!(document.activeElement && list.contains(document.activeElement))) renderDay();
+    // Con la unidad cambiada, la casilla que estás escribiendo mostraría la
+    // unidad vieja y se leería con la nueva, así que se repinta igual.
+    if (unitBefore !== U() || !(document.activeElement && list.contains(document.activeElement))) renderDay();
     if (state.tab === 'progreso') renderProgress();
   });
 
@@ -3173,6 +3248,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   renderInstall();
   renderVoiceBtn();
   renderGym();
+  renderUnit();
   renderExCatalog();
   renderDays();
   renderDay();
