@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rutina de Volumen</title>
-<meta name="description" content="Rutina de volumen de 6 días con registro de series, temporizador de descanso y control del peso corporal. Funciona sin conexión.">
+<meta name="description" content="Rutina de volumen de 3 o 6 días con registro de series, temporizador de descanso y control del peso corporal. Funciona sin conexión.">
 <meta name="theme-color" content="#F6F4EE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0A0A0C" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
@@ -290,6 +290,35 @@ table.data-t th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;col
 .shop-item.on .shop-main b{text-decoration:line-through}
 .shop-item .stores{grid-column:2}
 
+/* Configuración inicial: sale una vez a quien abre la app por primera vez y
+   se vuelve a abrir desde Progreso para cambiar de programa. */
+.setup{position:fixed;inset:0;z-index:50;overflow-y:auto;-webkit-overflow-scrolling:touch;background:color-mix(in srgb, var(--bg) 78%, transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:calc(12px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.setup-card{max-width:560px;margin:0 auto;display:grid;gap:18px;padding:20px 16px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:var(--lift)}
+.setup-card h2{margin:0;font:800 30px/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
+.setup-card h2:focus{outline:none}
+.setup-lead{margin:-10px 0 0;font-size:14px;color:var(--muted)}
+.setup-q{margin:0;padding:0;border:0;display:grid;gap:8px;min-width:0}
+.setup-q legend{padding:0;margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.opts{display:grid;gap:8px}
+.opts.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.opt{position:relative;display:grid;align-content:center;gap:3px;min-height:48px;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .18s ease, background-color .18s ease}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt b{font-size:15px;line-height:1.25}
+.opt span{font-size:13px;line-height:1.35;color:var(--muted)}
+.opts.two .opt{justify-items:center;text-align:center}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.setup-health{display:grid;gap:8px;padding-left:12px;border-left:3px solid var(--warn)}
+.setup-health h3{margin:0;font:800 19px/1.1 var(--display);text-transform:uppercase;letter-spacing:.02em}
+.setup-health p{margin:0;font-size:14px}
+.setup-ok{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:14px;font-weight:700;cursor:pointer}
+.setup-ok input{flex:none;width:22px;height:22px;margin:0;accent-color:var(--accent)}
+.setup-actions{display:grid;gap:8px}
+.setup-actions .btn{min-height:48px;font-size:16px;border-radius:12px}
+.setup-actions .btn:disabled{opacity:.45;cursor:not-allowed}
+.setup-foot{margin:0;font-size:12px;color:var(--muted)}
+html.modal-open,html.modal-open body{overflow:hidden}
+
 .guide{display:grid;gap:20px;max-width:65ch}
 .guide h3{margin:0 0 6px;font:800 20px/1.1 var(--display);text-transform:uppercase;letter-spacing:.02em}
 .guide p,.guide li{margin:0;font-size:15px}
@@ -486,6 +515,14 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     <div class="chart" id="prog-chart" tabindex="0"></div>
     <details class="data" id="prog-data"><summary>Ver los datos de la gráfica</summary><div class="data-scroll" id="prog-table"></div></details>
 
+    <h2 class="sec next">Programa</h2>
+    <p class="backup-text" id="program-info"></p>
+    <div class="backup-actions">
+      <button class="btn" id="program-btn" type="button">Cambiar programa y ajustes</button>
+      <button class="btn" id="share-app" type="button">Pasar la app a alguien</button>
+    </div>
+    <p class="form-msg" id="share-msg" role="status" aria-live="polite"></p>
+
     <h2 class="sec next">Copia de seguridad</h2>
     <p class="backup-text">Tus datos se guardan solo en este móvil. Exporta una copia cada semana y guárdala en Archivos, iCloud Drive o Google Drive. Si borras la app o cambias de móvil, importas la copia y recuperas todo.</p>
     <p class="backup-status" id="backup-status"></p>
@@ -497,9 +534,10 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     <p class="form-msg" id="backup-msg" role="status" aria-live="polite"></p>
 
     <h2 class="sec next">Resumen para Claude</h2>
-    <p class="backup-text">Copia tus últimas semanas en texto y pégalas en tu conversación con Claude para que las interprete: fase, peso, cintura, objetivo de comida y cómo va la fuerza de cada ejercicio.</p>
+    <p class="backup-text">Copia tus últimas semanas en texto y pégalas en tu conversación con Claude para que las interprete: fase, peso, cintura, objetivo de comida y cómo va la fuerza de cada ejercicio. Con «Compartir» se lo mandas por WhatsApp a quien te lleve el entrenamiento.</p>
     <div class="backup-actions">
       <button class="btn" id="summary-btn" type="button">Copiar resumen</button>
+      <button class="btn" id="summary-share" type="button" hidden>Compartir</button>
     </div>
     <p class="form-msg" id="summary-msg" role="status" aria-live="polite"></p>
     <textarea class="summary-out" id="summary-out" readonly hidden rows="12" aria-label="Resumen para copiar a mano"></textarea>
@@ -512,6 +550,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     <h2 class="sec">Tus números del día</h2>
     <div id="food-targets"></div>
     <p class="chart-note" id="food-basis"></p>
+    <p class="chart-note">Orientativo para adultos sanos. Si tienes diabetes, problemas de riñón, un trastorno de la conducta alimentaria u otra condición médica, pregúntale antes a tu médico o a un dietista.</p>
 
     <h2 class="sec next">Plan del día</h2>
     <p class="backup-text">Cantidades en crudo y ya ajustadas a tu peso. Come lo mismo cada día: es más barato, se compra mejor y no tienes que pensar. Si te aburre, cambia un alimento por otro de la lista de abajo.</p>
@@ -543,6 +582,12 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   <section id="tab-guia" role="tabpanel" aria-labelledby="tab-btn-guia" hidden>
     <div class="guide">
       <details class="g" open>
+        <summary>Salud y seguridad</summary>
+        <p>La app da un plan general de entrenamiento y de comida pensado para adultos sanos. No es consejo médico, no sustituye a un médico, a un fisioterapeuta ni a un dietista, y no promete ningún resultado: lo que cambie tu cuerpo depende de lo que entrenes, comas y duermas, y de tu genética.</p>
+        <p>Habla antes con tu médico si tienes alguna enfermedad del corazón, tensión alta, diabetes o problemas de riñón; si te has mareado o has tenido dolor en el pecho haciendo ejercicio; si tienes una lesión o dolor en alguna articulación; si estás embarazada o si tomas medicación.</p>
+        <p>Mientras entrenas, para si notas dolor en el pecho, mareo, falta de aire fuera de lo normal o un dolor agudo en una articulación. El ardor del músculo al final de la serie y las agujetas del día siguiente son normales; un dolor punzante en una articulación no lo es, y ese ejercicio se deja hasta que lo vea un profesional.</p>
+      </details>
+      <details class="g" open>
         <summary>Cómo anotar</summary>
         <p>El peso viene ya puesto con el de la última vez, así que solo lo tocas cuando subes carga. Las repeticiones van vacías a propósito: con el número anterior delante pararías ahí en vez de pelear por una más. Escribe las reps y toca ✓; la serie queda marcada, arranca el descanso y se guarda en el móvil. Si una serie supera tu mejor marca de ese ejercicio, la app te lo avisa como récord.</p>
         <p>Bajo el nombre del día ves cuántas series llevas de las que tocan, y al marcar la última sale el aviso de sesión completada con la cuenta de sesiones de esta semana.</p>
@@ -553,8 +598,14 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <p>No es un adorno. Si marcas fácil, la próxima vez la app te dirá «Sube carga» aunque no llegaras al tope del rango, porque el rango se te quedó corto. Y va dentro del resumen que copias, que es lo que separa una tabla de números de algo interpretable: 8 repeticiones al límite y 8 fácil con el mismo peso no son la misma sesión.</p>
       </details>
       <details class="g" open>
+        <summary>Inicio o avanzado</summary>
+        <p>Hay dos programas. El de <b>inicio</b> son tres días por semana de cuerpo entero, con máquinas y mancuernas, menos series y dos o tres repeticiones en reserva en todo. El <b>avanzado</b> es la semana de seis días: empuje, tirón y pierna dos veces.</p>
+        <p>Empieza por el de inicio si nunca has entrenado con constancia. Los primeros meses se crece con poco volumen, y lo que limita es la técnica y la costumbre de ir. Pasa al avanzado cuando lleves unos tres meses sin fallar semanas y la mayoría de ejercicios dejen de subir dos o tres semanas seguidas aunque comas y duermas bien.</p>
+        <p>El programa se elige la primera vez que abres la app y se cambia en Progreso, en «Programa». Al cambiarlo no se pierde nada, y el historial de cada ejercicio sigue, porque casi todos están en los dos.</p>
+      </details>
+      <details class="g" open>
         <summary>Por qué está cada ejercicio</summary>
-        <p>La semana de seis días se repartió mirando qué músculo cruza qué articulación, no por grupos sueltos. Tres cosas que parecen repetidas y no lo son:</p>
+        <p>La semana de seis días del programa avanzado se repartió mirando qué músculo cruza qué articulación, no por grupos sueltos. Tres cosas que parecen repetidas y no lo son:</p>
         <ul>
           <li><b>Curl femoral sentado (martes) y tumbado (viernes).</b> Los isquios cruzan cadera y rodilla. Sentado tienes la cadera flexionada y el músculo empieza la serie ya estirado, y entrenar en esa posición produce más hipertrofia que tumbado.</li>
           <li><b>Pantorrilla de pie (martes) y sentado (viernes).</b> El gemelo nace por encima de la rodilla, así que solo trabaja con la pierna estirada. El sóleo nace debajo, en la tibia, y es el que queda cuando doblas la rodilla. Son dos músculos, no dos versiones del mismo.</li>
@@ -573,8 +624,8 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       <details class="g" open>
         <summary>Todos los ejercicios</summary>
         <p>Al final de Entreno están todos los ejercicios de la app agrupados por el músculo que trabajan. Cada uno dice qué lo distingue de los que se le parecen, en qué día cae y con qué series, y lleva su enlace de técnica.</p>
-        <p>Los marcados como alternativa no están en la semana: el curl con barra Z, el curl predicador, la patada de glúteo y el remo en barra T. Los marcados PF son la versión de Planet Fitness de uno que allí no existe.</p>
-        <p>Antes había tres programas para elegir, principiante, intermedio y avanzado. Ahora hay uno solo, la semana de seis días. Si en algún momento registraste sesiones con otro, no se han borrado: siguen en tus datos y en la gráfica de fuerza, y la rejilla de constancia te dice cuántas quedaron fuera de sus columnas.</p>
+        <p>Los marcados como alternativa no están en tu semana; en el programa avanzado son el curl con barra Z, el curl predicador, la patada de glúteo y el remo en barra T. Los marcados PF son la versión de Planet Fitness de uno que allí no existe.</p>
+        <p>Si registraste sesiones con otro programa, no se han borrado: siguen en tus datos y en la gráfica de fuerza, y la rejilla de constancia te dice cuántas quedaron fuera de sus columnas.</p>
       </details>
       <details class="g" open>
         <summary>Dos gimnasios</summary>
@@ -585,6 +636,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <p>Cada ejercicio dice debajo de las series con qué se hace. Cuando es una máquina, va entre comillas el nombre en inglés que suele llevar en la placa, como «Leg Press», «Seated Leg Curl» o «Lat Pulldown», para que la encuentres sin buscar. Las poleas dicen además qué agarre poner: cuerda, maneral de una mano o barra.</p>
         <p>Elige el gimnasio antes de la primera serie. Si se te olvida y ya anotaste algo, cámbialo igual: lo de hoy se mueve contigo, y el hack squat que marcaste por error pasa a ser la sentadilla en Smith que hiciste de verdad.</p>
         <p>Y si puedes elegir, haz cada ejercicio casi siempre en el mismo sitio. Alternar sin orden deja dos historiales a medias en cada máquina, y la progresión doble necesita comparar una sesión con la anterior.</p>
+        <p>Rutina de Volumen no está afiliada a Planet Fitness ni a EōS Fitness, ni tiene su patrocinio o aprobación. Sus nombres solo aparecen para que sepas con qué máquinas se hace cada ejercicio.</p>
       </details>
       <details class="g" open>
         <summary>Kilos o libras</summary>
@@ -638,8 +690,8 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       </details>
       <details class="g" open>
         <summary>Reentrada</summary>
-        <p>Vuelves de un parón, así que las 3 primeras semanas van más suaves: en cada serie deja 2 o 3 repeticiones en reserva en vez de apretar, y come a mantenimiento. La app ya muestra esos RIR en Entreno y baja el objetivo de calorías sola.</p>
-        <p>Las semanas se cuentan desde tu primera sesión registrada, no desde hoy. Desde la semana 4 pasa a RIR 1-2 y al superávit de volumen. Si el primer día acabas con agujetas que te impiden entrenar al siguiente, te pasaste: la reentrada existe justo para eso.</p>
+        <p>Si en la configuración dijiste que vuelves de un parón, las 3 primeras semanas del programa avanzado van más suaves: en cada serie deja 2 o 3 repeticiones en reserva en vez de apretar, y come a mantenimiento. La app ya muestra esos RIR en Entreno y baja el objetivo de calorías sola.</p>
+        <p>Las semanas se cuentan desde tu primera sesión registrada, no desde hoy. Desde la semana 4 pasa a RIR 1-2 y al superávit de volumen. Si el primer día acabas con agujetas que te impiden entrenar al siguiente, te pasaste: la reentrada existe justo para eso. El programa de inicio no la lleva porque ya va entero con ese margen.</p>
       </details>
       <details class="g" open>
         <summary>Pedirme opinión</summary>
@@ -706,11 +758,59 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       <details class="g" open>
         <summary>Tus datos</summary>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
+        <p>Para pasársela a alguien, en Progreso tienes «Pasar la app a alguien». Cada persona guarda sus datos en su propio móvil y nadie ve los de nadie; si alguien quiere que le sigas el entrenamiento, te manda su resumen con «Compartir».</p>
       </details>
-      <p class="app-version">Versión 27 · 30 de septiembre de 2026</p>
+      <p class="app-version">Versión 28 · 30 de septiembre de 2026</p>
     </div>
   </section>
 </main>
+
+<div class="setup" id="setup" hidden>
+  <form class="setup-card" id="setup-form" role="dialog" aria-modal="true" aria-labelledby="setup-title" novalidate>
+    <h2 id="setup-title" tabindex="-1">Antes de empezar</h2>
+    <p class="setup-lead" id="setup-lead">Cuatro preguntas y un aviso. Todo se puede cambiar luego en Progreso.</p>
+    <fieldset class="setup-q">
+      <legend>¿Cómo entrenas ahora?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="level" value="inicio"><b>Empiezo desde cero o casi</b><span>Programa de inicio: 3 días por semana de cuerpo entero</span></label>
+        <label class="opt"><input type="radio" name="level" value="avanzado"><b>Ya entreno con regularidad</b><span>Programa avanzado: 6 días, empuje, tirón y pierna dos veces</span></label>
+      </div>
+    </fieldset>
+    <fieldset class="setup-q" id="setup-reentry" hidden>
+      <legend>¿Llevas más de un mes sin entrenar?</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="reentry" value="1"><b>Sí, vuelvo de un parón</b><span>Tres semanas con más margen y calorías de mantenimiento antes de apretar</span></label>
+        <label class="opt"><input type="radio" name="reentry" value="0"><b>No, entreno ahora</b><span>Empiezas directamente con el programa</span></label>
+      </div>
+    </fieldset>
+    <fieldset class="setup-q">
+      <legend>¿Dónde entrenas?</legend>
+      <div class="opts two">
+        <label class="opt"><input type="radio" name="gym" value="eos"><b>EōS</b></label>
+        <label class="opt"><input type="radio" name="gym" value="pf"><b>Planet Fitness</b></label>
+      </div>
+    </fieldset>
+    <fieldset class="setup-q">
+      <legend>¿En qué unidad están los pesos?</legend>
+      <div class="opts two">
+        <label class="opt"><input type="radio" name="unit" value="lb"><b>Libras (lb)</b></label>
+        <label class="opt"><input type="radio" name="unit" value="kg"><b>Kilos (kg)</b></label>
+      </div>
+    </fieldset>
+    <div class="setup-health">
+      <h3>Aviso de salud</h3>
+      <p>Esta app da un plan general de entrenamiento y de comida pensado para adultos sanos. No es consejo médico, no sustituye a tu médico, a un fisioterapeuta ni a un dietista, y no promete ningún resultado.</p>
+      <p>Habla antes con tu médico si tienes alguna enfermedad del corazón, tensión alta, diabetes o problemas de riñón; si te has mareado o has tenido dolor en el pecho haciendo ejercicio; si tienes una lesión o dolor en alguna articulación; si estás embarazada o si tomas medicación.</p>
+      <p>Para en cuanto notes dolor en el pecho, mareo, falta de aire fuera de lo normal o un dolor agudo en una articulación.</p>
+      <label class="setup-ok"><input type="checkbox" id="setup-agree"><span>Tengo 18 años o más y he leído el aviso de salud.</span></label>
+    </div>
+    <div class="setup-actions">
+      <button class="btn primary" id="setup-go" type="submit" disabled>Empezar</button>
+      <button class="btn" id="setup-cancel" type="button" hidden>Cancelar</button>
+    </div>
+    <p class="setup-foot">Rutina de Volumen no está afiliada a Planet Fitness ni a EōS Fitness, ni tiene su patrocinio. Sus nombres solo aparecen para que sepas con qué máquinas se hace cada ejercicio.</p>
+  </form>
+</div>
 
 <div class="timer" id="timer" hidden>
   <div class="timer-inner">
@@ -877,15 +977,58 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (!LIB[id]) console.error('Ejercicio desconocido en el plan: ' + id);
     return Object.assign({ id, name: id, video: '' }, LIB[id], { sets, reps, rir, rest });
   };
-  // Un solo programa: la semana de seis días. Los días que tuvieron otros
-  // programas se siguen aceptando al validar para no tirar historial de una
-  // copia vieja, aunque ya no tengan columna donde salir.
-  const DAY_KEYS = D_AVANZ.map(d => d.key);
-  const LEGACY_KEYS = ['p1', 'p2', 'p3', 'i1', 'i2', 'i3', 'i4'];
-  const ALL_KEYS = DAY_KEYS.concat(LEGACY_KEYS);
-  const DAYS = D_AVANZ;
+  // Programa de inicio: tres días de cuerpo entero, máquinas y mancuernas
+  // primero y dos o tres repeticiones en reserva mientras se aprende la
+  // técnica. Son los mismos ejercicios y vídeos que el avanzado, con menos
+  // series. Reusa las claves del antiguo principiante, que ya eran válidas.
+  const D_INICIO = [
+    { key: 'p1', short: 'Lun', long: 'Lunes', name: 'Cuerpo A', focus: 'Cuerpo entero', disc: 'var(--p-lun)', ink: '#FFFFFF', ex: [
+      rx('prensa', 3, [10, 15], '2-3', 120),
+      rx('press-plano-mancuernas', 3, [8, 12], '2-3', 120),
+      rx('jalon-neutro', 3, [10, 12], '2-3', 120),
+      rx('curl-femoral-sentado', 2, [10, 15], '2-3', 90),
+      rx('lateral-mancuernas', 2, [12, 15], '2-3', 90),
+      rx('crunch-polea', 2, [10, 15], '2-3', 60)
+    ] },
+    { key: 'p2', short: 'Mié', long: 'Miércoles', name: 'Cuerpo B', focus: 'Cuerpo entero', disc: 'var(--p-mie)', ink: '#1A1403', ex: [
+      rx('hack-squat', 3, [8, 12], '2-3', 150),
+      rx('remo-apoyo-pecho', 3, [10, 12], '2-3', 120),
+      rx('press-hombro', 3, [8, 12], '2-3', 120),
+      rx('hiperextension', 2, [10, 15], '2-3', 90),
+      rx('pressdown-cuerda', 2, [10, 15], '2-3', 60),
+      rx('curl-martillo', 2, [10, 12], '2-3', 60)
+    ] },
+    { key: 'p3', short: 'Vie', long: 'Viernes', name: 'Cuerpo C', focus: 'Cuerpo entero', disc: 'var(--p-vie)', ink: '#15140E', ex: [
+      rx('peso-muerto-rumano', 3, [8, 12], '2-3', 150),
+      rx('press-inclinado-maquina', 3, [8, 12], '2-3', 120),
+      rx('remo-mancuerna', 3, [8, 12], '2-3', 120),
+      rx('extension-cuadriceps', 2, [12, 15], '2-3', 90),
+      rx('face-pull', 2, [12, 15], '2-3', 60),
+      rx('gemelo-pie', 2, [10, 15], '2-3', 60)
+    ] }
+  ];
+  const PROGRAMS = { avanzado: D_AVANZ, inicio: D_INICIO };
+  const PROGRAM_NAME = { avanzado: 'Avanzado', inicio: 'Inicio' };
+  const PROGRAM_TEXT = { avanzado: 'Empuje, tirón y pierna dos veces', inicio: 'Cuerpo entero' };
+  // El programa sale de la configuración y se lee antes que el resto del
+  // almacenamiento porque de él dependen los días, los ejercicios y la semana.
+  // Cambiarlo recarga la app.
+  const KEY = 'rutina-volumen.v1';
+  const LEVEL = (() => {
+    try { return JSON.parse(localStorage.getItem(KEY) || '{}').level === 'inicio' ? 'inicio' : 'avanzado'; } catch (e) { return 'avanzado'; }
+  })();
+  const DAYS = PROGRAMS[LEVEL];
+  const ALL_DAYS = D_AVANZ.concat(D_INICIO);
+  const DAY_KEYS = DAYS.map(d => d.key);
+  // Los días del programa que no está activo, y los del antiguo intermedio, se
+  // siguen aceptando para no tirar historial, aunque no tengan columna.
+  const LEGACY_KEYS = ['i1', 'i2', 'i3', 'i4'];
+  const ALL_KEYS = ALL_DAYS.map(d => d.key).concat(LEGACY_KEYS);
   const WEEK_SETS = DAYS.reduce((a, d) => a + d.ex.reduce((b, e) => b + e.sets, 0), 0);
+  // Todos los ejercicios, para poder nombrar los de sesiones del otro
+  // programa; los del programa activo, con su prescripción.
   const EX = {};
+  Object.values(LIB).forEach(e => { EX[e.id] = e; });
   DAYS.forEach(d => d.ex.forEach(e => { EX[e.id] = e; }));
   // La versión Planet Fitness hereda series, repeticiones, RIR y descanso del
   // original: cambia la máquina, no el trabajo.
@@ -967,7 +1110,10 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       ['elevacion-piernas', 'Abdomen bajo y flexores de cadera, colgado de la barra.']
     ] }
   ];
+  // findDay busca en el programa activo, que es donde se navega; anyDay en los
+  // dos, para poner nombre a sesiones del otro en el historial y el resumen.
   const findDay = k => DAYS.find(d => d.key === k) || null;
+  const anyDay = k => ALL_DAYS.find(d => d.key === k) || null;
   const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
   const ICON = {
     pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/></svg>',
@@ -1069,8 +1215,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   const ATE_NAME = Object.fromEntries(ATE.map(([k, n]) => [k, n]));
 
   // ---- almacenamiento en el móvil ----
-  const KEY = 'rutina-volumen.v1';
-  const emptyStore = () => ({ v: 1, gym: 'eos', unit: 'kg', sessions: {}, bw: {}, waist: {}, shop: {}, meals: {}, kcalAdj: 0, adjDate: null, deloadUntil: null, voice: true, lastBackup: null, backupSnooze: null });
+  const emptyStore = () => ({ v: 1, level: 'avanzado', reentry: true, setup: null, agreed: false, gym: 'eos', unit: 'kg', sessions: {}, bw: {}, waist: {}, shop: {}, meals: {}, kcalAdj: 0, adjDate: null, deloadUntil: null, voice: true, lastBackup: null, backupSnooze: null });
   let storageOk = true, changed = false;
   // Solo sobreviven fechas reales, comidas que existen y los tres estados.
   function cleanMeals(raw) {
@@ -1092,7 +1237,10 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       const raw = localStorage.getItem(KEY);
       if (!raw) return emptyStore();
       const d = JSON.parse(raw);
-      return { v: 1, gym: d.gym === 'pf' ? 'pf' : 'eos', unit: d.unit === 'lb' ? 'lb' : 'kg', sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, meals: cleanMeals(d.meals), kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, deloadUntil: isYmd(d.deloadUntil) ? d.deloadUntil : null, voice: d.voice !== false, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
+      // Sin el campo «setup» son datos de antes de la configuración inicial:
+      // quien ya usaba la app no tiene que volver a pasar por ella.
+      const setup = 'setup' in d ? (typeof d.setup === 'string' ? d.setup : null) : 'previa';
+      return { v: 1, level: d.level === 'inicio' ? 'inicio' : 'avanzado', reentry: d.reentry !== false, setup, agreed: d.agreed === true, gym: d.gym === 'pf' ? 'pf' : 'eos', unit: d.unit === 'lb' ? 'lb' : 'kg', sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, meals: cleanMeals(d.meals), kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, deloadUntil: isYmd(d.deloadUntil) ? d.deloadUntil : null, voice: d.voice !== false, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
     } catch (e) {
       storageOk = false;
       return emptyStore();
@@ -1219,6 +1367,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const mine = state.sessions.find(x => DAY_KEYS.includes(x.day));
     if (mine) return DAY_KEYS[(DAY_KEYS.indexOf(mine.day) + 1) % DAY_KEYS.length];
     const wd = new Date().getDay();
+    if (LEVEL === 'inicio') return DAY_KEYS[0];
     return wd >= 1 && wd <= DAY_KEYS.length ? DAY_KEYS[wd - 1] : DAY_KEYS[0];
   }
 
@@ -1288,6 +1437,106 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (state.tab === 'progreso') renderProgress();
   });
 
+  // ---- configuración inicial y ajustes del programa ----
+  // Sale sola a quien abre la app por primera vez, con el aviso de salud
+  // obligatorio, y se reabre desde Progreso. Cambiar de programa recarga la
+  // app porque de él salen los días y los ejercicios.
+  const setupForm = $('setup-form');
+  const BEHIND_SETUP = 'body > header, body > nav, body > main, body > .timer';
+  let setupOpener = null;
+  function setupValid() {
+    const f = setupForm, lvl = f.level.value;
+    return !!lvl && (lvl === 'inicio' || !!f.reentry.value) && !!f.gym.value && !!f.unit.value && $('setup-agree').checked;
+  }
+  function setupSync() {
+    $('setup-reentry').hidden = setupForm.level.value !== 'avanzado';
+    $('setup-go').disabled = !setupValid();
+  }
+  function openSetup(edit) {
+    const f = setupForm;
+    f.reset();
+    if (edit) {
+      f.level.value = store.level;
+      f.reentry.value = store.reentry ? '1' : '0';
+      f.gym.value = state.gym;
+      f.unit.value = U();
+      $('setup-agree').checked = store.agreed;
+    } else {
+      // Los dos gimnasios cargan en libras.
+      f.unit.value = 'lb';
+    }
+    $('setup-title').textContent = edit ? 'Programa y ajustes' : 'Antes de empezar';
+    $('setup-lead').textContent = edit ? 'Si cambias de programa, la app se recarga; tus datos se quedan como están.' : 'Cuatro preguntas y un aviso. Todo se puede cambiar luego en Progreso.';
+    $('setup-go').textContent = edit ? 'Guardar' : 'Empezar';
+    $('setup-cancel').hidden = !edit;
+    setupSync();
+    setupOpener = edit ? document.activeElement : null;
+    document.querySelectorAll(BEHIND_SETUP).forEach(el => { el.inert = true; });
+    document.documentElement.classList.add('modal-open');
+    $('setup').hidden = false;
+    $('setup').scrollTop = 0;
+    $('setup-title').focus();
+  }
+  function closeSetup() {
+    $('setup').hidden = true;
+    document.documentElement.classList.remove('modal-open');
+    document.querySelectorAll(BEHIND_SETUP).forEach(el => { el.inert = false; });
+    if (setupOpener && setupOpener.focus) setupOpener.focus();
+    setupOpener = null;
+  }
+  setupForm.addEventListener('change', setupSync);
+  setupForm.addEventListener('submit', e => {
+    e.preventDefault();
+    if (!setupValid()) return;
+    const f = setupForm, lvl = f.level.value;
+    store.level = lvl;
+    store.reentry = lvl === 'avanzado' && f.reentry.value === '1';
+    store.agreed = true;
+    if (!store.setup) store.setup = today();
+    changed = true;
+    persistNow();
+    closeSetup();
+    // Gimnasio y unidad pasan por sus selectores, que ya mueven lo anotado hoy
+    // y repintan los pesos en la unidad nueva.
+    if (f.gym.value !== state.gym) $('gym').querySelector('[data-gym="' + f.gym.value + '"]').click();
+    if (f.unit.value !== U()) $('unit').querySelector('[data-unit="' + f.unit.value + '"]').click();
+    if (lvl !== LEVEL) {
+      if (storageOk) { location.reload(); return; }
+      showBanner('Este navegador no deja guardar datos, así que el programa no se puede cambiar.');
+    }
+    renderDays();
+    renderDay();
+    renderProgramInfo();
+    if (state.tab === 'progreso') renderProgress();
+  });
+  $('setup-cancel').addEventListener('click', closeSetup);
+  $('setup').addEventListener('keydown', e => { if (e.key === 'Escape' && !$('setup-cancel').hidden) closeSetup(); });
+  $('program-btn').addEventListener('click', () => openSetup(true));
+  function renderProgramInfo() {
+    const box = $('program-info');
+    if (!box) return;
+    box.textContent = PROGRAM_NAME[LEVEL] + ': ' + PROGRAM_TEXT[LEVEL].toLowerCase() + ', ' + DAYS.length + ' días por semana y ' + WEEK_SETS + ' series.'
+      + (LEVEL === 'avanzado' ? (store.reentry ? ' Con reentrada por volver de un parón.' : ' Sin reentrada.') : '')
+      + ' Entrenas en ' + GYM_NAME[state.gym] + ' y los pesos van en ' + U() + '.';
+  }
+
+  // ---- compartir ----
+  // Para pasarle la app a alguien y para que te manden su resumen por
+  // WhatsApp: si nadie más la usa, no hay forma de saber si sirve.
+  function shareMsg(text, err) { const m = $('share-msg'); m.textContent = text; m.classList.toggle('err', !!err); }
+  $('share-app').addEventListener('click', async () => {
+    const url = location.origin + location.pathname.replace(/index\.html$/, '');
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Rutina de Volumen', text: 'Rutina de gimnasio en español: apuntas cada serie, funciona sin cobertura y sin crear cuenta.', url });
+        shareMsg('');
+        return;
+      } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    try { await navigator.clipboard.writeText(url); shareMsg('Enlace copiado: ' + url); }
+    catch (e) { shareMsg('Copia este enlace y mándalo: ' + url); }
+  });
+
   function renderExCatalog() {
     const box = $('ex-catalog');
     if (!box) return;
@@ -1299,10 +1548,10 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       for (const [id, why] of g.ex) {
         const e = LIB[id];
         if (!e) continue;
-        const orig = SWAP_OF[id], d = dayOf[id] || (orig && dayOf[orig]), px = orig ? EX[id] : e;
+        const orig = SWAP_OF[id], d = dayOf[id] || (orig && dayOf[orig]), px = EX[id] || e;
         const sub = !d ? 'Fuera de la semana, por si quieres cambiar alguno'
           : orig ? 'En Planet Fitness, en lugar del ' + LIB[orig].name.toLowerCase()
-          : d.long + ' · ' + d.name + ' · RIR ' + rirFor(e) + (PF_SWAP[id] ? ' · en Planet Fitness va en la Smith' : '');
+          : d.long + ' · ' + d.name + ' · RIR ' + rirFor(px) + (PF_SWAP[id] ? ' · en Planet Fitness va en la Smith' : '');
         body.append(h('div', { class: 'food-row' },
           h('span', { class: 'food-name', text: e.name }),
           h('span', { class: 'food-amt', text: d ? (orig ? 'PF · ' : '') + d.short + ' · ' + px.sets + '×' + px.reps[0] + '-' + px.reps[1] : 'Alternativa' }),
@@ -1342,11 +1591,14 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   // siguiente, y superávit sin capacidad de entrenar es grasa.
   const REENTRY_WEEKS = 3;
   const RE_RIR = { '0-1': '1-2', '1-2': '2-3', '2': '3' };
+  // Solo para quien vuelve de un parón, que se elige en la configuración. El
+  // programa de inicio ya va entero con ese margen, así que no la lleva.
   function phase() {
+    const on = store.reentry !== false && LEVEL === 'avanzado';
     const first = state.sessions.length ? state.sessions[state.sessions.length - 1].date : null;
-    if (!first) return { started: false, week: 0, reentry: true };
+    if (!first) return { started: false, week: 0, reentry: on };
     const week = Math.floor(diffDays(first, today()) / 7) + 1;
-    return { started: true, week, first, reentry: week <= REENTRY_WEEKS };
+    return { started: true, week, first, reentry: on && week <= REENTRY_WEEKS };
   }
   const rirFor = ex => (phase().reentry ? (RE_RIR[ex.rir] || ex.rir) : ex.rir);
   function renderPhase() {
@@ -1752,6 +2004,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   }
 
   function renderProgress() {
+    renderProgramInfo();
     renderStreak();
     const { entries, cur, prev, rate } = weightTrend();
 
@@ -2113,7 +2366,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       return;
     }
     for (const s of sess) {
-      const d = findDay(s.day);
+      const d = anyDay(s.day);
       const order = d ? d.ex.map(e => e.id) : [];
       const rank = id => { let i = order.indexOf(id); if (i < 0 && SWAP_OF[id]) i = order.indexOf(SWAP_OF[id]); return i < 0 ? 99 : i; };
       const exs = Object.entries(s.sets || {}).sort((a, b) => rank(a[0]) - rank(b[0]));
@@ -2225,7 +2478,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   }
   async function exportBackup() {
     flush();
-    const payload = { app: 'rutina-volumen', version: 1, exportedAt: new Date().toISOString(), unit: U(), sessions: store.sessions, bw: store.bw, waist: store.waist, meals: store.meals };
+    const payload = { app: 'rutina-volumen', version: 1, exportedAt: new Date().toISOString(), unit: U(), level: store.level, reentry: store.reentry, sessions: store.sessions, bw: store.bw, waist: store.waist, meals: store.meals };
     const json = JSON.stringify(payload, null, 2);
     const name = 'rutina-volumen-' + today() + '.json';
     let done = false;
@@ -2390,6 +2643,8 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       }
       // Los datos del archivo van en kg siempre; la unidad es solo cómo verlos.
       if (d.unit === 'kg' || d.unit === 'lb') store.unit = d.unit;
+      if (d.level === 'inicio' || d.level === 'avanzado') store.level = d.level;
+      if (typeof d.reentry === 'boolean') store.reentry = d.reentry;
       changed = true;
       if (!persistNow()) return;
       state.local = {};
@@ -2399,7 +2654,10 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       renderDays();
       renderDay();
       renderProgress();
-      backupMsg('Copia importada: ' + ns + (ns === 1 ? ' sesión, ' : ' sesiones, ') + nb + (nb === 1 ? ' pesaje, ' : ' pesajes, ') + nw + (nw === 1 ? ' medida de cintura y ' : ' medidas de cintura y ') + nm + (nm === 1 ? ' comida marcada.' : ' comidas marcadas.'));
+      backupMsg('Copia importada: ' + ns + (ns === 1 ? ' sesión, ' : ' sesiones, ') + nb + (nb === 1 ? ' pesaje, ' : ' pesajes, ') + nw + (nw === 1 ? ' medida de cintura y ' : ' medidas de cintura y ') + nm + (nm === 1 ? ' comida marcada.' : ' comidas marcadas.')
+        + (store.level !== LEVEL ? ' La copia es del programa ' + PROGRAM_NAME[store.level].toLowerCase() + ': la app se recarga para abrirlo.' : ''));
+      // Los días y los ejercicios salen del programa al arrancar.
+      if (store.level !== LEVEL) setTimeout(() => location.reload(), 1800);
     } catch (err) {
       backupMsg('Ese archivo no es una copia válida de esta app.', true);
     }
@@ -3016,7 +3274,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const L = [], kg = planKg(), { cur, prev, rate } = weightTrend(), ph = phase();
     L.push('Resumen de mi app Rutina de Volumen · ' + fmtDate(today()), '');
     L.push('PROGRAMA');
-    L.push('Empuje, tirón y pierna dos veces: ' + DAYS.length + ' días por semana, ' + WEEK_SETS + ' series.');
+    L.push('Programa ' + PROGRAM_NAME[LEVEL].toLowerCase() + '. ' + PROGRAM_TEXT[LEVEL] + ': ' + DAYS.length + ' días por semana, ' + WEEK_SETS + ' series.');
     L.push('Todos los pesos de este resumen van en ' + (U() === 'lb' ? 'libras (lb)' : 'kilos (kg)') + ', también los de las series sin unidad escrita.');
     const byGym = { eos: 0, pf: 0 };
     for (const x of state.sessions) if (x.gym && hasWork(x.sets)) byGym[x.gym]++;
@@ -3083,7 +3341,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const recent = state.sessions.slice(0, 6);
     if (!recent.length) L.push('Ninguna');
     for (const s of recent) {
-      const d = findDay(s.day), parts = [];
+      const d = anyDay(s.day), parts = [];
       for (const [exId, arr] of Object.entries(s.sets || {})) {
         const done = Array.isArray(arr) ? arr.filter(x => x && x.reps > 0) : [];
         if (!done.length) continue;
@@ -3109,6 +3367,16 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       out.focus();
       out.select();
       summaryMsg('Este navegador no me deja copiar solo. Copia el texto del recuadro a mano.', true);
+    }
+  });
+  if (navigator.share) $('summary-share').hidden = false;
+  $('summary-share').addEventListener('click', async () => {
+    flush();
+    try {
+      await navigator.share({ title: 'Mi resumen de Rutina de Volumen', text: claudeSummary() });
+      summaryMsg('');
+    } catch (e) {
+      if (!(e && e.name === 'AbortError')) $('summary-btn').click();
     }
   });
 
@@ -3306,6 +3574,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (e.key !== KEY) return;
     const unitBefore = U();
     store = readStore();
+    if (store.level !== LEVEL) { location.reload(); return; }
     state.local = {};
     state.sessions = sessionsSorted();
     if (!state.gymPicked) state.gym = store.gym;
@@ -3336,6 +3605,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   renderProgress();
   renderBackupNag();
   setTab('entreno');
+  if (!store.setup) openSetup(false);
   if (!storageOk) {
     showBanner('Este navegador no deja guardar datos (quizá estás en una ventana privada). La rutina, los videos y el temporizador funcionan, pero lo que anotes no se guardará.');
     setSync('Sin almacenamiento', true);
