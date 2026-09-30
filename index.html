@@ -29,6 +29,7 @@
   --bg:#F6F4EE; --surface:#FFFFFF; --surface-2:#F0EDE4; --ink:#15140E; --muted:#6A6459; --line:#E2DDD1;
   --accent:#8A6410; --accent-ink:#FFFFFF; --accent-soft:#F6EBCF;
   --gold-1:#B98F2A; --gold-2:#8A6410; --sheen:rgba(255,255,255,.55);
+  --btn-grad:linear-gradient(100deg, #95701A, #7A5608);
   --ok:#17773F; --ok-soft:#E1F3E8; --warn:#7A4E00; --warn-soft:#FBF0D7; --bad:#B3261E; --bad-soft:#FBE3E1;
   --timer-bg:#15140E; --timer-ink:#F6F4EE; --timer-fill:#E8B94A;
   --series:#8A6410; --grid:#EAE6DA;
@@ -43,6 +44,7 @@
     --bg:#0A0A0C; --surface:#15151A; --surface-2:#1E1E25; --ink:#F2EFE9; --muted:#A39C8C; --line:#2A2A33;
     --accent:#E8B94A; --accent-ink:#17140B; --accent-soft:#2A2314;
     --gold-1:#F5D67E; --gold-2:#C89A2E; --sheen:rgba(255,255,255,.22);
+    --btn-grad:linear-gradient(100deg, var(--gold-1), var(--gold-2));
     --ok:#6FD39A; --ok-soft:#12301F; --warn:#E5B052; --warn-soft:#30250F; --bad:#F2877C; --bad-soft:#36160F;
     --timer-bg:#111116; --timer-ink:#F2EFE9; --timer-fill:#E8B94A;
     --series:#E8B94A; --grid:#22222A;
@@ -86,6 +88,12 @@ a{color:var(--accent)}
 .done-banner b{font:800 21px/1 var(--display);text-transform:uppercase;letter-spacing:.02em}
 .done-banner span{font-size:13px;font-weight:600}
 
+.gymsw{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin:0 0 12px}
+.gymsw-l{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.gymsw-row{display:inline-grid;grid-template-columns:repeat(2,auto);gap:3px;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.gym-btn{appearance:none;border:0;background:none;color:var(--muted);border-radius:999px;padding:0 14px;min-height:38px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.gym-btn.on{background:var(--accent);color:var(--accent-ink)}
+.pf-note{border-left:2px solid var(--accent);padding-left:8px}
 .days{display:grid;grid-template-columns:repeat(var(--cols,6),minmax(0,1fr));gap:6px}
 .day{position:relative;appearance:none;display:grid;justify-items:center;gap:4px;padding:13px 2px 9px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;min-width:0;-webkit-tap-highlight-color:transparent}
 .day .disc{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 50% 50%,var(--bg) 0 2.5px,var(--p-edge) 2.6px 3.6px,var(--disc) 3.7px);box-shadow:inset 0 0 0 1px var(--p-edge)}
@@ -309,10 +317,12 @@ body{background:radial-gradient(120% 60% at 50% 0%, var(--surface-2) 0%, var(--b
 .sec{position:relative;padding-left:14px}
 .sec::before{content:'';position:absolute;left:0;top:.12em;bottom:.12em;width:4px;border-radius:4px;background:linear-gradient(var(--gold-1), var(--gold-2))}
 
+.gym-btn{transition:background-color .18s ease, color .18s ease}
+.gym-btn.on{background-image:var(--btn-grad);box-shadow:0 4px 12px -8px var(--accent)}
 .day{transition:transform .16s ease, box-shadow .2s ease, border-color .2s ease}
 .day:active{transform:scale(.96)}
 .day[aria-selected="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent), 0 6px 18px -10px var(--accent)}
-.toca{background:linear-gradient(100deg, var(--gold-1), var(--gold-2));color:var(--accent-ink)}
+.toca{background:var(--btn-grad);color:var(--accent-ink)}
 
 .set-row input,.chk{transition:background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease}
 .chk:active{transform:scale(.92)}
@@ -322,7 +332,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, var(--surface-2) 0%, var(--b
 
 .btn,.store,.adj-btn{transition:transform .14s ease, border-color .18s ease, background-color .18s ease, box-shadow .18s ease}
 .btn:active,.store:active,.adj-btn:active{transform:translateY(1px)}
-.btn.primary{background-image:linear-gradient(100deg, var(--gold-1), var(--gold-2));border-color:transparent;color:var(--accent-ink);box-shadow:0 6px 18px -10px var(--accent)}
+.btn.primary{background-image:var(--btn-grad);border-color:transparent;color:var(--accent-ink);box-shadow:0 6px 18px -10px var(--accent)}
 :focus-visible{outline-color:var(--accent)}
 
 .pr-note,.done-banner{position:relative;overflow:hidden;border:1px solid color-mix(in srgb, var(--ok) 28%, transparent)}
@@ -337,7 +347,7 @@ body{background:radial-gradient(120% 60% at 50% 0%, var(--surface-2) 0%, var(--b
 .voice-btn:active{transform:scale(.9)}
 .effort-btn{transition:background-color .18s ease, border-color .18s ease, color .18s ease, transform .14s ease}
 .effort-btn:active{transform:translateY(1px)}
-.effort-btn.on{background-image:linear-gradient(100deg, var(--gold-1), var(--gold-2));border-color:transparent;box-shadow:0 5px 14px -9px var(--accent)}
+.effort-btn.on{background-image:var(--btn-grad);border-color:transparent;box-shadow:0 5px 14px -9px var(--accent)}
 .fday{transition:transform .16s ease, box-shadow .2s ease, border-color .2s ease}
 .fday:active{transform:scale(.95)}
 .fday.on{box-shadow:inset 0 0 0 1px var(--accent), 0 6px 18px -12px var(--accent)}
@@ -398,6 +408,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     <div class="banner info" id="install" hidden></div>
     <div class="banner info" id="phase" hidden></div>
     <div class="banner nag" id="backup-nag" role="status" hidden></div>
+    <div class="gymsw" id="gym"></div>
     <div class="days" id="days" role="tablist" aria-label="Día de la rutina"></div>
     <p class="banner" id="banner" hidden></p>
     <div class="dayhead" id="dayhead"></div>
@@ -405,7 +416,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     <ol class="exlist" id="exlist"></ol>
 
     <h2 class="sec next">Todos los ejercicios</h2>
-    <p class="backup-text">Los 41 ejercicios de la app por el músculo que trabajan, con lo que distingue a cada uno de los que se le parecen y dónde cae en tu semana. Toca un grupo para abrirlo.</p>
+    <p class="backup-text">Todos los ejercicios de la app por el músculo que trabajan, con lo que distingue a cada uno de los que se le parecen y dónde cae en tu semana. Los marcados PF son la versión de Planet Fitness de uno que allí no existe. Toca un grupo para abrirlo.</p>
     <div id="ex-catalog"></div>
   </section>
 
@@ -530,9 +541,18 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       </details>
       <details class="g" open>
         <summary>Todos los ejercicios</summary>
-        <p>Al final de Entreno están los 41 ejercicios de la app agrupados por el músculo que trabajan. Cada uno dice qué lo distingue de los que se le parecen, en qué día cae y con qué series, y lleva su enlace de técnica.</p>
-        <p>Tres de ellos no están en la semana y salen marcados como alternativa: el curl con barra Z, el curl predicador y la patada de glúteo. Se quedaron fuera porque el bíceps y el glúteo ya venían servidos, no porque sean malos. Si quieres cambiar uno de la semana por alguno de ellos, ahí tienes el sitio donde mirarlo.</p>
+        <p>Al final de Entreno están todos los ejercicios de la app agrupados por el músculo que trabajan. Cada uno dice qué lo distingue de los que se le parecen, en qué día cae y con qué series, y lleva su enlace de técnica.</p>
+        <p>Los marcados como alternativa no están en la semana: el curl con barra Z, el curl predicador, la patada de glúteo y el remo en barra T. Los marcados PF son la versión de Planet Fitness de uno que allí no existe.</p>
         <p>Antes había tres programas para elegir, principiante, intermedio y avanzado. Ahora hay uno solo, la semana de seis días. Si en algún momento registraste sesiones con otro, no se han borrado: siguen en tus datos y en la gráfica de fuerza, y la rejilla de constancia te dice cuántas quedaron fuera de sus columnas.</p>
+      </details>
+      <details class="g" open>
+        <summary>Dos gimnasios</summary>
+        <p>Arriba de Entreno eliges dónde entrenas hoy, EōS o Planet Fitness. La rutina es la misma en los dos; cambian tres ejercicios y cambia cómo se leen los pesos.</p>
+        <p>Planet Fitness no tiene racks ni barras olímpicas: todo lo de barra va en la máquina Smith, y la mayoría de clubes no tiene hack squat. Por eso allí el <b>hack squat</b> pasa a sentadilla en Smith, el <b>peso muerto rumano</b> a rumano en Smith, y el <b>hip thrust</b> a hip thrust en Smith, con las mismas series y el mismo RIR. El remo del miércoles es con mancuerna en los dos gimnasios, porque la barra T tampoco suele estar. EōS tiene racks, barras y mancuernas hasta 150 lb, así que allí va todo tal cual.</p>
+        <p>Lo que sí varía de un Planet Fitness a otro, las máquinas de curl femoral y de pantorrilla y el press inclinado en máquina, lleva una nota en su ejercicio que solo aparece allí.</p>
+        <p>Lo importante: una máquina o una polea de otra marca tiene otra palanca y otra relación de polea, así que 40 kg en la placa de un gimnasio no son 40 kg en el otro. Por eso la app separa el historial por gimnasio en máquinas, poleas y Smith: la «última vez», la etiqueta de progresión, los récords y la gráfica salen del mismo gimnasio. Lo de mancuerna, barra y peso corporal pesa igual en todas partes y se comparte.</p>
+        <p>Elige el gimnasio antes de la primera serie. Si se te olvida y ya anotaste algo, cámbialo igual: lo de hoy se mueve contigo, y el hack squat que marcaste por error pasa a ser la sentadilla en Smith que hiciste de verdad.</p>
+        <p>Y si puedes elegir, haz cada ejercicio casi siempre en el mismo sitio. Alternar sin orden deja dos historiales a medias en cada máquina, y la progresión doble necesita comparar una sesión con la anterior.</p>
       </details>
       <details class="g" open>
         <summary>RIR</summary>
@@ -642,7 +662,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <summary>Tus datos</summary>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </details>
-      <p class="app-version">Versión 22 · 30 de septiembre de 2026</p>
+      <p class="app-version">Versión 23 · 30 de septiembre de 2026</p>
     </div>
   </section>
 </main>
@@ -683,7 +703,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     ] },
     { key: 'mie', short: 'Mié', long: 'Miércoles', name: 'Pull A', focus: 'Espalda alta', disc: 'var(--p-mie)', ink: '#1A1403', ex: [
       { id: 'remo-apoyo-pecho', name: 'Remo con apoyo en pecho', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'gdoaioGPXfE' },
-      { id: 'remo-barra-t', name: 'Remo en barra T', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'j3Igk5nyZE4' },
+      { id: 'remo-mancuerna', name: 'Remo con mancuerna a una mano', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'fURsHPHgssI', side: 'por brazo', note: 'Rodilla y mano del mismo lado sobre el banco y la espalda plana. Lleva el codo hacia la cadera, no hacia el hombro.' },
       { id: 'jalon-neutro', name: 'Jalón al pecho agarre neutro', sets: 3, reps: [8, 12], rir: '1-2', rest: 120, video: '4P3-TXbH4tw' },
       { id: 'encogimiento', name: 'Encogimiento con mancuernas', sets: 3, reps: [10, 15], rir: '0-1', rest: 90, video: 'qvvJUKq7_sU', note: 'Sube el hombro recto hacia la oreja y aguanta un segundo arriba. No lo gires: rodar el hombro no añade nada y carga el cuello.' },
       { id: 'face-pull', name: 'Face pull', sets: 3, reps: [12, 15], rir: '0-1', rest: 90, video: 'rep-qVOkqgk' },
@@ -699,7 +719,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       { id: 'pressdown-cuerda', name: 'Pressdown con cuerda', sets: 3, reps: [10, 15], rir: '0-1', rest: 90, video: 'vB5OHsJ3EME' }
     ] },
     { key: 'vie', short: 'Vie', long: 'Viernes', name: 'Pierna B', focus: 'Cuádriceps', disc: 'var(--p-vie)', ink: '#15140E', ex: [
-      { id: 'hack-squat', name: 'Hack squat', sets: 4, reps: [6, 10], rir: '1-2', rest: 150, video: 'm2DiSYKPzqk', note: 'Si prefieres la sentadilla con barra, úsala en su lugar con las mismas series, nunca las dos el mismo día.', alt: { label: 'Técnica de la sentadilla', video: 'vaMYBmJH-tw' } },
+      { id: 'hack-squat', name: 'Hack squat', sets: 4, reps: [6, 10], rir: '1-2', rest: 150, video: 'm2DiSYKPzqk', note: 'Si tu gimnasio no tiene hack squat, haz la sentadilla con barra en su lugar. Elige una y quédate con ella: los pesos de una y otra no se comparan.', alt: { label: 'Técnica de la sentadilla', video: 'vaMYBmJH-tw' } },
       { id: 'zancada', name: 'Zancada con mancuernas', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'D7KaRcUTQeE', side: 'por pierna' },
       { id: 'curl-femoral-tumbado', name: 'Curl femoral tumbado', sets: 3, reps: [10, 15], rir: '0-1', rest: 90, video: '1Tq3QdYUuHs' },
       { id: 'hiperextension', name: 'Hiperextensión a 45°', sets: 3, reps: [10, 15], rir: '1-2', rest: 90, video: 'KA2AuDQipSQ', load: 'lastre', note: 'Sube hasta alinear el cuerpo y para ahí, sin arquear de más. Con un disco en el pecho cuando pases de 15 repeticiones; sin disco, deja la casilla de kg vacía.' },
@@ -725,11 +745,39 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   const LIB_EXTRA = [
     { id: 'curl-barra-z', name: 'Curl con barra Z', sets: 3, reps: [8, 12], rir: '0-1', rest: 90, video: 'zG2xJ0Q5QtI' },
     { id: 'curl-predicador', name: 'Curl predicador', sets: 3, reps: [8, 12], rir: '0-1', rest: 90, video: 'RgN216Cumtw' },
-    { id: 'patada-gluteo', name: 'Patada de glúteo en cable', sets: 3, reps: [12, 15], rir: '0-1', rest: 90, video: 'U5V4wGVYcbg', side: 'por pierna' }
+    { id: 'patada-gluteo', name: 'Patada de glúteo en cable', sets: 3, reps: [12, 15], rir: '0-1', rest: 90, video: 'U5V4wGVYcbg', side: 'por pierna' },
+    { id: 'remo-barra-t', name: 'Remo en barra T', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'j3Igk5nyZE4' }
   ];
+  // Planet Fitness no tiene racks ni barras olímpicas: todo lo de barra va en
+  // la Smith, y la mayoría de clubes no tiene hack squat. Estas son las
+  // versiones que existen allí de los tres ejercicios que no.
+  const LIB_PF = [
+    { id: 'sentadilla-smith', name: 'Sentadilla en máquina Smith', sets: 4, reps: [6, 10], rir: '1-2', rest: 150, video: '3PpzYOubZ5A', note: 'En Planet Fitness, en lugar del hack squat. Pies un poco por delante de la barra, que es lo que carga el cuádriceps como en la hack. Si tu club sí tiene hack squat, puedes usarla, pero elige una y no las alternes: los pesos no se comparan.' },
+    { id: 'rumano-smith', name: 'Peso muerto rumano en máquina Smith', sets: 3, reps: [6, 10], rir: '2', rest: 150, video: 'nmGzbW15qYo', note: 'En Planet Fitness, en lugar del rumano con barra. La barra baja pegada a las piernas mientras la cadera va hacia atrás, con la rodilla casi fija. Para cuando notes el estiramiento en los isquios, no cuando llegues al suelo.' },
+    { id: 'hip-thrust-smith', name: 'Hip thrust en máquina Smith', sets: 3, reps: [8, 12], rir: '1-2', rest: 150, video: 'qKz4Va7GkUI', note: 'En Planet Fitness, en lugar del hip thrust con barra. Banco detrás de ti y la barra sobre la cadera con una almohadilla. Si tu club tiene máquina de hip thrust, úsala, pero no alternes una y otra.' }
+  ];
+  const PF_SWAP = { 'hack-squat': 'sentadilla-smith', 'peso-muerto-rumano': 'rumano-smith', 'hip-thrust': 'hip-thrust-smith' };
+  const SWAP_OF = Object.fromEntries(Object.entries(PF_SWAP).map(([a, b]) => [b, a]));
+  // Lo que en Planet Fitness varía de un club a otro: se avisa en vez de
+  // afirmar qué máquina tiene el tuyo.
+  const PF_NOTE = {
+    'press-inclinado-maquina': 'Si tu Planet Fitness no tiene press inclinado en máquina, hazlo en la Smith con el banco a unos 30°.',
+    'curl-femoral-sentado': 'No todos los Planet Fitness tienen las dos máquinas de curl femoral. Si el tuyo solo tiene la tumbada, haz esa hoy y el viernes.',
+    'curl-femoral-tumbado': 'Si tu Planet Fitness solo tiene la máquina sentada, hazla también hoy: de las dos, es la mejor.',
+    'gemelo-pie': 'Si no hay máquina de pantorrilla de pie, hazla en la prensa: puntas en el borde de la plataforma y rodillas estiradas.',
+    'gemelo-sentado': 'Si no hay máquina de pantorrilla sentado, hazla en la Smith sentado en un banco, con la barra sobre las rodillas y una toalla doblada debajo.'
+  };
+  // Mancuernas, peso corporal y barra pesan lo mismo en cualquier gimnasio,
+  // así que su historial se comparte. El resto (máquinas, poleas, Smith) no.
+  const SHARED = new Set(['press-hombro', 'press-inclinado-neutro', 'press-plano-mancuernas', 'lateral-mancuernas',
+    'curl-martillo', 'encogimiento', 'zancada', 'fondos', 'dominadas', 'elevacion-piernas', 'hiperextension',
+    'curl-inverso', 'curl-muneca', 'remo-mancuerna', 'peso-muerto-rumano', 'hip-thrust', 'curl-barra-z', 'curl-predicador']);
+  const GYMS = [['eos', 'EōS'], ['pf', 'Planet Fitness']];
+  const GYM_NAME = Object.fromEntries(GYMS);
   const LIB = {};
   D_AVANZ.forEach(d => d.ex.forEach(e => { LIB[e.id] = e; }));
   LIB_EXTRA.forEach(e => { LIB[e.id] = e; });
+  LIB_PF.forEach(e => { LIB[e.id] = e; });
   const rx = (id, sets, reps, rir, rest) => {
     if (!LIB[id]) console.error('Ejercicio desconocido en el plan: ' + id);
     return Object.assign({ id, name: id, video: '' }, LIB[id], { sets, reps, rir, rest });
@@ -744,6 +792,10 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   const WEEK_SETS = DAYS.reduce((a, d) => a + d.ex.reduce((b, e) => b + e.sets, 0), 0);
   const EX = {};
   DAYS.forEach(d => d.ex.forEach(e => { EX[e.id] = e; }));
+  // La versión Planet Fitness hereda series, repeticiones, RIR y descanso del
+  // original: cambia la máquina, no el trabajo.
+  const pfVersion = e => Object.assign({}, LIB[PF_SWAP[e.id]], { sets: e.sets, reps: e.reps, rir: e.rir, rest: e.rest, swapOf: e.id });
+  for (const orig of Object.keys(PF_SWAP)) if (EX[orig]) EX[PF_SWAP[orig]] = pfVersion(EX[orig]);
   // Todos los ejercicios de la app agrupados por el músculo que trabajan, con
   // lo que distingue a cada uno de los que se le parecen. Los que no están en
   // la semana salen igual, marcados como alternativa.
@@ -764,12 +816,13 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     ] },
     { g: 'Espalda', ex: [
       ['remo-apoyo-pecho', 'Espalda media con el pecho apoyado: no puedes tirar con la lumbar, así que va todo a la espalda.'],
-      ['remo-barra-t', 'Espalda media con más carga. Aquí el erector sí trabaja para sostener el tronco.'],
+      ['remo-mancuerna', 'Espalda media y dorsal, un lado cada vez con el tronco apoyado. Las mancuernas pesan igual en los dos gimnasios, así que es de los pocos remos cuyos números se comparan.'],
       ['remo-unilateral-cable', 'Un lado cada vez, con más recorrido porque el hombro puede viajar más adelante y atrás.'],
       ['jalon-neutro', 'Dorsal con agarre neutro, el más cómodo de hombro y el que más deja apretar.'],
       ['jalon-prono', 'Dorsal con agarre abierto, más énfasis en la anchura.'],
       ['dominadas', 'Dorsal con tu propio peso. Pasando de 10 repeticiones toca lastre.'],
-      ['pullover-cable', 'Dorsal sin flexionar el codo: el único que lo trabaja sin que el bíceps se lleve parte.']
+      ['pullover-cable', 'Dorsal sin flexionar el codo: el único que lo trabaja sin que el bíceps se lleve parte.'],
+      ['remo-barra-t', 'Espalda media con más carga, pero pide una barra T que Planet Fitness no suele tener. Por eso el miércoles va el remo con mancuerna.']
     ] },
     { g: 'Trapecio', ex: [
       ['encogimiento', 'Trapecio superior, la línea del cuello al hombro. Los remos trabajan el medio y el inferior; este es el único que entra al de arriba.']
@@ -791,17 +844,20 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     ] },
     { g: 'Cuádriceps', ex: [
       ['hack-squat', 'Cuádriceps con el tronco apoyado, así que la carga no se la lleva la espalda.'],
+      ['sentadilla-smith', 'Guiada como la hack, y con los pies algo adelantados carga el cuádriceps de forma parecida.'],
       ['prensa', 'Cuádriceps y glúteo con mucha carga y poco riesgo técnico.'],
       ['zancada', 'Una pierna cada vez: cuádriceps y glúteo, y además te obliga a estabilizar.'],
       ['extension-cuadriceps', 'Aislamiento del cuádriceps, el único que llega al recto femoral con la cadera extendida.']
     ] },
     { g: 'Isquiosurales', ex: [
       ['peso-muerto-rumano', 'Isquios desde la cadera, con la rodilla casi fija. El otro papel que tienen.'],
+      ['rumano-smith', 'La barra guiada baja en línea recta, que es justo el recorrido de un rumano bien hecho.'],
       ['curl-femoral-sentado', 'Isquios desde la rodilla con la cadera flexionada, que los deja estirados. Produce más crecimiento que tumbado.'],
       ['curl-femoral-tumbado', 'Isquios desde la rodilla con la cadera extendida, en posición más corta.']
     ] },
     { g: 'Glúteo', ex: [
       ['hip-thrust', 'Glúteo en su posición más corta, con la tensión máxima arriba.'],
+      ['hip-thrust-smith', 'El mismo movimiento con la barra guiada.'],
       ['patada-gluteo', 'Aislamiento de glúteo, una pierna cada vez.']
     ] },
     { g: 'Gemelo y sóleo', ex: [
@@ -874,7 +930,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
 
   // ---- almacenamiento en el móvil ----
   const KEY = 'rutina-volumen.v1';
-  const emptyStore = () => ({ v: 1, sessions: {}, bw: {}, waist: {}, shop: {}, meals: {}, kcalAdj: 0, adjDate: null, deloadUntil: null, voice: true, lastBackup: null, backupSnooze: null });
+  const emptyStore = () => ({ v: 1, gym: 'eos', sessions: {}, bw: {}, waist: {}, shop: {}, meals: {}, kcalAdj: 0, adjDate: null, deloadUntil: null, voice: true, lastBackup: null, backupSnooze: null });
   let storageOk = true, changed = false;
   // Solo sobreviven fechas reales, comidas que existen y los tres estados.
   function cleanMeals(raw) {
@@ -896,7 +952,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       const raw = localStorage.getItem(KEY);
       if (!raw) return emptyStore();
       const d = JSON.parse(raw);
-      return { v: 1, sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, meals: cleanMeals(d.meals), kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, deloadUntil: isYmd(d.deloadUntil) ? d.deloadUntil : null, voice: d.voice !== false, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
+      return { v: 1, gym: d.gym === 'pf' ? 'pf' : 'eos', sessions: isObj(d.sessions) ? d.sessions : {}, bw: isObj(d.bw) ? d.bw : {}, waist: isObj(d.waist) ? d.waist : {}, shop: isObj(d.shop) ? d.shop : {}, meals: cleanMeals(d.meals), kcalAdj: typeof d.kcalAdj === 'number' && Number.isFinite(d.kcalAdj) ? Math.max(-600, Math.min(900, Math.round(d.kcalAdj / 150) * 150)) : 0, adjDate: isYmd(d.adjDate) ? d.adjDate : null, deloadUntil: isYmd(d.deloadUntil) ? d.deloadUntil : null, voice: d.voice !== false, lastBackup: typeof d.lastBackup === 'string' ? d.lastBackup : null, backupSnooze: isYmd(d.backupSnooze) ? d.backupSnooze : null };
     } catch (e) {
       storageOk = false;
       return emptyStore();
@@ -928,7 +984,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     } catch (e) { /* opcional */ }
   }
 
-  const state = { tab: 'entreno', day: null, dayPicked: false, sessions: [], local: {}, effort: {}, progEx: null, foodDay: null };
+  const state = { tab: 'entreno', day: null, dayPicked: false, sessions: [], local: {}, effort: {}, progEx: null, foodDay: null, gym: 'eos', gymPicked: false };
   // Esfuerzo real con el que terminaste cada ejercicio. Sin esto, «estancado»
   // no distingue entre chocar con un muro y no haber apretado.
   const EFFORTS = [
@@ -975,10 +1031,16 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (!state.effort[id]) state.effort[id] = Object.assign({}, (store.sessions[id] && store.sessions[id].effort) || {});
     return state.effort[id];
   }
+  // Una máquina o una polea de otra marca tiene otra palanca y otra relación
+  // de polea: 40 kg en la placa de un gimnasio no son 40 kg en el otro. Su
+  // historial va por gimnasio; lo de mancuerna, barra y peso corporal, no.
+  // Las sesiones sin gimnasio (anteriores a esta versión) valen para los dos.
+  const gymOk = (s, exId) => SHARED.has(exId) || !s.gym || s.gym === state.gym;
   function lastEffort(exId) {
     const cur = sessionId();
     for (const s of state.sessions) {
       if (s.id === cur) continue;
+      if (!gymOk(s, exId)) continue;
       if (s.effort && s.effort[exId]) return s.effort[exId];
       if (s.sets && s.sets[exId]) return null;
     }
@@ -988,6 +1050,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const cur = sessionId();
     for (const s of state.sessions) {
       if (s.id === cur) continue;
+      if (!gymOk(s, exId)) continue;
       const raw = s.sets && s.sets[exId];
       const arr = Array.isArray(raw) ? raw.filter(x => x && x.reps > 0) : [];
       if (arr.length) return { date: s.date, sets: arr };
@@ -1019,6 +1082,43 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     return wd >= 1 && wd <= DAY_KEYS.length ? DAY_KEYS[wd - 1] : DAY_KEYS[0];
   }
 
+  function renderGym() {
+    const box = $('gym');
+    if (!box) return;
+    box.textContent = '';
+    const row = h('div', { class: 'gymsw-row', role: 'radiogroup', 'aria-label': 'Gimnasio de hoy' });
+    for (const [k, n] of GYMS) {
+      const on = k === state.gym;
+      row.append(h('button', { class: 'gym-btn' + (on ? ' on' : ''), type: 'button', role: 'radio', 'aria-checked': String(on), 'data-gym': k }, n));
+    }
+    box.append(h('span', { class: 'gymsw-l', text: 'Hoy entreno en' }), row);
+  }
+  $('gym').addEventListener('click', e => {
+    const b = e.target.closest('button[data-gym]');
+    if (!b || b.dataset.gym === state.gym) return;
+    const to = b.dataset.gym;
+    // Lo ya anotado hoy se mueve con el cambio: si marcaste hack squat estando
+    // en Planet Fitness, lo que hiciste fue la sentadilla en Smith.
+    const id = sessionId(), cur = store.sessions[id];
+    if (state.local[id] || (cur && cur.sets)) {
+      const sets = editable(), eff = editableEffort();
+      for (const [orig, alt] of Object.entries(PF_SWAP)) {
+        const [from, dest] = to === 'pf' ? [orig, alt] : [alt, orig];
+        if (sets[from] && !sets[dest]) { sets[dest] = sets[from]; delete sets[from]; }
+        if (eff[from] && !eff[dest]) { eff[dest] = eff[from]; delete eff[from]; }
+      }
+      scheduleSave();
+    }
+    state.gym = to;
+    state.gymPicked = true;
+    store.gym = to;
+    changed = true;
+    persistNow();
+    renderGym();
+    renderDay();
+    if (state.tab === 'progreso') renderProgress();
+  });
+
   function renderExCatalog() {
     const box = $('ex-catalog');
     if (!box) return;
@@ -1030,11 +1130,14 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       for (const [id, why] of g.ex) {
         const e = LIB[id];
         if (!e) continue;
-        const d = dayOf[id];
+        const orig = SWAP_OF[id], d = dayOf[id] || (orig && dayOf[orig]), px = orig ? EX[id] : e;
+        const sub = !d ? 'Fuera de la semana, por si quieres cambiar alguno'
+          : orig ? 'En Planet Fitness, en lugar del ' + LIB[orig].name.toLowerCase()
+          : d.long + ' · ' + d.name + ' · RIR ' + rirFor(e) + (PF_SWAP[id] ? ' · en Planet Fitness va en la Smith' : '');
         body.append(h('div', { class: 'food-row' },
           h('span', { class: 'food-name', text: e.name }),
-          h('span', { class: 'food-amt', text: d ? d.short + ' · ' + e.sets + '×' + e.reps[0] + '-' + e.reps[1] : 'Alternativa' }),
-          h('span', { class: 'food-sub', text: d ? d.long + ' · ' + d.name + ' · RIR ' + rirFor(e) : 'Fuera de la semana, por si quieres cambiar alguno' }),
+          h('span', { class: 'food-amt', text: d ? (orig ? 'PF · ' : '') + d.short + ' · ' + px.sets + '×' + px.reps[0] + '-' + px.reps[1] : 'Alternativa' }),
+          h('span', { class: 'food-sub', text: sub }),
           h('span', { class: 'food-note', text: why }),
           h('div', { class: 'stores' },
             h('a', { class: 'store', href: YT(e.video), target: '_blank', rel: 'noopener noreferrer', 'aria-label': 'Ver la técnica de ' + e.name }, 'Técnica ↗'))));
@@ -1086,10 +1189,16 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     box.hidden = false;
   }
 
+  // Los ejercicios del día en el gimnasio de hoy: en Planet Fitness, los que
+  // no existen allí se cambian por su versión en la Smith.
+  const dayEx = d => d.ex.map(e => (state.gym === 'pf' && PF_SWAP[e.id] ? EX[PF_SWAP[e.id]] : e));
   function renderDay() {
     renderPhase();
     const d = findDay(state.day) || DAYS[0];
-    const total = d.ex.reduce((a, e) => a + e.sets, 0);
+    // Al reabrir la app a mitad de sesión, el gimnasio es el de esa sesión,
+    // salvo que acabes de elegir otro a mano.
+    const cur = store.sessions[sessionId()];
+    if (!state.gymPicked && cur && cur.gym && !state.local[sessionId()]) { state.gym = cur.gym; renderGym(); }
     const head = $('dayhead');
     head.textContent = '';
     head.append(
@@ -1098,7 +1207,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     const list = $('exlist');
     list.textContent = '';
     const sets = setsFor();
-    d.ex.forEach((ex, i) => list.append(renderEx(ex, i, sets[ex.id] || [])));
+    dayEx(d).forEach((ex, i) => list.append(renderEx(ex, i, sets[ex.id] || [])));
     renderDayProgress();
   }
 
@@ -1111,11 +1220,11 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     return dates.size;
   }
   function renderDayProgress(finishedEx) {
-    const d = findDay(state.day) || DAYS[0], sets = setsFor();
-    const planned = d.ex.reduce((a, e) => a + e.sets, 0);
-    const total = d.ex.reduce((a, e) => a + rowCount(e, sets[e.id]), 0);
+    const d = findDay(state.day) || DAYS[0], sets = setsFor(), exs = dayEx(d);
+    const planned = exs.reduce((a, e) => a + e.sets, 0);
+    const total = exs.reduce((a, e) => a + rowCount(e, sets[e.id]), 0);
     const doneOf = e => (sets[e.id] || []).filter(x => x && x.done).length;
-    const done = d.ex.reduce((a, e) => a + doneOf(e), 0);
+    const done = exs.reduce((a, e) => a + doneOf(e), 0);
     const extra = total - planned;
     const p = $('dayprog');
     if (p) p.textContent = d.focus + ' · ' + done + ' de ' + total + ' series hechas'
@@ -1138,7 +1247,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       if (box) box.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'center' });
       return;
     }
-    const next = d.ex.find(e => doneOf(e) < rowCount(e, sets[e.id]));
+    const next = exs.find(e => doneOf(e) < rowCount(e, sets[e.id]));
     say(next ? finishedEx.name + ' hecho. Siguiente: ' + next.name : finishedEx.name + ' hecho.');
   }
 
@@ -1157,6 +1266,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       li.append(h('p', { class: 'note' }, ex.note,
         ex.alt ? [' ', h('a', { href: YT(ex.alt.video), target: '_blank', rel: 'noopener noreferrer' }, ex.alt.label + ' ↗')] : null));
     }
+    if (state.gym === 'pf' && PF_NOTE[ex.id]) li.append(h('p', { class: 'note pf-note' }, PF_NOTE[ex.id]));
     li.append(h('div', { class: 'last', 'data-role': 'last' }));
     const grid = h('div', { class: 'sets' },
       h('div', { class: 'set-row set-head', 'aria-hidden': 'true' },
@@ -1373,7 +1483,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     for (const [exId, v] of Object.entries(state.effort[id] || (store.sessions[id] && store.sessions[id].effort) || {})) {
       if (clean[exId] && EFFORT_NAME[v]) eff[exId] = v;
     }
-    if (Object.keys(clean).length) store.sessions[id] = { date, day, sets: clean, effort: eff, updatedAt: new Date().toISOString() };
+    if (Object.keys(clean).length) store.sessions[id] = { date, day, gym: state.gym, sets: clean, effort: eff, updatedAt: new Date().toISOString() };
     else delete store.sessions[id];
     changed = true;
   }
@@ -1696,11 +1806,15 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (ex.load === 'lastre') return Object.keys(store.bw).length ? 'bw' : 'reps';
     return 'load';
   }
-  function strengthSeries(ex) {
-    const metric = metricFor(ex);
+  // Gimnasio del que sale la gráfica de un ejercicio: las versiones de un solo
+  // gimnasio, del suyo; el resto, del que tengas elegido.
+  const chartGym = ex => (SWAP_OF[ex.id] ? 'pf' : PF_SWAP[ex.id] ? 'eos' : state.gym);
+  function strengthSeries(ex, gym) {
+    const metric = metricFor(ex), g = gym || chartGym(ex);
     const pts = [];
     for (let i = state.sessions.length - 1; i >= 0; i--) {
       const sess = state.sessions[i];
+      if (!SHARED.has(ex.id) && sess.gym && sess.gym !== g) continue;
       const raw = sess.sets && sess.sets[ex.id];
       const sets = Array.isArray(raw) ? raw.filter(x => x && x.reps > 0) : [];
       if (!sets.length) continue;
@@ -1733,7 +1847,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   function defaultProgEx() {
     for (const sess of state.sessions) {
       const d = findDay(sess.day);
-      const id = d && d.ex.map(e => e.id).find(k => Array.isArray(sess.sets[k]) && sess.sets[k].some(x => x && x.reps > 0));
+      const id = d && d.ex.flatMap(e => (PF_SWAP[e.id] ? [e.id, PF_SWAP[e.id]] : [e.id])).find(k => Array.isArray(sess.sets[k]) && sess.sets[k].some(x => x && x.reps > 0));
       if (id) return id;
     }
     return DAYS[0].ex[0].id;
@@ -1743,7 +1857,10 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     sel.textContent = '';
     for (const d of DAYS) {
       const g = h('optgroup', { label: d.long + ' · ' + d.name });
-      d.ex.forEach(e => g.append(h('option', { value: e.id, text: e.name })));
+      d.ex.forEach(e => {
+        g.append(h('option', { value: e.id, text: e.name }));
+        if (PF_SWAP[e.id]) g.append(h('option', { value: PF_SWAP[e.id], text: LIB[PF_SWAP[e.id]].name + ' (Planet Fitness)' }));
+      });
       sel.append(g);
     }
   }
@@ -1761,6 +1878,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     $('prog-note').textContent = metric === 'reps'
       ? 'Repeticiones totales de cada sesión.' + (ex.id !== 'elevacion-piernas' ? ' Apunta tu peso corporal para ver la fuerza estimada con tu peso incluido.' : '')
       : 'Mejor serie de cada sesión convertida a 1RM estimado' + (metric === 'bw' ? ', con tu peso corporal incluido' : '') + '. Sirve para comparar sesiones; no es tu máximo real.';
+    if (!SHARED.has(ex.id)) $('prog-note').textContent += ' Solo sesiones en ' + GYM_NAME[chartGym(ex)] + ': la máquina del otro gimnasio es otra y sus pesos no se comparan.';
     chart.hidden = !pts.length;
     $('prog-data').hidden = !pts.length;
     if (!pts.length) {
@@ -1809,7 +1927,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     for (const s of sess) {
       const d = findDay(s.day);
       const order = d ? d.ex.map(e => e.id) : [];
-      const rank = id => { const i = order.indexOf(id); return i < 0 ? 99 : i; };
+      const rank = id => { let i = order.indexOf(id); if (i < 0 && SWAP_OF[id]) i = order.indexOf(SWAP_OF[id]); return i < 0 ? 99 : i; };
       const exs = Object.entries(s.sets || {}).sort((a, b) => rank(a[0]) - rank(b[0]));
       let n = 0;
       const ul = h('ul');
@@ -1822,7 +1940,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       }
       box.append(h('details', { class: 'sess' },
         h('summary', null,
-          h('b', { text: fmtDate(s.date) + ' · ' + (d ? d.name + ' (' + d.focus.toLowerCase() + ')' : s.day) }),
+          h('b', { text: fmtDate(s.date) + ' · ' + (d ? d.name + ' (' + d.focus.toLowerCase() + ')' : s.day) + (s.gym ? ' · ' + GYM_NAME[s.gym] : '') }),
           h('span', { text: n + (n === 1 ? ' serie' : ' series') })),
         ul));
     }
@@ -1994,6 +2112,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     let best = null;
     for (const s of state.sessions) {
       if (s.id === cur) continue;
+      if (!gymOk(s, ex.id)) continue;
       const arr = s.sets && s.sets[ex.id];
       if (!Array.isArray(arr)) continue;
       for (const x of arr) {
@@ -2031,7 +2150,9 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     }
     const effort = {};
     if (isObj(s.effort)) for (const [exId, v] of Object.entries(s.effort)) if (sets[exId] && EFFORT_NAME[v]) effort[exId] = v;
-    return { date: s.date, day: s.day, sets, effort, updatedAt: typeof s.updatedAt === 'string' ? s.updatedAt : new Date().toISOString() };
+    const out = { date: s.date, day: s.day, sets, effort, updatedAt: typeof s.updatedAt === 'string' ? s.updatedAt : new Date().toISOString() };
+    if (s.gym === 'eos' || s.gym === 'pf') out.gym = s.gym;
+    return out;
   }
   $('import-file').addEventListener('change', async e => {
     const input = e.target;
@@ -2689,6 +2810,9 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     L.push('Resumen de mi app Rutina de Volumen · ' + fmtDate(today()), '');
     L.push('PROGRAMA');
     L.push('Empuje, tirón y pierna dos veces: ' + DAYS.length + ' días por semana, ' + WEEK_SETS + ' series.');
+    const byGym = { eos: 0, pf: 0 };
+    for (const x of state.sessions) if (x.gym && hasWork(x.sets)) byGym[x.gym]++;
+    L.push('Gimnasios: EōS y Planet Fitness (en Planet Fitness el hack squat, el rumano y el hip thrust van en la Smith). Sesiones: ' + byGym.eos + ' en EōS, ' + byGym.pf + ' en Planet Fitness.');
     L.push('', 'FASE');
     L.push(!ph.started ? 'Todavía sin sesiones registradas'
       : (ph.reentry ? 'Semana ' + ph.week + ' de ' + REENTRY_WEEKS + ' de reentrada' : 'Semana ' + ph.week + ', volumen') + ' (primera sesión el ' + fmtDate(ph.first) + ')');
@@ -2725,18 +2849,26 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     if (a14.marked) L.push('Comidas marcadas 14 días: ' + a14.marked + ' de ' + a14.possible + ' (' + a14.si + ' plan, ' + a14.otra + ' otra, ' + a14.no + ' saltadas)');
     L.push('', 'FUERZA (mejor serie convertida a 1RM estimado)');
     let any = false;
-    for (const d of DAYS) for (const ex of d.ex) {
-      const { metric, pts } = strengthSeries(ex);
+    const lines = [];
+    for (const d of DAYS) for (const base of d.ex) {
+      for (const ex of PF_SWAP[base.id] ? [base, EX[PF_SWAP[base.id]]] : [base]) {
+        const gyms = SHARED.has(ex.id) ? [null] : SWAP_OF[ex.id] ? ['pf'] : PF_SWAP[ex.id] ? ['eos'] : ['eos', 'pf'];
+        for (const g of gyms) lines.push([ex, g]);
+      }
+    }
+    for (const [ex, g] of lines) {
+      const { metric, pts } = strengthSeries(ex, g || state.gym);
       if (!pts.length) continue;
       any = true;
+      const where = g && !SHARED.has(ex.id) ? ' [' + GYM_NAME[g] + ']' : '';
       const u = metric === 'reps' ? 'reps' : 'kg';
       const fv = v => (metric === 'reps' ? String(Math.round(v)) : nf1.format(v));
       const lastPt = pts[pts.length - 1];
       const eff = latestEffort(ex.id), effTxt = eff ? ' · esfuerzo ' + effortWord(eff) : '';
-      if (pts.length === 1) { L.push('- ' + ex.name + ': ' + fv(lastPt.v) + ' ' + u + ' (1 sesión, ' + lastPt.best + ')' + effTxt); continue; }
+      if (pts.length === 1) { L.push('- ' + ex.name + where + ': ' + fv(lastPt.v) + ' ' + u + ' (1 sesión, ' + lastPt.best + ')' + effTxt); continue; }
       const tr = strengthTrend(pts);
       const tag = tr && tr.plateau ? 'estancado' : !tr || tr.delta === 0 ? 'igual' : tr.delta > 0 ? 'subiendo' : 'bajando';
-      L.push('- ' + ex.name + ': ' + fv(pts[0].v) + ' → ' + fv(lastPt.v) + ' ' + u + ' en ' + pts.length + ' sesiones · ' + tag + ' · última ' + lastPt.best + effTxt);
+      L.push('- ' + ex.name + where + ': ' + fv(pts[0].v) + ' → ' + fv(lastPt.v) + ' ' + u + ' en ' + pts.length + ' sesiones · ' + tag + ' · última ' + lastPt.best + effTxt);
     }
     if (!any) L.push('Sin series registradas todavía');
     L.push('', 'ÚLTIMAS SESIONES');
@@ -2751,7 +2883,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         const eff = s.effort && s.effort[exId];
         parts.push((ex ? ex.name : exId) + ' ' + done.map(x => fmtSet(ex, x)).join('/') + (eff ? ' (' + effortWord(eff) + ')' : ''));
       }
-      L.push(fmtDate(s.date) + ' · ' + (d ? d.name : s.day) + ': ' + (parts.join(' | ') || 'sin series'));
+      L.push(fmtDate(s.date) + ' · ' + (d ? d.name : s.day) + (s.gym ? ' en ' + GYM_NAME[s.gym] : '') + ': ' + (parts.join(' | ') || 'sin series'));
     }
     return L.join('\n');
   }
@@ -2967,7 +3099,9 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
     store = readStore();
     state.local = {};
     state.sessions = sessionsSorted();
+    if (!state.gymPicked) state.gym = store.gym;
     if (!state.dayPicked || !findDay(state.day)) state.day = suggestedDay();
+    renderGym();
     renderDays();
     if (!(document.activeElement && list.contains(document.activeElement))) renderDay();
     if (state.tab === 'progreso') renderProgress();
@@ -2979,8 +3113,10 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   $('bw-date').value = today();
   $('waist-date').value = today();
   populateExerciseSelect();
+  state.gym = store.gym;
   renderInstall();
   renderVoiceBtn();
+  renderGym();
   renderExCatalog();
   renderDays();
   renderDay();
