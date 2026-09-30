@@ -117,6 +117,9 @@ a{color:var(--accent)}
 .vid{font-weight:700;text-decoration:none;color:var(--accent)}
 .vid:hover{text-decoration:underline}
 .note{margin:0;font-size:13px;color:var(--muted)}
+.mach{margin:0;font-size:13px;line-height:1.35;color:var(--ink)}
+.mach span{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-right:6px}
+.food-mach{grid-column:1 / -1;font-size:12.5px;line-height:1.35;color:var(--ink);padding-top:3px}
 .note a{font-weight:600}
 .last{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:13px;color:var(--muted)}
 .last .vals{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
@@ -551,6 +554,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <p>Planet Fitness no tiene racks ni barras olímpicas: todo lo de barra va en la máquina Smith, y la mayoría de clubes no tiene hack squat. Por eso allí el <b>hack squat</b> pasa a sentadilla en Smith, el <b>peso muerto rumano</b> a rumano en Smith, y el <b>hip thrust</b> a hip thrust en Smith, con las mismas series y el mismo RIR. El remo del miércoles es con mancuerna en los dos gimnasios, porque la barra T tampoco suele estar. EōS tiene racks, barras y mancuernas hasta 150 lb, así que allí va todo tal cual.</p>
         <p>Lo que sí varía de un Planet Fitness a otro, las máquinas de curl femoral y de pantorrilla y el press inclinado en máquina, lleva una nota en su ejercicio que solo aparece allí.</p>
         <p>Lo importante: una máquina o una polea de otra marca tiene otra palanca y otra relación de polea, así que 40 kg en la placa de un gimnasio no son 40 kg en el otro. Por eso la app separa el historial por gimnasio en máquinas, poleas y Smith: la «última vez», la etiqueta de progresión, los récords y la gráfica salen del mismo gimnasio. Lo de mancuerna, barra y peso corporal pesa igual en todas partes y se comparte.</p>
+        <p>Cada ejercicio dice debajo de las series con qué se hace. Cuando es una máquina, va entre comillas el nombre en inglés que suele llevar en la placa, como «Leg Press», «Seated Leg Curl» o «Lat Pulldown», para que la encuentres sin buscar. Las poleas dicen además qué agarre poner: cuerda, maneral de una mano o barra.</p>
         <p>Elige el gimnasio antes de la primera serie. Si se te olvida y ya anotaste algo, cámbialo igual: lo de hoy se mueve contigo, y el hack squat que marcaste por error pasa a ser la sentadilla en Smith que hiciste de verdad.</p>
         <p>Y si puedes elegir, haz cada ejercicio casi siempre en el mismo sitio. Alternar sin orden deja dos historiales a medias en cada máquina, y la progresión doble necesita comparar una sesión con la anterior.</p>
       </details>
@@ -662,7 +666,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
         <summary>Tus datos</summary>
         <p>Todo se guarda en este móvil, dentro de la app instalada, y funciona sin cobertura. Los videos de técnica sí necesitan conexión. Exporta una copia de seguridad cada semana desde Progreso; si pasan 7 días sin hacerlo, te lo recordará en Entreno. Cuando haya una versión nueva de la app verás un aviso arriba con el botón «Actualizar»; tus datos no se tocan.</p>
       </details>
-      <p class="app-version">Versión 23 · 30 de septiembre de 2026</p>
+      <p class="app-version">Versión 24 · 30 de septiembre de 2026</p>
     </div>
   </section>
 </main>
@@ -772,6 +776,56 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
   const SHARED = new Set(['press-hombro', 'press-inclinado-neutro', 'press-plano-mancuernas', 'lateral-mancuernas',
     'curl-martillo', 'encogimiento', 'zancada', 'fondos', 'dominadas', 'elevacion-piernas', 'hiperextension',
     'curl-inverso', 'curl-muneca', 'remo-mancuerna', 'peso-muerto-rumano', 'hip-thrust', 'curl-barra-z', 'curl-predicador']);
+  // Con qué se hace cada ejercicio. Entre «» va el nombre que suele llevar la
+  // máquina en un gimnasio de Estados Unidos, que es lo que vas a leer en la
+  // placa. Son los nombres genéricos, no los de una marca concreta.
+  const MACHINE = {
+    'press-hombro': 'Mancuernas y banco con el respaldo casi vertical',
+    'press-inclinado-neutro': 'Mancuernas y banco ajustable a unos 30°',
+    'pec-deck': 'Máquina «Pec Fly / Rear Delt», sentado mirando hacia fuera',
+    'lateral-cable': 'Polea baja con un maneral de una mano («D-handle»)',
+    'posterior-maquina': 'La misma máquina «Pec Fly / Rear Delt», sentado de cara al respaldo',
+    'overhead-cable': 'Polea con cuerda («rope»), de espaldas a la máquina',
+    'peso-muerto-rumano': 'Barra olímpica y discos',
+    'hip-thrust': 'Barra olímpica, discos, banco plano y una almohadilla para la cadera',
+    'prensa': 'Máquina «Leg Press»',
+    'extension-cuadriceps': 'Máquina «Leg Extension»',
+    'curl-femoral-sentado': 'Máquina «Seated Leg Curl»',
+    'gemelo-pie': 'Máquina «Standing Calf Raise»',
+    'remo-apoyo-pecho': 'Máquina de remo con apoyo de pecho («Seated Row»)',
+    'remo-mancuerna': 'Una mancuerna y un banco plano',
+    'jalon-neutro': 'Máquina «Lat Pulldown» con el maneral en V',
+    'encogimiento': 'Mancuernas',
+    'face-pull': 'Polea a la altura de la cara con cuerda («rope»)',
+    'curl-inverso': 'Barra Z; en Planet Fitness, las de peso fijo',
+    'crunch-polea': 'Polea alta con cuerda, de rodillas frente a la máquina',
+    'press-inclinado-maquina': 'Máquina «Incline Chest Press»',
+    'press-plano-mancuernas': 'Mancuernas y banco plano',
+    'fondos': 'Paralelas o máquina de asistencia («Assisted Chin/Dip»)',
+    'lateral-mancuernas': 'Mancuernas',
+    'skull-crusher-cable': 'Polea baja con barra recta o Z, tumbado en un banco con la cabeza hacia la máquina',
+    'pressdown-cuerda': 'Polea alta con cuerda («rope»)',
+    'hack-squat': 'Máquina «Hack Squat», o rack y barra si haces la sentadilla',
+    'zancada': 'Mancuernas',
+    'curl-femoral-tumbado': 'Máquina «Lying Leg Curl», a veces rotulada «Prone Leg Curl»',
+    'hiperextension': 'Banco «Back Extension» a 45°, el que también llaman «Roman Chair»',
+    'gemelo-sentado': 'Máquina «Seated Calf Raise»',
+    'elevacion-piernas': 'Barra de dominadas o la «Captain\'s Chair»',
+    'dominadas': 'Barra de dominadas o máquina de asistencia («Assisted Chin/Dip»)',
+    'jalon-prono': 'Máquina «Lat Pulldown» con la barra larga',
+    'remo-unilateral-cable': 'Polea a media altura con un maneral de una mano («D-handle»)',
+    'pullover-cable': 'Polea alta con barra recta o cuerda, de pie',
+    'curl-martillo': 'Mancuernas',
+    'curl-bayesiano': 'Polea baja con un maneral de una mano, de espaldas a la máquina',
+    'curl-muneca': 'Barra recta o Z y un banco; en Planet Fitness, las de peso fijo',
+    'curl-barra-z': 'Barra Z',
+    'curl-predicador': 'Banco predicador («Preacher Curl») con barra Z',
+    'patada-gluteo': 'Polea baja con tobillera («ankle strap»)',
+    'remo-barra-t': 'Barra T o «landmine» con discos',
+    'sentadilla-smith': 'Máquina Smith',
+    'rumano-smith': 'Máquina Smith',
+    'hip-thrust-smith': 'Máquina Smith, banco plano y una almohadilla para la cadera'
+  };
   const GYMS = [['eos', 'EōS'], ['pf', 'Planet Fitness']];
   const GYM_NAME = Object.fromEntries(GYMS);
   const LIB = {};
@@ -1138,6 +1192,7 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
           h('span', { class: 'food-name', text: e.name }),
           h('span', { class: 'food-amt', text: d ? (orig ? 'PF · ' : '') + d.short + ' · ' + px.sets + '×' + px.reps[0] + '-' + px.reps[1] : 'Alternativa' }),
           h('span', { class: 'food-sub', text: sub }),
+          MACHINE[id] ? h('span', { class: 'food-mach', text: 'Material: ' + MACHINE[id] }) : null,
           h('span', { class: 'food-note', text: why }),
           h('div', { class: 'stores' },
             h('a', { class: 'store', href: YT(e.video), target: '_blank', rel: 'noopener noreferrer', 'aria-label': 'Ver la técnica de ' + e.name }, 'Técnica ↗'))));
@@ -1261,7 +1316,8 @@ main>section[role="tabpanel"]:not([hidden]){animation:rise .26s cubic-bezier(.2,
       h('a', { class: 'vid', href: YT(ex.video), target: '_blank', rel: 'noopener noreferrer' }, 'Técnica ↗'));
     li.append(h('div', { class: 'ex-head' },
       h('span', { class: 'ex-num', text: String(i + 1), 'aria-hidden': 'true' }),
-      h('div', { class: 'ex-title' }, h('h3', { text: ex.name }), rx)));
+      h('div', { class: 'ex-title' }, h('h3', { text: ex.name }), rx,
+        MACHINE[ex.id] ? h('p', { class: 'mach' }, h('span', { text: 'Material' }), MACHINE[ex.id]) : null)));
     if (ex.note) {
       li.append(h('p', { class: 'note' }, ex.note,
         ex.alt ? [' ', h('a', { href: YT(ex.alt.video), target: '_blank', rel: 'noopener noreferrer' }, ex.alt.label + ' ↗')] : null));
